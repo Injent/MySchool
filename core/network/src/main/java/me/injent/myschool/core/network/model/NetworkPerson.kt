@@ -8,7 +8,7 @@ import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import me.injent.myschool.core.model.ExternalUserProfile
+import me.injent.myschool.core.model.Person
 
 @Serializable
 data class NetworkExternalUserProfile(
@@ -22,8 +22,8 @@ data class NetworkExternalUserProfile(
     val phone: String? = null
 )
 
-fun NetworkExternalUserProfile.asExternalModel() = ExternalUserProfile(
-    personId = personId,
+fun NetworkExternalUserProfile.asExternalModel() = Person(
+    id = personId,
     shortName = shortName,
     locale = locale,
     birthday = birthday,

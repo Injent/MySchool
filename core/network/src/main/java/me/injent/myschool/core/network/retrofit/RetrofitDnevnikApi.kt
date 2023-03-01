@@ -5,9 +5,6 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
 import me.injent.myschool.core.common.result.Result
-import me.injent.myschool.core.model.ExternalUserProfile
-import me.injent.myschool.core.model.ShortUserInfo
-import me.injent.myschool.core.model.UserContext
 import me.injent.myschool.core.network.DnevnikApi
 import me.injent.myschool.core.network.DnevnikNetworkDataSource
 import me.injent.myschool.core.network.model.*

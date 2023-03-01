@@ -43,6 +43,7 @@ object Dependencies {
     const val WORK = "androidx.work:work-runtime:${Versions.AndroidX.WORK}"
     const val HILT_WORK = "androidx.hilt:hilt-work:${Versions.AndroidX.HILT_WORK}"
     const val LIVEDATA = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.AndroidX.LIFECYCLE}"
+    const val KSP = ""
 }
 
 fun DependencyHandler.room() {

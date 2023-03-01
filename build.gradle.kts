@@ -2,9 +2,11 @@ buildscript {
     repositories {
         google()
         mavenCentral()
+        gradlePluginPortal()
     }
 }
 
+// Definiton of all plugins used in the project
 plugins {
     id("com.android.application") apply false
     id("com.android.library") apply false
@@ -12,4 +14,5 @@ plugins {
     id("org.jetbrains.kotlin.plugin.serialization") version Versions.KOTLIN apply false
     id("com.google.dagger.hilt.android") version Versions.HILT apply false
     id("org.jetbrains.kotlin.jvm") apply false
+    id("com.google.devtools.ksp") apply false
 }

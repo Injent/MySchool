@@ -7,12 +7,14 @@ plugins {
 repositories {
     google()
     mavenCentral()
+    gradlePluginPortal()
 }
 
 dependencies {
     implementation("com.android.tools.build:gradle:7.4.1")
     implementation(kotlin("gradle-plugin", "1.8.10"))
     implementation("com.squareup:javapoet:1.13.0")
+    implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:1.8.0-1.0.9")
 }
 
 gradlePlugin {
@@ -44,6 +46,10 @@ gradlePlugin {
         register("kotlinSerializationPlugin") {
             id = "injent.kotlin.serialization"
             implementationClass = "KotlinSerializationConventionPlugin"
+        }
+        register("androidRoomConventionPlugin") {
+            id = "injent.android.room"
+            implementationClass = "AndroidRoomConventionPlugin"
         }
     }
 }

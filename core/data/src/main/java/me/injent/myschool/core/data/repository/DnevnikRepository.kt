@@ -1,13 +1,14 @@
 package me.injent.myschool.core.data.repository
 
 import me.injent.myschool.core.model.UserContext
-import me.injent.myschool.core.model.ExternalUserProfile
+import me.injent.myschool.core.model.Person
 import me.injent.myschool.core.model.ShortUserInfo
 import me.injent.myschool.core.network.DnevnikNetworkDataSource
 import me.injent.myschool.core.network.model.asExternalModel
 import me.injent.myschool.core.common.result.Result
 import me.injent.myschool.core.common.result.Result.Error
 import me.injent.myschool.core.common.result.Result.Success
+import me.injent.myschool.core.database.dao.PersonDao
 import me.injent.myschool.core.model.ReportingPeriod
 import javax.inject.Inject
 
@@ -26,7 +27,7 @@ interface DnevnikRepository : Synchronizable {
      * @param userId refers to [UserContext.userId] or [ShortUserInfo.userId]
      * Gets external user profile information
      */
-    suspend fun getExternalUserProfile(userId: Long): ExternalUserProfile
+    suspend fun getExternalUserProfile(userId: Long): Person
 
     /**
      * @param eduGroupId refers to [EduGroup.id]
@@ -50,7 +51,8 @@ interface DnevnikRepository : Synchronizable {
  * business logic offline.
  */
 class OfflineFirstDnevnikRepository @Inject constructor(
-    private val networkDataSource: DnevnikNetworkDataSource
+    private val networkDataSource: DnevnikNetworkDataSource,
+    private val personDao: PersonDao
 ) : DnevnikRepository {
 
     override suspend fun synchronize() {
