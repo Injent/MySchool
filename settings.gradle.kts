@@ -1,29 +1,4 @@
 @file:Suppress("UnstableApiUsage")
-
-include(":core:database")
-
-
-include(":sync")
-
-
-include(":feature:profile")
-
-
-include(":core:network")
-
-
-include(":core:model")
-
-
-include(":core:data")
-
-
-include(":core:common")
-
-
-include(":core:datastore")
-
-
 pluginManagement {
     repositories {
         google()
@@ -42,3 +17,11 @@ rootProject.name = "MySchool"
 include(":app")
 include(":core:designsystem")
 include(":feature:authorization")
+include(":core:database")
+include(":sync")
+include(":feature:profile")
+include(":core:network")
+include(":core:model")
+include(":core:data")
+include(":core:common")
+include(":core:datastore")

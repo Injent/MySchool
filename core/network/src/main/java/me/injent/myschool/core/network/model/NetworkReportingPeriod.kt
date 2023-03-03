@@ -1,6 +1,7 @@
 package me.injent.myschool.core.network.model
 
 import kotlinx.datetime.Instant
+import kotlinx.datetime.serializers.InstantIso8601Serializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.injent.myschool.core.model.ReportingPeriod
@@ -11,9 +12,9 @@ data class NetworkReportingPeriod(
     val name: String,
     @SerialName("id_str")
     val id: String,
-    @Serializable(with = InstantSerializer::class)
+    @Serializable(with = InstantIso8601Serializer::class)
     val start: Instant,
-    @Serializable(with = InstantSerializer::class)
+    @Serializable(with = InstantIso8601Serializer::class)
     val finish: Instant
 )
 

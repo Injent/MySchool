@@ -30,26 +30,26 @@ private data class NetworkResponse<T>(
  * Retrofit API declaration for Dnevnik API
  */
 private interface RetrofitDnevnikApi {
-    @GET(DnevnikApi.V2.CHECK_TOKEN_EXPIRATION)
-    suspend fun checkTokenExpiration(): String?
-
-    @GET(DnevnikApi.V2.CONTEXT)
+    @GET(DnevnikApi.CONTEXT)
     suspend fun getUserContext(): Response<NetworkUserContext>
 
-    @GET(DnevnikApi.V2.EXTERNAL_USER_PROFILE)
-    suspend fun getExternalUserProfile(
+    @GET(DnevnikApi.PERSON)
+    suspend fun getPerson(
         @Path(DnevnikApi.USER_ID) userId: Long
-    ): NetworkExternalUserProfile
+    ): NetworkPerson
 
-    @GET(DnevnikApi.V2.PEOPLE_IN_EDUGROUP)
+    @GET(DnevnikApi.PEOPLE_IN_EDUGROUP)
     suspend fun getPeopleInEduGroup(
         @Path(DnevnikApi.EDUGROUP_ID) eduGroupId: Long
     ): List<NetworkShortUserInfo>
 
-    @GET(DnevnikApi.V2.REPORTING_PERIODS)
+    @GET(DnevnikApi.REPORTING_PERIODS)
     suspend fun getReportingPeriods(
         @Path(DnevnikApi.EDUGROUP_ID) eduGroupId: Long
     ): List<NetworkReportingPeriod>
+
+    @GET(DnevnikApi.CLASSMATES)
+    suspend fun getClassmates(): List<Long>
 }
 
 /**
@@ -70,9 +70,6 @@ class RetrofitDnevnik @Inject constructor(
         .build()
         .create(RetrofitDnevnikApi::class.java)
 
-    override suspend fun isTokenActive(): Boolean
-        = !api.checkTokenExpiration().isNullOrEmpty()
-
     override suspend fun getUserContext(): Result<NetworkUserContext> {
         val response = api.getUserContext()
         return when(response.code()) {
@@ -85,8 +82,11 @@ class RetrofitDnevnik @Inject constructor(
         }
     }
 
-    override suspend fun getExternalUserProfile(userId: Long): NetworkExternalUserProfile
-        = api.getExternalUserProfile(userId)
+    override suspend fun getClassmates(): List<Long>
+        = api.getClassmates()
+
+    override suspend fun getPerson(userId: Long): NetworkPerson
+        = api.getPerson(userId)
 
     override suspend fun getPersonsInEduGroup(eduGroupId: Long): List<NetworkShortUserInfo>
         = api.getPeopleInEduGroup(eduGroupId)

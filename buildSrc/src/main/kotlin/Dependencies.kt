@@ -24,6 +24,7 @@ object Dependencies {
     const val HILT_ADNROID = "com.google.dagger:hilt-android:${Versions.HILT}"
     const val HILT_ANDROID_COMPILER = "com.google.dagger:hilt-android-compiler:${Versions.HILT}"
     const val HILT_COMPILER = "com.google.dagger:hilt-compiler:${Versions.HILT}"
+    const val ANDROIDX_HILT_COMPILER = "androidx.hilt:hilt-compiler:${Versions.AndroidX.HILT}"
     const val HILT_GRADLE_PLUGIN = "com.google.dagger:hilt-android-gradle-plugin:${Versions.HILT}"
     const val DATETIME = "org.jetbrains.kotlinx:kotlinx-datetime:${Versions.KotlinX.DATETIME}"
     const val SERIALIZATION = "org.jetbrains.kotlinx:kotlinx-serialization-json:${Versions.KotlinX.SERIALIZATION}"
@@ -40,7 +41,7 @@ object Dependencies {
     const val RETROFIT_KOTLINX_SERIALIZATION_CONVERTER = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:${Versions.RETROFIT_KOTLINX_SERIALIZATION}"
     const val OKHTTP = "com.squareup.okhttp3:okhttp:${Versions.OKHTTP}"
     const val STARTUP = "androidx.startup:startup-runtime:${Versions.AndroidX.STARTUP}"
-    const val WORK = "androidx.work:work-runtime:${Versions.AndroidX.WORK}"
+    const val WORK = "androidx.work:work-runtime-ktx:${Versions.AndroidX.WORK}"
     const val HILT_WORK = "androidx.hilt:hilt-work:${Versions.AndroidX.HILT_WORK}"
     const val LIVEDATA = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.AndroidX.LIFECYCLE}"
     const val KSP = ""
@@ -61,6 +62,8 @@ fun DependencyHandler.ktor() {
 
 fun DependencyHandler.hilt() {
     implementation(Dependencies.HILT_ADNROID)
+    kapt(Dependencies.HILT_ANDROID_COMPILER)
+    kapt(Dependencies.ANDROIDX_HILT_COMPILER)
     kapt(Dependencies.HILT_COMPILER)
 }
 

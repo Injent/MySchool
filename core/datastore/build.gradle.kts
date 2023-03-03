@@ -13,4 +13,5 @@ dependencies {
     implementation(project(":core:model"))
     implementation(Dependencies.COROUTINES)
     implementation(Dependencies.DATASTORE)
+    implementation(Dependencies.DATETIME)
 }

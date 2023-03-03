@@ -62,3 +62,7 @@
 # kept. Suspend functions are wrapped in continuations where the type argument
 # is used.
 -keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+
+-keepclassmembers class * extends androidx.work.CoroutineWorker {
+    public <init>(android.content.Context,androidx.work.WorkerParameters);
+}

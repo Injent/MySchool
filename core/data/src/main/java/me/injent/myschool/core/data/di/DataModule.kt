@@ -4,8 +4,8 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import me.injent.myschool.core.data.repository.DnevnikRepository
-import me.injent.myschool.core.data.repository.OfflineFirstDnevnikRepository
+import me.injent.myschool.core.data.repository.PersonRepository
+import me.injent.myschool.core.data.repository.OfflineFirstPersonRepository
 import me.injent.myschool.core.data.repository.UserDataRepository
 import me.injent.myschool.core.data.repository.UserDataRepositoryImpl
 
@@ -19,6 +19,6 @@ interface DataModule {
 
     @Binds
     fun bindsDnevnikRepository(
-        offlineFirstDnevnikRepository: OfflineFirstDnevnikRepository
-    ) : DnevnikRepository
+        offlineFirstPersonRepository: OfflineFirstPersonRepository
+    ) : PersonRepository
 }

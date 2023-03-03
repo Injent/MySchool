@@ -5,18 +5,20 @@ import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.ExistingWorkPolicy
+import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import me.injent.myschool.core.common.SessionManager
 import me.injent.myschool.core.common.result.Result
-import me.injent.myschool.core.data.repository.DnevnikRepository
+import me.injent.myschool.core.data.repository.PersonRepository
 import me.injent.myschool.core.data.repository.UserDataRepository
 import me.injent.myschool.core.model.UserContext
 import me.injent.myschool.feature.authorization.AuthState
 import me.injent.myschool.feature.authorization.AuthorizationViewModel.Companion.AUTH_STATE
+import me.injent.myschool.sync.initializers.WORKER_NAME
+import me.injent.myschool.sync.workers.SyncWorker
 import javax.inject.Inject
 
 @HiltViewModel
@@ -27,7 +29,7 @@ class MainActivityViewModel @Inject constructor(
 ) : ViewModel() {
 
     @Inject
-    lateinit var dnevnikRepository: dagger.Lazy<DnevnikRepository>
+    lateinit var personRepository: dagger.Lazy<PersonRepository>
 
     val authState = savedStateHandle.getStateFlow(AUTH_STATE, AuthState.CHECKING_TOKEN)
 
@@ -40,9 +42,14 @@ class MainActivityViewModel @Inject constructor(
                 savedStateHandle[AUTH_STATE] = AuthState.CHECKING_TOKEN
 
                 // Checking is token not expired
-                val result = dnevnikRepository.get().getContext()
+                val result = personRepository.get().getContext()
                 if (result is Result.Success) {
                     saveUserContext(result.data)
+                    WorkManager.getInstance(context).enqueueUniqueWork(
+                        WORKER_NAME,
+                        ExistingWorkPolicy.KEEP,
+                        SyncWorker.startUpSyncWork()
+                    )
                 } else {
                     savedStateHandle[AUTH_STATE] = AuthState.NOT_AUTHED
                 }

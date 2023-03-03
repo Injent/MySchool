@@ -4,6 +4,7 @@ import android.content.Intent
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import me.injent.myschool.feature.authorization.AuthorizationRoute
+import me.injent.myschool.feature.authorization.BuildConfig
 
 const val AUTHORIZATION_ROUTE = "authorization_route"
 const val REDIRECT_URL = "http://myschool"

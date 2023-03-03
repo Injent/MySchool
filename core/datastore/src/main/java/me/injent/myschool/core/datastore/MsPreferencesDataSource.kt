@@ -1,6 +1,7 @@
 package me.injent.myschool.core.datastore
 
 import androidx.datastore.core.DataStore
+import kotlinx.datetime.*
 import me.injent.myschool.core.model.UserContext
 import me.injent.myschool.core.model.datastore.UserData
 import me.injent.myschool.core.model.datastore.toSaveableModel
@@ -11,9 +12,10 @@ class MsPreferencesDataSource @Inject constructor(
 ) {
     val userData = dataStore.data
 
-    suspend fun setToken(token: String?) {
+    suspend fun setLastSyncTime() {
         dataStore.updateData {
-            it.copy(token = token)
+            val time = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
+            it.copy(lastSyncTime = time)
         }
     }
 

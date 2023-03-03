@@ -1,6 +1,7 @@
 package me.injent.myschool.core.network.model
 
 import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.descriptors.PrimitiveKind
@@ -11,19 +12,19 @@ import kotlinx.serialization.encoding.Encoder
 import me.injent.myschool.core.model.Person
 
 @Serializable
-data class NetworkExternalUserProfile(
-    val personId: Long,
+data class NetworkPerson(
+    val id: Long,
     val shortName: String,
     val locale: String,
-    @Serializable(with = InstantSerializer::class)
-    val birthday: Instant? = null,
+    @Serializable(with = CustomLocalDateSerializer::class)
+    val birthday: LocalDate? = null,
     val sex: String,
     val roles: List<String>,
     val phone: String? = null
 )
 
-fun NetworkExternalUserProfile.asExternalModel() = Person(
-    id = personId,
+fun NetworkPerson.asExternalModel() = Person(
+    id = id,
     shortName = shortName,
     locale = locale,
     birthday = birthday,
@@ -32,11 +33,11 @@ fun NetworkExternalUserProfile.asExternalModel() = Person(
     phone = phone
 )
 
-object InstantSerializer : KSerializer<Instant> {
+object CustomLocalDateSerializer : KSerializer<LocalDate> {
     override val descriptor: SerialDescriptor
-        = PrimitiveSerialDescriptor("Instant", PrimitiveKind.LONG)
-    override fun serialize(encoder: Encoder, value: Instant)
-        = encoder.encodeLong(value.toEpochMilliseconds())
+        = PrimitiveSerialDescriptor("LocalDate", PrimitiveKind.STRING)
+    override fun serialize(encoder: Encoder, value: LocalDate)
+        = encoder.encodeString(value.toString())
     override fun deserialize(decoder: Decoder)
-        = Instant.fromEpochMilliseconds(decoder.decodeLong())
+        = LocalDate.parse(decoder.decodeString().substring(0, 10)) // get only yyyy-MM-dd
 }

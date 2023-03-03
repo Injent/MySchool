@@ -38,6 +38,7 @@ android {
 }
 
 dependencies {
+    implementation(project(":sync"))
     implementation(project(":core:data"))
     implementation(project(":core:model"))
     implementation(project(":core:common"))
@@ -49,4 +50,5 @@ dependencies {
     implementation(Dependencies.ACTIVITY_COMPOSE)
     implementation(Dependencies.NAVIGATION_COMPOSE)
     implementation(Dependencies.CORE_SPLASHSCREEN)
+    implementation(Dependencies.HILT_WORK)
 }

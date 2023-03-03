@@ -32,14 +32,14 @@ object NetworkModule {
             .addInterceptor(AuthInterceptor(context))
             .build()
     }
-}
 
-@Module
-@InstallIn(SingletonComponent::class)
-interface OptionalNetworkModule {
-    /**
-     * Selecting [RetrofitDnevnik] as default REST API tool
-     */
-    @Binds
-    fun RetrofitDnevnik.binds(): DnevnikNetworkDataSource
+    @Module
+    @InstallIn(SingletonComponent::class)
+    interface BindsNetworkModule {
+        /**
+         * Selects [RetrofitDnevnik] as default REST API tool
+         */
+        @Binds
+        fun RetrofitDnevnik.binds(): DnevnikNetworkDataSource
+    }
 }

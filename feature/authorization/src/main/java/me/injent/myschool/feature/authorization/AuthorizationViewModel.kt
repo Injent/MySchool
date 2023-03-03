@@ -9,9 +9,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import me.injent.myschool.core.common.SessionManager
-import me.injent.myschool.core.common.result.Result
 import me.injent.myschool.core.common.result.Result.Success
-import me.injent.myschool.core.data.repository.DnevnikRepository
+import me.injent.myschool.core.data.repository.PersonRepository
 import me.injent.myschool.core.data.repository.UserDataRepository
 import javax.inject.Inject
 
@@ -23,7 +22,7 @@ class AuthorizationViewModel @Inject constructor(
 ) : ViewModel() {
 
     @Inject
-    lateinit var dnevnikRepository: dagger.Lazy<DnevnikRepository>
+    lateinit var personRepository: dagger.Lazy<PersonRepository>
 
     companion object {
         const val AUTH_STATE = "auth_state"
@@ -42,7 +41,7 @@ class AuthorizationViewModel @Inject constructor(
             viewModelScope.launch {
                 SessionManager(context).saveToken(token)
                 delay(100)
-                val result = dnevnikRepository.get().getContext()
+                val result = personRepository.get().getContext()
                 if (result is Success) {
                     userDataRepository.setUserContext(result.data)
                     savedStateHandle[AUTH_STATE] = AuthState.SUCCESS

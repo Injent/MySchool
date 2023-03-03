@@ -1,3 +1,4 @@
+@file:Suppress("UnstableApiUsage")
 plugins {
     id("injent.android.feature")
     id("injent.android.library.compose")
@@ -8,6 +9,5 @@ android {
 }
 
 dependencies {
-    implementation(project(":core:common"))
     implementation(Dependencies.LIFECYCLE_RUNTIME_COMPOSE)
 }

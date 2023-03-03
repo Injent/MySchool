@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notification_name">Synchronization</string>
+    <string name="notification_title">My School</string>
+    <string name="notification_description">Синхронизация данных</string>
+</resources>

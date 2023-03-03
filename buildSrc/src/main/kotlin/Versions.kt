@@ -30,7 +30,7 @@ object Versions {
         const val NAVIGATION = "2.5.3"
         const val ROOM = "2.5.0"
         const val SECURITY_CRYPTO = "1.1.0-alpha04"
-        const val WORK = "2.8.0"
+        const val WORK = "2.7.1"
         const val HILT_WORK = "1.0.0"
         const val STARTUP = "1.1.1"
     }
