@@ -31,7 +31,7 @@ private data class NetworkResponse<T>(
  */
 private interface RetrofitDnevnikApi {
     @GET(DnevnikApi.CONTEXT)
-    suspend fun getUserContext(): Response<NetworkUserContext>
+    suspend fun getUserContext(): NetworkUserContext
 
     @GET(DnevnikApi.PERSON)
     suspend fun getPerson(
@@ -70,17 +70,8 @@ class RetrofitDnevnik @Inject constructor(
         .build()
         .create(RetrofitDnevnikApi::class.java)
 
-    override suspend fun getUserContext(): Result<NetworkUserContext> {
-        val response = api.getUserContext()
-        return when(response.code()) {
-            200 -> Result.Success(response.body()!!)
-            else -> {
-                val errorMessage = JSONObject(response.errorBody()?.string() ?: "")
-                    .getString("description")
-                Result.Error(IllegalStateException(errorMessage))
-            }
-        }
-    }
+    override suspend fun getUserContext(): NetworkUserContext
+        = api.getUserContext()
 
     override suspend fun getClassmates(): List<Long>
         = api.getClassmates()

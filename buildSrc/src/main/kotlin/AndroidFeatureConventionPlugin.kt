@@ -15,6 +15,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 implementation(project(":core:data"))
                 implementation(project(":core:model"))
                 implementation(project(":core:common"))
+                implementation(project(":sync"))
                 implementation(Dependencies.NAVIGATION_COMPOSE)
                 implementation(Dependencies.HILT_NAVIGATION_COMPOSE)
             }

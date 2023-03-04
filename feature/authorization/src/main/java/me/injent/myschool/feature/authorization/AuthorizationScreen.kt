@@ -129,11 +129,17 @@ private fun BoxScope.AuthStateBoxContent(authState: AuthState) {
             )
         }
         AuthState.LOADING -> {
+            Text(
+                text = stringResource(id = R.string.receiving_data),
+                color = MaterialTheme.colorScheme.primary,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.align(Alignment.Center)
+            )
             LinearProgressIndicator(
                 modifier = Modifier
-                    .align(Alignment.Center)
+                    .align(Alignment.BottomCenter)
                     .width(80.dp)
-                    .height(8.dp)
+                    .height(6.dp)
                     .clip(MaterialTheme.shapes.extraSmall),
                 color = Color.LightGray,
                 trackColor = MaterialTheme.colorScheme.primary

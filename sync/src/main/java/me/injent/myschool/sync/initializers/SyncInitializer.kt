@@ -5,15 +5,11 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.startup.AppInitializer
 import androidx.startup.Initializer
 import androidx.work.*
-import dagger.Module
-import dagger.Provides
 import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import me.injent.myschool.sync.workers.SyncWorker
-import javax.inject.Singleton
 
 /**
  * Use it to initialize sync work.
@@ -26,14 +22,13 @@ object Sync {
     }
 }
 
-const val WORKER_NAME = "synchronization"
+const val SyncWorkName = "synchronization"
 
 /**
  * Followed by this guide
  * [Android Developers](https://developer.android.com/topic/architecture/data-layer/offline-first)
 **/
 object SyncInitializer : Initializer<WorkManager> {
-
     override fun create(@ApplicationContext context: Context): WorkManager {
         val workerFactory = getWorkerFactory(appContext = context.applicationContext)
         val config = Configuration.Builder()

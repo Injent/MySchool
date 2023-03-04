@@ -7,48 +7,51 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.injent.myschool.core.common.SessionManager
-import me.injent.myschool.core.common.result.Result.Success
+import me.injent.myschool.core.common.sync.SyncState
 import me.injent.myschool.core.data.repository.PersonRepository
 import me.injent.myschool.core.data.repository.UserDataRepository
+import me.injent.myschool.core.data.util.SyncStatusMonitor
+import me.injent.myschool.sync.WorkController
 import javax.inject.Inject
 
 @HiltViewModel
 class AuthorizationViewModel @Inject constructor(
-    userDataRepository: UserDataRepository,
     @ApplicationContext context: Context,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    syncStatusMonitor: SyncStatusMonitor,
+    workController: WorkController
 ) : ViewModel() {
 
-    @Inject
-    lateinit var personRepository: dagger.Lazy<PersonRepository>
-
-    companion object {
-        const val AUTH_STATE = "auth_state"
-        private const val TOKEN = "token"
-    }
-
-    val authState = savedStateHandle.getStateFlow(AUTH_STATE, AuthState.CHECKING_TOKEN)
-    /**
-     * Received token from deeplink
-     */
     private val token: String? = savedStateHandle[TOKEN]
+
+    val authState = syncStatusMonitor.isSyncing
+        .map {
+            when (it) {
+                SyncState.IDLE -> AuthState.NOT_AUTHED
+                SyncState.SYNCING -> AuthState.LOADING
+                SyncState.SUCCESS -> AuthState.SUCCESS
+            }
+        }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = AuthState.CHECKING_TOKEN
+        )
 
     init {
         if (token != null) {
-            savedStateHandle[AUTH_STATE] = AuthState.LOADING
             viewModelScope.launch {
                 SessionManager(context).saveToken(token)
                 delay(100)
-                val result = personRepository.get().getContext()
-                if (result is Success) {
-                    userDataRepository.setUserContext(result.data)
-                    savedStateHandle[AUTH_STATE] = AuthState.SUCCESS
-                } else {
-                    savedStateHandle[AUTH_STATE] = AuthState.NOT_AUTHED
-                }
+                workController.startOneTimeSyncWork()
             }
         }
+    }
+
+    companion object {
+        private const val TOKEN = "token"
     }
 }

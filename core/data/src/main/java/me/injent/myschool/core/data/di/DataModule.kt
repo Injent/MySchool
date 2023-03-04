@@ -8,6 +8,8 @@ import me.injent.myschool.core.data.repository.PersonRepository
 import me.injent.myschool.core.data.repository.OfflineFirstPersonRepository
 import me.injent.myschool.core.data.repository.UserDataRepository
 import me.injent.myschool.core.data.repository.UserDataRepositoryImpl
+import me.injent.myschool.core.data.util.ConnectivityManagerMonitor
+import me.injent.myschool.core.data.util.NetworkMonitor
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -21,4 +23,9 @@ interface DataModule {
     fun bindsDnevnikRepository(
         offlineFirstPersonRepository: OfflineFirstPersonRepository
     ) : PersonRepository
+
+    @Binds
+    fun bindsNetworkMonitor(
+        networkMonitor: ConnectivityManagerMonitor,
+    ): NetworkMonitor
 }

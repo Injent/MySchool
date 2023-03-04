@@ -2,9 +2,15 @@ package me.injent.myschool.core.common
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.util.Log
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import androidx.security.crypto.MasterKeys
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.flowOn
+import java.net.HttpURLConnection
+import java.net.URL
 
 class SessionManager(context: Context) {
 
@@ -47,4 +53,23 @@ class SessionManager(context: Context) {
             null
         }
     }
+
+    val isTokenActive: Flow<Boolean>
+        get() = flow {
+            try {
+                val token = fetchToken() ?: kotlin.run {
+                    emit(false)
+                    return@flow
+                }
+                val url = URL("https://api.dnevnik.ru/v2/users/me/organizations")
+                val connection = url.openConnection() as HttpURLConnection
+                connection.requestMethod = "GET"
+                connection.setRequestProperty("Access-Token", token)
+                connection.connect()
+                emit(connection.responseCode == 200)
+            } catch (e: Exception) {
+                emit(false)
+            }
+        }
+            .flowOn(Dispatchers.IO)
 }

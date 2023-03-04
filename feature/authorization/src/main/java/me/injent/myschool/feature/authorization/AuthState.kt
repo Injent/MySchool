@@ -1,7 +1,7 @@
 package me.injent.myschool.feature.authorization
 
 enum class AuthState {
-    TOKEN_EXPIRED,
+    NETWORK_ERROR,
     SUCCESS,
     NOT_AUTHED,
     LOADING,

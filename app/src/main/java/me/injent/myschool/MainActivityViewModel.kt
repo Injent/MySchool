@@ -1,68 +1,42 @@
 package me.injent.myschool
 
-import android.content.Context
 import android.util.Log
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.work.ExistingWorkPolicy
-import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.*
 import me.injent.myschool.core.common.SessionManager
-import me.injent.myschool.core.common.result.Result
-import me.injent.myschool.core.data.repository.PersonRepository
-import me.injent.myschool.core.data.repository.UserDataRepository
-import me.injent.myschool.core.model.UserContext
+import me.injent.myschool.core.data.util.NetworkMonitor
 import me.injent.myschool.feature.authorization.AuthState
-import me.injent.myschool.feature.authorization.AuthorizationViewModel.Companion.AUTH_STATE
-import me.injent.myschool.sync.initializers.WORKER_NAME
-import me.injent.myschool.sync.workers.SyncWorker
 import javax.inject.Inject
 
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
-    private val userDataRepository: UserDataRepository,
-    private val savedStateHandle: SavedStateHandle,
-    @ApplicationContext context: Context
+    sessionManager: SessionManager,
+    networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
-    @Inject
-    lateinit var personRepository: dagger.Lazy<PersonRepository>
-
-    val authState = savedStateHandle.getStateFlow(AUTH_STATE, AuthState.CHECKING_TOKEN)
-
-    init {
-        viewModelScope.launch {
-            val token = SessionManager(context).fetchToken()
-            if (token == null) {
-                savedStateHandle[AUTH_STATE] = AuthState.NOT_AUTHED
-            } else {
-                savedStateHandle[AUTH_STATE] = AuthState.CHECKING_TOKEN
-
-                // Checking is token not expired
-                val result = personRepository.get().getContext()
-                if (result is Result.Success) {
-                    saveUserContext(result.data)
-                    WorkManager.getInstance(context).enqueueUniqueWork(
-                        WORKER_NAME,
-                        ExistingWorkPolicy.KEEP,
-                        SyncWorker.startUpSyncWork()
-                    )
+    val authState: StateFlow<AuthState> = combine(
+        networkMonitor.isOnline, sessionManager.isTokenActive
+    ) { isOnline, isTokenActive ->
+        val token = sessionManager.fetchToken()
+        return@combine when {
+            isOnline && token == null -> AuthState.NOT_AUTHED
+            !isOnline && token == null -> AuthState.NETWORK_ERROR
+            isOnline && !token.isNullOrEmpty() -> {
+                 if (isTokenActive) {
+                    AuthState.SUCCESS
                 } else {
-                    savedStateHandle[AUTH_STATE] = AuthState.NOT_AUTHED
+                    AuthState.NOT_AUTHED
                 }
             }
+            !isOnline && !token.isNullOrEmpty() -> AuthState.SUCCESS
+            else -> AuthState.CHECKING_TOKEN
         }
     }
-
-    /**
-     * Saves [UserContext] for further access to the Dnevnik API
-     */
-    private suspend fun saveUserContext(userContext: UserContext) {
-        savedStateHandle[AUTH_STATE] = AuthState.LOADING
-        userDataRepository.setUserContext(userContext)
-        savedStateHandle[AUTH_STATE] = AuthState.SUCCESS
-    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = AuthState.CHECKING_TOKEN
+        )
 }
