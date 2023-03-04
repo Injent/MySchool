@@ -10,7 +10,7 @@ fun NavController.navigateToProfile() {
     navigate(PROFILE_ROUTE)
 }
 
-fun NavGraphBuilder.authorizationScreen() {
+fun NavGraphBuilder.profileScreen() {
     composable(
         route = PROFILE_ROUTE
     ) {

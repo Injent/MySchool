@@ -16,7 +16,7 @@ data class SaveableUserContext(
     val schoolId: Int,
     val schoolName: String,
     val schoolType: String,
-    val eduGroupId: String,
+    val eduGroupId: Long,
     val eduGroupName: String,
     val timetable: Long,
     val studyYear: Int
@@ -37,7 +37,7 @@ fun UserContext.toSaveableModel(): SaveableUserContext {
     )
 }
 
-fun SaveableUserContext.toDomainModel(): UserContext {
+fun SaveableUserContext.asExternalModel(): UserContext {
     return UserContext(
         userId = userId,
         personId = personId,

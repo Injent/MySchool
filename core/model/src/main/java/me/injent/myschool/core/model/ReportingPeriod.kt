@@ -1,14 +1,14 @@
 package me.injent.myschool.core.model
 
-import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
 
 /**
  *
  */
 data class ReportingPeriod(
+    val id: Long,
     val number: Int,
     val name: String,
-    val id: String,
-    val start: Instant,
-    val finish: Instant
+    val start: LocalDateTime,
+    val finish: LocalDateTime
 )

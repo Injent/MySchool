@@ -2,22 +2,18 @@ package me.injent.myschool.core.network.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import me.injent.myschool.core.model.EduGroup
+import me.injent.myschool.core.model.Subject
 import me.injent.myschool.core.network.IdSerializer
 
 @Serializable
-data class NetworkEduGroup(
+data class NetworkSubject(
     @SerialName("id_str")
     @Serializable(IdSerializer::class)
     val id: Long,
-    val name: String,
-    val timetable: Long,
-    @SerialName("studyyear") val studyYear: Int
+    val name: String
 )
 
-fun NetworkEduGroup.asExternalModel() = EduGroup(
+fun NetworkSubject.asExternalModel() = Subject(
     id = id,
-    name = name,
-    timetable = timetable,
-    studyYear = studyYear
+    name = name
 )

@@ -18,6 +18,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 implementation(project(":sync"))
                 implementation(Dependencies.NAVIGATION_COMPOSE)
                 implementation(Dependencies.HILT_NAVIGATION_COMPOSE)
+                implementation(Dependencies.LIFECYCLE_RUNTIME_COMPOSE)
             }
         }
     }

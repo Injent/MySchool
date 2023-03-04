@@ -1,8 +1,7 @@
 package me.injent.myschool.core.database.util
 
 import androidx.room.TypeConverter
-import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDate
+import kotlinx.datetime.*
 
 class InstantConverter {
     @TypeConverter
@@ -35,4 +34,13 @@ class LocalDateConverter {
     @TypeConverter
     fun intToLocalDate(value: Int?): LocalDate? =
         value?.let { LocalDate.fromEpochDays(it) }
+}
+
+class LocalDateTimeConverter {
+    @TypeConverter
+    fun localDateTimeToLong(value: LocalDateTime?): Long? =
+        value?.toInstant(TimeZone.currentSystemDefault())?.epochSeconds
+    @TypeConverter
+    fun intToLocalDateTime(value: Long?): LocalDateTime? =
+        value?.let { Instant.fromEpochSeconds(value).toLocalDateTime(TimeZone.currentSystemDefault()) }
 }

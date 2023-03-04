@@ -12,7 +12,9 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import me.injent.myschool.core.common.network.Dispatcher
 import me.injent.myschool.core.common.network.MsDispatchers.IO
+import me.injent.myschool.core.data.repository.MarkRepository
 import me.injent.myschool.core.data.repository.PersonRepository
+import me.injent.myschool.core.data.repository.SubjectRepository
 import me.injent.myschool.core.data.repository.UserDataRepository
 import me.injent.myschool.sync.initializers.SyncConstraints
 import me.injent.myschool.sync.initializers.syncForegroundInfo
@@ -23,14 +25,19 @@ class SyncWorker @AssistedInject constructor(
     @Assisted workerParams: WorkerParameters,
     @Dispatcher(IO) private val dispatcher: CoroutineDispatcher,
     private val personRepository: PersonRepository,
+    private val subjectRepository: SubjectRepository,
+    private val markRepository: MarkRepository,
     private val userDataRepository: UserDataRepository
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         return@withContext try {
-            val isSynchronized = awaitAll(
-                async { personRepository.synchronize() }
+            val isSynchronized = listOf(
+                personRepository.synchronize(),
+                subjectRepository.synchronize(),
+                markRepository.synchronize()
             ).all { it }
+
             if (isSynchronized) {
                 userDataRepository.updateSyncTime()
                 Result.success()

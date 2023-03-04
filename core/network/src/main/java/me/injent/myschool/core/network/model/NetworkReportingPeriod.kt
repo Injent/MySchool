@@ -1,21 +1,20 @@
 package me.injent.myschool.core.network.model
 
-import kotlinx.datetime.Instant
-import kotlinx.datetime.serializers.InstantIso8601Serializer
+import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.injent.myschool.core.model.ReportingPeriod
+import me.injent.myschool.core.network.IdSerializer
 
 @Serializable
 data class NetworkReportingPeriod(
+    @SerialName("id_str")
+    @Serializable(IdSerializer::class)
+    val id: Long,
     val number: Int,
     val name: String,
-    @SerialName("id_str")
-    val id: String,
-    @Serializable(with = InstantIso8601Serializer::class)
-    val start: Instant,
-    @Serializable(with = InstantIso8601Serializer::class)
-    val finish: Instant
+    val start: LocalDateTime,
+    val finish: LocalDateTime
 )
 
 fun NetworkReportingPeriod.asExternalModel() = ReportingPeriod(

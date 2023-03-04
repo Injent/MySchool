@@ -5,6 +5,7 @@ import me.injent.myschool.core.network.model.NetworkPerson
 
 fun NetworkPerson.asEntity() = PersonEntity(
     id = id,
+    personId = personId,
     shortName = shortName,
     locale = locale,
     birthday = birthday,

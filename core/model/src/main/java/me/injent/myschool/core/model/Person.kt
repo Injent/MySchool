@@ -7,6 +7,7 @@ import kotlinx.datetime.LocalDate
  */
 data class Person(
     val id: Long,
+    val personId: Long,
     val shortName: String,
     val locale: String,
     val birthday: LocalDate? = null,
