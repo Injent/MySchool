@@ -12,7 +12,7 @@ data class Mark(
     val dbSubjectId: Long? = null
 )
 
-data class MarkValueAndPerson(
+data class PersonAndMarkValue(
     val personId: Long,
     val personName: String,
     val value: Float

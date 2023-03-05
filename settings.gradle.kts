@@ -1,7 +1,4 @@
 @file:Suppress("UnstableApiUsage")
-
-include(":core:ui")
-
 pluginManagement {
     repositories {
         google()
@@ -28,3 +25,5 @@ include(":core:model")
 include(":core:data")
 include(":core:common")
 include(":core:datastore")
+include(":feature:students")
+include(":core:ui")

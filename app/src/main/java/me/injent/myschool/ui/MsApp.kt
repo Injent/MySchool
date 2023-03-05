@@ -15,6 +15,7 @@ import me.injent.myschool.feature.authorization.AuthState
 import me.injent.myschool.feature.authorization.navigation.AUTHORIZATION_ROUTE
 import me.injent.myschool.feature.profile.navigation.PROFILE_ROUTE
 import me.injent.myschool.feature.profile.navigation.navigateToProfile
+import me.injent.myschool.feature.students.navigation.STUDENTS_ROUTE
 import me.injent.myschool.navigation.MsNavHost
 
 @Composable
@@ -41,11 +42,7 @@ fun MsApp(
             startDestination = if (authState == AuthState.NOT_AUTHED) {
                 AUTHORIZATION_ROUTE
             } else {
-                LaunchedEffect(Unit) {
-                    delay(100)
-                    appState.navController.navigateToProfile(1000000822018)
-                }
-                AUTHORIZATION_ROUTE
+                STUDENTS_ROUTE
             }
         )
     }

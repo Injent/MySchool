@@ -15,4 +15,6 @@ interface MarkDao {
     @Query("SELECT * FROM marks WHERE person_id = :personId AND subject_id = :subjectId")
     fun getPersonMarkBySubject(personId: Long, subjectId: Long): Flow<List<MarkEntity>>
 
+    @Query("SELECT value FROM marks WHERE person_id = :personId")
+    fun getPersonAverageMark(personId: Long): Flow<List<String>>
 }

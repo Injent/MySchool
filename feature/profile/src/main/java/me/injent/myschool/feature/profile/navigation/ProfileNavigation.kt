@@ -11,7 +11,7 @@ fun NavController.navigateToProfile(personId: Long) {
     navigate("$PROFILE_ROUTE/$personId")
 }
 
-fun NavGraphBuilder.profileScreen() {
+fun NavGraphBuilder.profileScreen(onBack: () -> Unit) {
     composable(
         route = "$PROFILE_ROUTE/{$PERSON_ID}",
         arguments = listOf(
@@ -20,6 +20,6 @@ fun NavGraphBuilder.profileScreen() {
             }
         )
     ) {
-        ProfileRoute()
+        ProfileRoute(onBack = onBack)
     }
 }

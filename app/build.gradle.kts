@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":core:designsystem"))
     implementation(project(":feature:authorization"))
     implementation(project(":feature:profile"))
+    implementation(project(":feature:students"))
 
     implementation(Dependencies.CORE_KTX)
     implementation(Dependencies.ACTIVITY_COMPOSE)

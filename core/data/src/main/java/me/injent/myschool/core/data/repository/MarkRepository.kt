@@ -19,6 +19,7 @@ import javax.inject.Inject
 interface MarkRepository : Syncable {
     suspend fun getPersonFinalMarkBySubject(personId: Long, subjectId: Long): Float
     fun getPersonMarksBySubject(personId: Long, subjectId: Long): Flow<List<Mark>>
+    fun getPersonAverageMark(personId: Long): Flow<Float>
 }
 
 class OfflineFirstMarkRepository @Inject constructor(
@@ -37,6 +38,15 @@ class OfflineFirstMarkRepository @Inject constructor(
     override fun getPersonMarksBySubject(personId: Long, subjectId: Long): Flow<List<Mark>> {
         return markDao.getPersonMarkBySubject(personId, subjectId)
             .map { it.map(MarkEntity::asExternalModel) }
+    }
+
+    override fun getPersonAverageMark(personId: Long): Flow<Float> {
+        return markDao.getPersonAverageMark(personId)
+            .map {
+                it.mapNotNull(String::toFloatOrNull)
+                    .average()
+                    .toString().take(4).toFloat()
+            }
     }
 
     override suspend fun synchronize(): Boolean = try {
