@@ -32,7 +32,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import me.injent.myschool.feature.authorization.navigation.AUTH_URL
 import me.injent.myschool.core.designsystem.component.MsButton
-import me.injent.myschool.core.designsystem.theme.hintText
 
 private const val TRANSITION_FROM_AUTH_SCREEN_DELAY = 1000L
 
@@ -54,11 +53,11 @@ internal fun AuthorizationRoute(
 }
 
 @Composable
-internal fun AuthorizationScreen(
+private fun AuthorizationScreen(
     authState: AuthState
 ) {
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().systemBarsPadding()
     ) {
         Image(
             painter = painterResource(id = R.drawable.bg_auth),
@@ -66,22 +65,15 @@ internal fun AuthorizationScreen(
             contentDescription = null,
             modifier = Modifier.matchParentSize()
         )
-        val cardShape = MaterialTheme.shapes.medium
         Column(
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier
                 .align(Alignment.Center)
                 .fillMaxWidth(.75f)
-                .shadow(
-                    elevation = 4.dp,
-                    shape = cardShape,
-                    clip = false,
-                    spotColor = Color.Black.copy(.25f)
-                )
                 .background(
                     color = MaterialTheme.colorScheme.surface,
-                    shape = cardShape
+                    shape = MaterialTheme.shapes.medium
                 )
                 .padding(16.dp)
         ) {
@@ -99,7 +91,7 @@ internal fun AuthorizationScreen(
         ClickableText(
             text = buildAnnotatedString {
                 withStyle(style = SpanStyle(
-                    color = MaterialTheme.colorScheme.hintText,
+                    color = MaterialTheme.colorScheme.secondary,
                     textDecoration = TextDecoration.Underline)
                 ) {
                     append(stringResource(id = R.string.terms_of_use))

@@ -15,9 +15,9 @@ import me.injent.myschool.core.network.model.NetworkPerson
 import me.injent.myschool.core.network.model.asExternalModel
 import javax.inject.Inject
 
-interface PersonRepository : Synchronizable {
+interface PersonRepository : Syncable {
     fun getPersonsStream(): Flow<List<Person>>
-    suspend fun getPerson(userId: Long): Person?
+    fun getPerson(personId: Long): Flow<Person?>
 }
 
 class OfflineFirstPersonRepository @Inject constructor(
@@ -28,15 +28,15 @@ class OfflineFirstPersonRepository @Inject constructor(
     override fun getPersonsStream(): Flow<List<Person>>
         = personDao.getPersons().map { it.map(PersonEntity::asExternalModel) }
 
-    override suspend fun getPerson(userId: Long): Person?
-        = personDao.getPersonByUserId(userId)?.asExternalModel()
+    override fun getPerson(personId: Long): Flow<Person?>
+        = personDao.getPerson(personId).map { it?.asExternalModel() }
 
     override suspend fun synchronize(): Boolean = coroutineScope {
         return@coroutineScope try {
             val userContext = networkDataSource.getUserContext().asExternalModel()
             preferencesDataSource.setUserContext(userContext)
             // Obtain users ids from current user class
-            val userIds = networkDataSource.getClassmates()
+            val userIds = networkDataSource.getClassmates() + userContext.userId
             val semaphore = Semaphore(permits = maxConcurrentRequests)
 
             val persons = mutableListOf<NetworkPerson>()

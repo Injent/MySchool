@@ -6,3 +6,7 @@ plugins {
 android {
     namespace = "me.injent.myschool.feature.profile"
 }
+
+dependencies {
+    implementation(Dependencies.DATETIME)
+}

@@ -33,6 +33,7 @@ object Versions {
         const val WORK = "2.7.1"
         const val HILT_WORK = "1.0.0"
         const val STARTUP = "1.1.1"
+        const val WINDOW_SIZE_CLASS = "1.0.1"
     }
 
     object KotlinX {

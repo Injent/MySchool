@@ -45,6 +45,7 @@ object Dependencies {
     const val HILT_WORK = "androidx.hilt:hilt-work:${Versions.AndroidX.HILT_WORK}"
     const val LIVEDATA = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.AndroidX.LIFECYCLE}"
     const val KSP = ""
+    const val WINDOW_SIZE_CLASS = "androidx.compose.material3:material3-window-size-class:${Versions.AndroidX.WINDOW_SIZE_CLASS}"
 }
 
 fun DependencyHandler.room() {

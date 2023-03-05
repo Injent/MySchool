@@ -12,8 +12,9 @@ import javax.inject.Inject
 interface UserDataRepository {
     val userData: Flow<UserData>
     suspend fun getUserContext(): UserContext?
-    suspend fun updateSyncTime()
     suspend fun setUserContext(userContext: UserContext)
+    suspend fun updateSyncTime()
+    suspend fun banSubjectId(subjectId: Long)
 }
 
 class UserDataRepositoryImpl @Inject constructor(
@@ -30,4 +31,7 @@ class UserDataRepositoryImpl @Inject constructor(
         = userDataSource.setLastSyncTime()
     override suspend fun setUserContext(userContext: UserContext)
         = userDataSource.setUserContext(userContext)
+
+    override suspend fun banSubjectId(subjectId: Long)
+        = userDataSource.banSubject(subjectId)
 }

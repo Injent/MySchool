@@ -52,4 +52,5 @@ dependencies {
     implementation(Dependencies.NAVIGATION_COMPOSE)
     implementation(Dependencies.CORE_SPLASHSCREEN)
     implementation(Dependencies.HILT_WORK)
+    implementation(Dependencies.WINDOW_SIZE_CLASS)
 }

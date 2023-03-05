@@ -1,9 +1,7 @@
 package me.injent.myschool.core.data.repository
 
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.runBlocking
 import me.injent.myschool.core.data.model.asEntity
 import me.injent.myschool.core.database.dao.SubjectDao
 import me.injent.myschool.core.database.model.SubjectEntity
@@ -13,7 +11,7 @@ import me.injent.myschool.core.network.DnevnikNetworkDataSource
 import me.injent.myschool.core.network.model.NetworkSubject
 import javax.inject.Inject
 
-interface SubjectRepository : Synchronizable {
+interface SubjectRepository : Syncable {
     val subjects: Flow<List<Subject>>
 }
 
@@ -26,7 +24,7 @@ class OfflineFirstSubjectRepository @Inject constructor(
         get() = subjectDao.getSubjects().map { it.map(SubjectEntity::asExternalModel) }
 
     override suspend fun synchronize(): Boolean = try {
-        val eduGroupId = runBlocking { userDataRepository.userData.first().userContext!!.eduGroupId }
+        val eduGroupId = userDataRepository.getUserContext()!!.eduGroup.id
         val subjects = networkDataSource.getSubjects(eduGroupId).map(NetworkSubject::asEntity)
         subjectDao.saveSubjects(subjects)
         true

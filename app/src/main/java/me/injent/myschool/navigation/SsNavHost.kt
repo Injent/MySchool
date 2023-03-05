@@ -20,7 +20,7 @@ fun MsNavHost(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        authorizationScreen(onAuthorization = { navController.navigateToProfile() })
+        authorizationScreen(onAuthorization = { navController.navigateToProfile(1000000822018) })
         profileScreen()
     }
 }

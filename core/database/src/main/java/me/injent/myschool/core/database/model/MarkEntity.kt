@@ -4,6 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import kotlinx.datetime.LocalDateTime
+import me.injent.myschool.core.model.Mark
+import kotlin.random.Random
 
 @Entity(tableName = "marks")
 data class MarkEntity(
@@ -19,4 +21,14 @@ data class MarkEntity(
     val lessonId: Long,
     @ColumnInfo(name = "subject_id")
     val dbSubjectId: Long
+)
+
+fun MarkEntity.asExternalModel() = Mark(
+    id = id,
+    value = value,
+    date = date,
+    personId = personId,
+    workId = workId,
+    lessonId = lessonId,
+    dbSubjectId = dbSubjectId
 )

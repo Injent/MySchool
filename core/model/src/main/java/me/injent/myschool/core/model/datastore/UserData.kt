@@ -7,6 +7,6 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class UserData(
     val userContext: SaveableUserContext? = null,
-    @Serializable(with = LocalDateTimeIso8601Serializer::class)
-    val lastSyncTime: LocalDateTime? = null
+    val lastSyncTime: LocalDateTime? = null,
+    val bannedSubjects: List<Long> = emptyList()
 )

@@ -9,12 +9,15 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -59,14 +62,17 @@ class MainActivity : ComponentActivity() {
             authState == AuthState.CHECKING_TOKEN || authState == AuthState.NETWORK_ERROR
         }
 
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
         setContent {
-            LaunchedEffect(authState) {
-                if (authState == AuthState.NETWORK_ERROR)
-                    Toast.makeText(applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
-            }
             if (authState != AuthState.CHECKING_TOKEN && authState != AuthState.NETWORK_ERROR) {
                 MySchoolTheme {
-                    MsApp(authState = authState)
+                    MsApp(
+                        authState = authState,
+                        windowSizeClass =
+                            @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
+                            calculateWindowSizeClass(this),
+                    )
                 }
             }
         }

@@ -20,8 +20,8 @@ interface PersonDao {
     fun getPersons(): Flow<List<PersonEntity>>
     @Query("SELECT person_id, short_name FROM persons")
     fun getPersonsIdAndName(): List<PersonIdAndName>
-    @Query("SELECT * FROM persons WHERE id = :userId LIMIT 1")
-    suspend fun getPersonByUserId(userId: Long): PersonEntity?
+    @Query("SELECT * FROM persons WHERE person_id = :personId LIMIT 1")
+    fun getPerson(personId: Long): Flow<PersonEntity?>
     @Query("DELETE FROM persons")
     suspend fun deleteAll()
 }

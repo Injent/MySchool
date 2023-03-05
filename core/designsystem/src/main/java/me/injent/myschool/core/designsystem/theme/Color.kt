@@ -2,11 +2,23 @@ package me.injent.myschool.core.designsystem.theme
 
 import androidx.compose.ui.graphics.Color
 
-internal val Blue = Color(0xFF3d62f5)
-internal val LightGray = Color(0xFF9090a5)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val Primary = Color(0xFF3d62f5)
+val OnPrimary = Color.White
+val PrimaryContainer = Color(0xFFf1f7ff)
+val OnPrimaryContainer = Color(0xff54565f)
+val Secondary = Color(0xff9090a5)
+val Tertiary = Color(0xff3e53a4)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val Background = Color(0xFFf2f5f7)
+val OnBackground = Color(0xFF1d1d1d)
+
+val Surface = Color.White
+val OnSurface = Color(0xFF2a2a34)
+
+val Outline = Color(0xffd8dee1)
+
+val Positive = Color(0xFF21ba45)
+val Negative = Color(0xFFff3737)
+val Warning = Color(0xFFf2c037)
+val Link = Color(0xFF31ccec)
+val Hint = Color(0xffb4b9d1)

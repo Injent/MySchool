@@ -24,4 +24,11 @@ class MsPreferencesDataSource @Inject constructor(
             it.copy(userContext = userContext.toSaveableModel())
         }
     }
+
+    suspend fun banSubject(subjectId: Long) {
+        dataStore.updateData {
+            if (it.bannedSubjects.contains(subjectId)) return@updateData it
+            it.copy(bannedSubjects = it.bannedSubjects + subjectId)
+        }
+    }
 }

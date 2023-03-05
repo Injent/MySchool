@@ -9,4 +9,5 @@ android {
 
 dependencies {
     implementation(Dependencies.SECURITY_CRYPTO)
+    implementation(Dependencies.DATETIME)
 }
