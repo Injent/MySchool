@@ -1,0 +1,30 @@
+{
+  ConstraintSets: {
+    start: {
+      background: {
+        width: 'parent',
+        height: 'parent',
+      },
+      search: {
+        width: 'wrap',
+        height: 'wrap',
+        start: ['parent', 'start', 16],
+        bottom: ['parent', 'bottom', 16],
+      }
+    },
+    end: {
+      background: {
+        width: 'parent',
+        height: 'parent',
+      },
+      search: {
+        width: 'parent',
+        height: 'wrap',
+        start: ['parent', 'start', 48],
+        end: ['parent', 'end', 48],
+        top: ['parent', 'top', 0],
+        bottom: ['parent', 'bottom', 0]
+      }
+    }
+  }
+}

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="attached_files">Прикрепленные файлы</string>
+    <string name="file">Файл</string>
+    <string name="download">Скачать</string>
+    <string name="sent">Выдано</string>
+    <string name="task">Задание</string>
+</resources>

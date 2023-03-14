@@ -66,3 +66,7 @@
 -keepclassmembers class * extends androidx.work.CoroutineWorker {
     public <init>(android.content.Context,androidx.work.WorkerParameters);
 }
+
+-keep class androidx.security.** { *; }
+-keep class net.oqee.core.services.** { *; }
+-keep class com.google.crypto.** { *; }

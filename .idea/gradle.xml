@@ -23,8 +23,12 @@
             <option value="$PROJECT_DIR$/core/ui" />
             <option value="$PROJECT_DIR$/feature" />
             <option value="$PROJECT_DIR$/feature/authorization" />
-            <option value="$PROJECT_DIR$/feature/profile" />
-            <option value="$PROJECT_DIR$/feature/students" />
+            <option value="$PROJECT_DIR$/feature/dashboard" />
+            <option value="$PROJECT_DIR$/feature/homeworkdialog" />
+            <option value="$PROJECT_DIR$/feature/leaderboard" />
+            <option value="$PROJECT_DIR$/feature/myclass" />
+            <option value="$PROJECT_DIR$/feature/personmarks" />
+            <option value="$PROJECT_DIR$/feature/usersearch" />
             <option value="$PROJECT_DIR$/sync" />
           </set>
         </option>

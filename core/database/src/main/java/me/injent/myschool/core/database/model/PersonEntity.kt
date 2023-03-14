@@ -7,6 +7,7 @@ import androidx.room.TypeConverters
 import kotlinx.datetime.LocalDate
 import me.injent.myschool.core.database.util.LocalDateConverter
 import me.injent.myschool.core.model.Person
+import me.injent.myschool.core.model.Sex
 
 @Entity(tableName = "persons")
 data class PersonEntity(
@@ -18,7 +19,7 @@ data class PersonEntity(
     val shortName: String,
     val locale: String,
     val birthday: LocalDate? = null,
-    val sex: String,
+    val sex: Sex,
     val roles: List<String>,
     val phone: String? = null
 )

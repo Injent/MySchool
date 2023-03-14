@@ -9,6 +9,7 @@ object DnevnikApi {
     const val FROM_PERIOD = "from"
     const val TO_PERIOD = "to"
     const val PERIOD_ID = "periodId"
+    const val SCHOOL_ID = "schoolId"
 
     const val CHECK_TOKEN_EXPIRATION = "users/me/organizations"
     const val CONTEXT = "users/me/context"
@@ -21,4 +22,6 @@ object DnevnikApi {
     const val SUBJECTS = "edu-groups/{$EDUGROUP_ID}/subjects"
     const val AVERAGE_MARK = "persons/{$PERSON_ID}/reporting-periods/{$PERIOD_ID}/avg-mark"
     const val EDUGROUP_MARKS = "edu-groups/{$EDUGROUP_ID}/subjects/{$SUBJECT_ID}/marks/{$FROM_PERIOD}/{$TO_PERIOD}"
+
+    const val HOMEWORKS = "users/me/school/{$SCHOOL_ID}/homeworks"
 }

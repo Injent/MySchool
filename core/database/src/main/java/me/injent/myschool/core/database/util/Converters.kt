@@ -2,6 +2,7 @@ package me.injent.myschool.core.database.util
 
 import androidx.room.TypeConverter
 import kotlinx.datetime.*
+import me.injent.myschool.core.model.Sex
 
 class InstantConverter {
     @TypeConverter
@@ -43,4 +44,11 @@ class LocalDateTimeConverter {
     @TypeConverter
     fun intToLocalDateTime(value: Long?): LocalDateTime? =
         value?.let { Instant.fromEpochSeconds(value).toLocalDateTime(TimeZone.currentSystemDefault()) }
+}
+
+class SexConverter {
+    @TypeConverter
+    fun sexToOrdinal(value: Sex): Int = value.ordinal
+    @TypeConverter
+    fun ordinalToSex(value: Int): Sex = Sex.values()[value]
 }

@@ -5,20 +5,20 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
-import me.injent.myschool.core.model.datastore.UserData
+import me.injent.myschool.core.datastore.model.SaveableUserData
 import java.io.InputStream
 import java.io.OutputStream
 
 @Suppress("BlockingMethodInNonBlockingContext")
-object UserDataSerializer : Serializer<UserData> {
-    override val defaultValue: UserData
-        get() = UserData()
+object UserDataSerializer : Serializer<SaveableUserData> {
+    override val defaultValue: SaveableUserData
+        get() = SaveableUserData()
 
     @OptIn(ExperimentalSerializationApi::class)
-    override suspend fun readFrom(input: InputStream): UserData {
+    override suspend fun readFrom(input: InputStream): SaveableUserData {
         return try {
             Json.decodeFromStream(
-                deserializer = UserData.serializer(),
+                deserializer = SaveableUserData.serializer(),
                 stream = input
             )
         } catch (e: SerializationException) {
@@ -27,10 +27,10 @@ object UserDataSerializer : Serializer<UserData> {
         }
     }
 
-    override suspend fun writeTo(t: UserData, output: OutputStream) {
+    override suspend fun writeTo(t: SaveableUserData, output: OutputStream) {
         output.write(
             Json.encodeToString(
-                serializer = UserData.serializer(),
+                serializer = SaveableUserData.serializer(),
                 value = t
             ).encodeToByteArray()
         )

@@ -16,9 +16,10 @@ val Surface = Color.White
 val OnSurface = Color(0xFF2a2a34)
 
 val Outline = Color(0xffd8dee1)
+val OutlineVariant = Background
 
 val Positive = Color(0xFF21ba45)
 val Negative = Color(0xFFff3737)
 val Warning = Color(0xFFf2c037)
 val Link = Color(0xFF31ccec)
-val Hint = Color(0xffb4b9d1)
+val Hint = Background

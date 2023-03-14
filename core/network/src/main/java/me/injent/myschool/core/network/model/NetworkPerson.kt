@@ -1,6 +1,5 @@
 package me.injent.myschool.core.network.model
 
-import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
@@ -11,6 +10,7 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import me.injent.myschool.core.model.Person
+import me.injent.myschool.core.model.Sex
 import me.injent.myschool.core.network.IdSerializer
 
 @Serializable
@@ -23,7 +23,8 @@ data class NetworkPerson(
     val locale: String,
     @Serializable(with = CustomLocalDateSerializer::class)
     val birthday: LocalDate? = null,
-    val sex: String,
+    @Serializable(SexSerializer::class)
+    val sex: Sex,
     val roles: List<String>,
     val phone: String? = null
 )
@@ -46,4 +47,22 @@ class CustomLocalDateSerializer : KSerializer<LocalDate> {
         = encoder.encodeString(value.toString())
     override fun deserialize(decoder: Decoder)
         = LocalDate.parse(decoder.decodeString().substring(0, 10)) // get only yyyy-MM-dd
+}
+
+class SexSerializer : KSerializer<Sex> {
+
+    override val descriptor: SerialDescriptor
+        get() = PrimitiveSerialDescriptor("Sex", PrimitiveKind.STRING)
+
+    override fun serialize(encoder: Encoder, value: Sex) {
+        encoder.encodeString(value.serializeName)
+    }
+
+    override fun deserialize(decoder: Decoder): Sex {
+        return if (decoder.decodeString() == "Male") {
+            Sex.MALE
+        } else {
+            Sex.FEMALE
+        }
+    }
 }

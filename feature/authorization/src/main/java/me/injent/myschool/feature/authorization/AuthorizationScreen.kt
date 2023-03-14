@@ -32,6 +32,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import me.injent.myschool.feature.authorization.navigation.AUTH_URL
 import me.injent.myschool.core.designsystem.component.MsButton
+import me.injent.myschool.core.designsystem.theme.hint
 
 private const val TRANSITION_FROM_AUTH_SCREEN_DELAY = 1000L
 
@@ -97,7 +98,7 @@ private fun AuthorizationScreen(
                     append(stringResource(id = R.string.terms_of_use))
                 }
             },
-            style = MaterialTheme.typography.bodySmall,
+            style = MaterialTheme.typography.bodyMedium,
             onClick = {
                 val intent = Intent(Intent.ACTION_VIEW, "http://license_url".toUri())
                 context.startActivity(intent)
@@ -116,7 +117,7 @@ private fun BoxScope.AuthStateBoxContent(authState: AuthState) {
             Text(
                 text = stringResource(id = R.string.successful_login),
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -124,7 +125,7 @@ private fun BoxScope.AuthStateBoxContent(authState: AuthState) {
             Text(
                 text = stringResource(id = R.string.receiving_data),
                 color = MaterialTheme.colorScheme.primary,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.align(Alignment.Center)
             )
             LinearProgressIndicator(
@@ -133,7 +134,7 @@ private fun BoxScope.AuthStateBoxContent(authState: AuthState) {
                     .width(80.dp)
                     .height(6.dp)
                     .clip(MaterialTheme.shapes.extraSmall),
-                color = Color.LightGray,
+                color = MaterialTheme.colorScheme.hint,
                 trackColor = MaterialTheme.colorScheme.primary
             )
         }
@@ -146,7 +147,10 @@ private fun BoxScope.AuthStateBoxContent(authState: AuthState) {
                 },
                 modifier = Modifier.height(ButtonDefaults.MinHeight)
             ) {
-                Text(text = stringResource(id = R.string.login), style = MaterialTheme.typography.bodySmall)
+                Text(
+                    text = stringResource(id = R.string.login),
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }

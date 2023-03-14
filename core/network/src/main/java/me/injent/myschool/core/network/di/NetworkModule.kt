@@ -21,6 +21,7 @@ object NetworkModule {
     @Singleton
     fun providesJsonConverterFactory() = Json {
         ignoreUnknownKeys = true
+        coerceInputValues = true
     }
 
     @Singleton

@@ -1,8 +1,6 @@
 package me.injent.myschool.core.network
 
 import kotlinx.datetime.LocalDateTime
-import me.injent.myschool.core.common.result.Result
-import me.injent.myschool.core.model.Mark
 import me.injent.myschool.core.network.model.*
 
 /**
@@ -29,5 +27,18 @@ interface DnevnikNetworkDataSource {
         from: LocalDateTime,
         to: LocalDateTime
     ): List<NetworkMark>
-}
 
+    suspend fun getHomeworks(
+        schoolId: Int,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): NetworkHomeworkData
+
+    suspend fun getRecentMarks(
+        personId: Long,
+        eduGroupId: Long,
+        fromDate: LocalDateTime? = null,
+        toDate: LocalDateTime? = null,
+        limit: Int? = null
+    )
+}

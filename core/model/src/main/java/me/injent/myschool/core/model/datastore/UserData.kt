@@ -1,12 +1,14 @@
 package me.injent.myschool.core.model.datastore
 
 import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.serializers.LocalDateTimeIso8601Serializer
-import kotlinx.serialization.Serializable
+import me.injent.myschool.core.model.ReportingPeriod
+import me.injent.myschool.core.model.Subject
+import me.injent.myschool.core.model.UserContext
 
-@Serializable
 data class UserData(
-    val userContext: SaveableUserContext? = null,
+    val userContext: UserContext? = null,
     val lastSyncTime: LocalDateTime? = null,
-    val bannedSubjects: List<Long> = emptyList()
+    val bannedSubjects: List<Subject> = emptyList(),
+    val period: ReportingPeriod? = null,
+    val isInitialized: Boolean = false
 )

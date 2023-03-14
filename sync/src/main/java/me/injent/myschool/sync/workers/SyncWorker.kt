@@ -12,12 +12,10 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import me.injent.myschool.core.common.network.Dispatcher
 import me.injent.myschool.core.common.network.MsDispatchers.IO
-import me.injent.myschool.core.data.repository.MarkRepository
-import me.injent.myschool.core.data.repository.PersonRepository
-import me.injent.myschool.core.data.repository.SubjectRepository
-import me.injent.myschool.core.data.repository.UserDataRepository
+import me.injent.myschool.core.data.repository.*
 import me.injent.myschool.sync.initializers.SyncConstraints
 import me.injent.myschool.sync.initializers.syncForegroundInfo
+import java.time.Duration
 
 @HiltWorker
 class SyncWorker @AssistedInject constructor(
@@ -27,24 +25,28 @@ class SyncWorker @AssistedInject constructor(
     private val personRepository: PersonRepository,
     private val subjectRepository: SubjectRepository,
     private val markRepository: MarkRepository,
-    private val userDataRepository: UserDataRepository
+    private val userDataRepository: UserDataRepository,
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         return@withContext try {
             val isSynchronized = listOf(
+                userDataRepository.synchronize(),
                 personRepository.synchronize(),
                 subjectRepository.synchronize(),
-                markRepository.synchronize()
+                markRepository.synchronize(),
             ).all { it }
 
-            if (isSynchronized) {
+            return@withContext if (isSynchronized) {
+                userDataRepository.setInitizalized()
                 userDataRepository.updateSyncTime()
                 Result.success()
+            } else {
+                Result.failure()
             }
-            else Result.retry()
         } catch (e: Exception) {
-            Result.retry()
+            e.printStackTrace()
+            Result.failure()
         }
     }
 

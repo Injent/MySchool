@@ -10,6 +10,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import me.injent.myschool.sync.WorkController
 
 /**
  * Use it to initialize sync work.
@@ -24,10 +25,6 @@ object Sync {
 
 const val SyncWorkName = "synchronization"
 
-/**
- * Followed by this guide
- * [Android Developers](https://developer.android.com/topic/architecture/data-layer/offline-first)
-**/
 object SyncInitializer : Initializer<WorkManager> {
     override fun create(@ApplicationContext context: Context): WorkManager {
         val workerFactory = getWorkerFactory(appContext = context.applicationContext)

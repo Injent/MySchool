@@ -13,6 +13,7 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.http.GET
 import retrofit2.http.Path
+import retrofit2.http.Query
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -65,6 +66,13 @@ private interface RetrofitDnevnikApi {
         @Path(DnevnikApi.FROM_PERIOD) from: LocalDateTime,
         @Path(DnevnikApi.TO_PERIOD) to: LocalDateTime
     ): List<NetworkMark>
+
+    @GET(DnevnikApi.HOMEWORKS)
+    suspend fun getHomeworks(
+        @Path(DnevnikApi.SCHOOL_ID) schoolId: Int,
+        @Query("startDate") from: LocalDateTime,
+        @Query("endDate") to: LocalDateTime
+    ): NetworkHomeworkData
 }
 
 /**
@@ -85,45 +93,66 @@ class RetrofitDnevnik @Inject constructor(
         .build()
         .create(RetrofitDnevnikApi::class.java)
 
-    override suspend fun getUserContext(): NetworkUserContext
-        = api.getUserContext()
+    override suspend fun getUserContext(): NetworkUserContext =
+        api.getUserContext()
 
-    override suspend fun getClassmates(): List<Long>
-        = api.getClassmates()
+    override suspend fun getClassmates(): List<Long> =
+        api.getClassmates()
 
-    override suspend fun getPerson(userId: Long): NetworkPerson
-        = api.getPerson(userId)
+    override suspend fun getPerson(userId: Long): NetworkPerson =
+        api.getPerson(userId)
 
-    override suspend fun getPersonsInEduGroup(eduGroupId: Long): List<NetworkShortUserInfo>
-        = api.getPeopleInEduGroup(eduGroupId)
+    override suspend fun getPersonsInEduGroup(eduGroupId: Long): List<NetworkShortUserInfo> =
+        api.getPeopleInEduGroup(eduGroupId)
 
-    override suspend fun getReportingPeriods(eduGroupId: Long): List<NetworkReportingPeriod>
-        = api.getReportingPeriods(eduGroupId)
+    override suspend fun getReportingPeriods(eduGroupId: Long): List<NetworkReportingPeriod> =
+        api.getReportingPeriods(eduGroupId)
 
-    override suspend fun getSubjects(eduGroupId: Long): List<NetworkSubject>
-        = api.getSubjects(eduGroupId)
+    override suspend fun getSubjects(eduGroupId: Long): List<NetworkSubject> =
+        api.getSubjects(eduGroupId)
 
     override suspend fun getPersonMarksBySubjectAndPeriod(
         personId: Long,
         subjectId: Long,
         from: LocalDateTime,
         to: LocalDateTime
-    ): List<NetworkMark>
-        = api.getPersonMarksBySubjectAndPeriod(personId, subjectId, from, to)
+    ): List<NetworkMark> =
+        api.getPersonMarksBySubjectAndPeriod(personId, subjectId, from, to)
 
-    override suspend fun getAverageMark(personId: Long, periodId: Long): Float
-        = api.getAverageMark(personId, periodId).replace(',', '.').toFloat()
+    override suspend fun getAverageMark(personId: Long, periodId: Long): Float =
+        api.getAverageMark(personId, periodId).replace(',', '.').toFloat()
 
     override suspend fun getEduGroupMarksBySubject(
         eduGroupId: Long,
         subjectId: Long,
         from: LocalDateTime,
         to: LocalDateTime
-    ): List<NetworkMark>
-        = api.getEduGroupMarksBySubject(
+    ): List<NetworkMark> =
+        api.getEduGroupMarksBySubject(
             eduGroupId,
             subjectId,
             from,
             to
         )
+
+    override suspend fun getHomeworks(
+        schoolId: Int,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): NetworkHomeworkData =
+        api.getHomeworks(
+            schoolId = schoolId,
+            from = from,
+            to = to
+        )
+
+    override suspend fun getRecentMarks(
+        personId: Long,
+        eduGroupId: Long,
+        fromDate: LocalDateTime?,
+        toDate: LocalDateTime?,
+        limit: Int?
+    ) {
+        TODO("Not yet implemented")
+    }
 }

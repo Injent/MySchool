@@ -20,6 +20,10 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 implementation(Dependencies.NAVIGATION_COMPOSE)
                 implementation(Dependencies.HILT_NAVIGATION_COMPOSE)
                 implementation(Dependencies.LIFECYCLE_RUNTIME_COMPOSE)
+                implementation(Dependencies.LIFECYCLE_VIEWMODEL_COMPOSE)
+                implementation(Dependencies.LIFECYCLE_RUNTIME_KTX)
+                implementation(Dependencies.COMPOSE_COMPILER)
+                implementation(Dependencies.DATETIME)
             }
         }
     }

@@ -1,12 +1,11 @@
 package me.injent.myschool.core.ui
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import me.injent.myschool.core.designsystem.icon.MsIcons
@@ -20,10 +19,12 @@ fun ProfileTopAppBar(
     modifier: Modifier = Modifier,
     personShortName: String,
     containerColor: Color = Color.Transparent,
-    contentColor: Color = MaterialTheme.colorScheme.hint,
+    contentColor: Color = MaterialTheme.colorScheme.secondary,
     titleColor: Color = MaterialTheme.colorScheme.onBackground,
+    scrollBehavior: TopAppBarScrollBehavior? = null
 ) {
     TopAppBar(
+        modifier = modifier,
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = containerColor,
             navigationIconContentColor = contentColor,
@@ -46,15 +47,18 @@ fun ProfileTopAppBar(
                 Icon(
                     imageVector = MsIcons.ArrowBack,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.hint
+                    tint = MaterialTheme.colorScheme.secondary
                 )
             }
         },
         actions = {
             ProfilePicture(
                 shortName = personShortName,
-                onClick = onProfileClick
+                onClick = onProfileClick,
+                modifier = Modifier
+                    .padding(ButtonDefaults.IconSpacing)
             )
-        }
+        },
+        scrollBehavior = scrollBehavior
     )
 }

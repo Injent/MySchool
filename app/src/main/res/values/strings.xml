@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">MySchool</string>
     <string name="network_error">Нет подключения к сети</string>
+    <string name="dashboard">Дашборд</string>
+    <string name="my_class">Мой класс</string>
+    <string name="statistics">Статистика</string>
+    <string name="profile">Профиль</string>
 </resources>

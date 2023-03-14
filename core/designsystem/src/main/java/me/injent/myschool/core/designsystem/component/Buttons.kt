@@ -1,12 +1,12 @@
 package me.injent.myschool.core.designsystem.component
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import me.injent.myschool.core.designsystem.theme.hint
 
 @Composable
 fun MsButton(
@@ -26,6 +26,34 @@ fun MsButton(
         contentPadding = contentPadding,
         content = content
     )
+}
+
+@Composable
+fun MsTextButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
+    contentColor: Color = MaterialTheme.colorScheme.tertiary
+) {
+    TextButton(
+        modifier = modifier,
+        onClick = onClick,
+        colors = ButtonDefaults.textButtonColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+            disabledContainerColor = MaterialTheme.colorScheme.hint,
+            disabledContentColor = MaterialTheme.colorScheme.secondary
+        ),
+        shape = MaterialTheme.shapes.small,
+        enabled = enabled
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyMedium
+        )
+    }
 }
 
 @Composable

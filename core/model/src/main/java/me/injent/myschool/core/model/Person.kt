@@ -11,7 +11,12 @@ data class Person(
     val shortName: String,
     val locale: String,
     val birthday: LocalDate? = null,
-    val sex: String,
+    val sex: Sex,
     val roles: List<String>,
     val phone: String? = null
 )
+
+enum class Sex(val serializeName: String) {
+    MALE("Male"),
+    FEMALE("Female")
+}

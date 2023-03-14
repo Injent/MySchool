@@ -9,10 +9,7 @@ import me.injent.myschool.core.database.dao.SubjectDao
 import me.injent.myschool.core.database.model.MarkEntity
 import me.injent.myschool.core.database.model.PersonEntity
 import me.injent.myschool.core.database.model.SubjectEntity
-import me.injent.myschool.core.database.util.InstantConverter
-import me.injent.myschool.core.database.util.LocalDateConverter
-import me.injent.myschool.core.database.util.LocalDateTimeConverter
-import me.injent.myschool.core.database.util.StringListConverter
+import me.injent.myschool.core.database.util.*
 
 @Database(
     version = 1,
@@ -26,7 +23,8 @@ import me.injent.myschool.core.database.util.StringListConverter
     InstantConverter::class,
     StringListConverter::class,
     LocalDateConverter::class,
-    LocalDateTimeConverter::class
+    LocalDateTimeConverter::class,
+    SexConverter::class
 )
 abstract class MsDatabase : RoomDatabase() {
     abstract fun personDao(): PersonDao

@@ -12,4 +12,7 @@ interface SubjectDao {
     suspend fun saveSubjects(subjects: List<SubjectEntity>)
     @Query("SELECT * FROM subjects")
     fun getSubjects(): Flow<List<SubjectEntity>>
+
+    @Query("SELECT * FROM subjects WHERE id = :subjectId LIMIT 1")
+    fun getSubject(subjectId: Long): Flow<SubjectEntity>
 }

@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun ProfilePicture(
@@ -27,8 +28,7 @@ fun ProfilePicture(
 ) {
     Box(
         modifier = modifier
-            .padding(12.dp)
-            .requiredSize(48.dp)
+            .requiredSize(40.dp)
             .clip(CircleShape)
             .clickable(onClick = onClick)
             .background(MaterialTheme.colorScheme.primary)
@@ -36,7 +36,7 @@ fun ProfilePicture(
         Text(
             text = "${shortName.first()}${shortName.last()}",
             color = MaterialTheme.colorScheme.onPrimary,
-            style = MaterialTheme.typography.titleMedium,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
             modifier = Modifier.align(Alignment.Center)
         )
