@@ -13,6 +13,12 @@ import me.injent.myschool.core.data.util.NetworkMonitor
 @Module
 @InstallIn(SingletonComponent::class)
 interface DataModule {
+
+    @Binds
+    fun bindsUserContextRepository(
+        userContextRepository: OfflineFirstUserContextRepository
+    ): UserContextRepository
+
     @Binds
     fun bindsUserDataRepository(
         userDataRepository: UserDataRepositoryImpl

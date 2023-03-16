@@ -15,7 +15,7 @@ import kotlinx.coroutines.SupervisorJob
 import me.injent.myschool.core.common.network.Dispatcher
 import me.injent.myschool.core.common.network.MsDispatchers.IO
 import me.injent.myschool.core.datastore.UserDataSerializer
-import me.injent.myschool.core.datastore.model.SaveableUserData
+import me.injent.myschool.core.model.datastore.UserData
 import javax.inject.Singleton
 
 @Module
@@ -26,11 +26,11 @@ object DataStoreModule {
     fun providesDataStore(
         @ApplicationContext context: Context,
         @Dispatcher(IO) dispatcher: CoroutineDispatcher
-    ): DataStore<SaveableUserData> =
+    ): DataStore<UserData> =
         DataStoreFactory.create(
             serializer = UserDataSerializer,
             scope = CoroutineScope(dispatcher + SupervisorJob())
         ) {
-            context.dataStoreFile("user_preferences.pb")
+            context.dataStoreFile("user_preferences.data")
         }
 }

@@ -2,7 +2,9 @@ import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.DependencyHandler
 
 object Dependencies {
-    const val ACCOMPANIST_SYSTEMUICONTROLLER = "com.google.accompanist:accompanist-systemuicontroller:${Versions.ACCOMPANIST}"
+    const val ACCOMPANIST_SYSTEMUICONTROLLER = "com.google.accompanist:accompanist-systemuicontroller:${Versions.ACCOMPANIST_SYSTEM_UI_CONTROLLER}"
+    const val ACCOMPANIST_PLACEHOLDER = "com.google.accompanist:accompanist-placeholder-material:${Versions.ACCOMPANIST_PLACEHOLDER}"
+    const val ACCOMPANIST_PERMISSIONS = "com.google.accompanist:accompanist-permissions:${Versions.ACCOMPANIST_PERMISSIONS}"
     const val ACTIVITY_COMPOSE = "androidx.activity:activity-compose:${Versions.AndroidX.ACTIVITY}"
     const val CORE_KTX = "androidx.core:core-ktx:${Versions.AndroidX.CORE}"
     const val CORE_SPLASHSCREEN = "androidx.core:core-splashscreen:${Versions.AndroidX.CORE_SPLASHSCREEN}"

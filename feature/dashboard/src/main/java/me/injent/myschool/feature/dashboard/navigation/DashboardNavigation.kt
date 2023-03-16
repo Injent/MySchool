@@ -6,16 +6,14 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import me.injent.myschool.feature.dashboard.DashboardRoute
 
-const val DASHBOARD_ROUTE = "dashboard_route"
+const val dashboardRoute = "dashboard_route"
 
-fun NavController.navigateToDashboard(navOptions: NavOptions) {
-    navigate(DASHBOARD_ROUTE, navOptions)
+fun NavController.navigateToDashboard(navOptions: NavOptions?) {
+    navigate(dashboardRoute, navOptions)
 }
 
 fun NavGraphBuilder.dashboardScreen() {
-    composable(
-        route = DASHBOARD_ROUTE
-    ) {
+    composable(route = dashboardRoute) {
         DashboardRoute()
     }
 }

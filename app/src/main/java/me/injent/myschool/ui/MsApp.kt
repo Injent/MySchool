@@ -13,18 +13,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import me.injent.myschool.R
 import me.injent.myschool.core.designsystem.component.MsBackground
-import me.injent.myschool.core.designsystem.theme.hint
 import me.injent.myschool.core.ui.MsNavigationBarItem
 import me.injent.myschool.feature.authorization.AuthState
-import me.injent.myschool.feature.authorization.navigation.AUTHORIZATION_ROUTE
-import me.injent.myschool.feature.dashboard.navigation.DASHBOARD_ROUTE
+import me.injent.myschool.feature.authorization.navigation.authorizationRoute
+import me.injent.myschool.feature.dashboard.navigation.dashboardRoute
 import me.injent.myschool.navigation.MsNavHost
 import me.injent.myschool.navigation.RootDestination
 
@@ -48,7 +46,7 @@ fun MsApp(
             contentColor = MaterialTheme.colorScheme.onBackground,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             bottomBar = {
-                if (appState.shouldShowBottomNavigation) {
+                if (true) {
                     MsBottomNavigation(
                         destinations = appState.rootDestinations,
                         onNavigate = appState::navigateTo,
@@ -71,9 +69,9 @@ fun MsApp(
                 MsNavHost(
                     navController = appState.navController,
                     startDestination = if (authState == AuthState.NOT_AUTHED) {
-                        AUTHORIZATION_ROUTE
+                        authorizationRoute
                     } else {
-                        DASHBOARD_ROUTE
+                        dashboardRoute
                     }
                 )
             }
@@ -98,7 +96,8 @@ private fun MsBottomNavigation(
         verticalAlignment = Alignment.CenterVertically
     ) {
         for (destination in destinations) {
-            val selected = currentDestination.isRootDestination(destination)
+            val selected = currentDestination.isChildOfRootDestination(destination)
+
             MsNavigationBarItem(
                 selected = selected,
                 onClick = { onNavigate(destination) },
@@ -124,8 +123,7 @@ private fun MsBottomNavigation(
     }
 }
 
-private fun NavDestination?.isRootDestination(destination: RootDestination): Boolean {
-    return this?.hierarchy?.any {
-        it.route?.contains(destination.name, ignoreCase = true) ?: false
+fun NavDestination?.isChildOfRootDestination(destination: RootDestination?) =
+    this?.hierarchy?.any {
+        it.route?.contains(destination?.route ?: return@any false, true) ?: false
     } ?: false
-}

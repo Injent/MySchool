@@ -7,7 +7,6 @@ fun NetworkPerson.asEntity() = PersonEntity(
     id = id,
     personId = personId,
     shortName = shortName,
-    locale = locale,
     birthday = birthday,
     sex = sex,
     roles = roles,

@@ -3,15 +3,18 @@ package me.injent.myschool.ui
 import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.*
 import androidx.navigation.NavDestination
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import kotlinx.coroutines.CoroutineScope
-import me.injent.myschool.feature.dashboard.navigation.DASHBOARD_ROUTE
+import me.injent.myschool.feature.dashboard.navigation.dashboardRoute
 import me.injent.myschool.feature.dashboard.navigation.navigateToDashboard
-import me.injent.myschool.feature.students.navigation.MY_CLASS_ROUTE
+import me.injent.myschool.feature.profile.navigation.navigateToProfile
+import me.injent.myschool.feature.students.navigation.myClassGraphRoutePattern
+import me.injent.myschool.feature.students.navigation.myClassRoute
 import me.injent.myschool.feature.students.navigation.navigateToMyClass
 import me.injent.myschool.navigation.RootDestination
 
@@ -39,14 +42,16 @@ class MsAppState(
         @Composable get() = navController
             .currentBackStackEntryAsState().value?.destination
 
-    val shouldShowBottomNavigation: Boolean
-        @Composable get() = currentDestination.isDestinationWithBottomNavigation()
-
-    val currentRootDestination: RootDestination?
-        @Composable get() = when (currentDestination?.route) {
-            DASHBOARD_ROUTE -> RootDestination.DASHBOARD
+    private val currentRootDestination: RootDestination?
+        @Composable get() = when {
+            currentDestination?.route == dashboardRoute -> RootDestination.DASHBOARD
+            currentDestination?.route?.startsWith(myClassGraphRoutePattern)
+                ?: false -> RootDestination.MYCLASS
             else -> null
         }
+
+    val shouldShowBottomNavigation: Boolean
+        @Composable get() = currentDestination.isChildOfRootDestination(currentRootDestination)
 
     fun navigateTo(destination: RootDestination) {
         val rootNavOptions = navOptions {
@@ -61,7 +66,7 @@ class MsAppState(
         when (destination) {
             RootDestination.DASHBOARD -> navController.navigateToDashboard(rootNavOptions)
             RootDestination.MYCLASS -> navController.navigateToMyClass(rootNavOptions)
-            RootDestination.PROFILE -> {}
+            RootDestination.PROFILE -> navController.navigateToProfile(rootNavOptions)
             RootDestination.STATISTICS -> {}
         }
     }
@@ -69,6 +74,6 @@ class MsAppState(
 
 private fun NavDestination?.isDestinationWithBottomNavigation(): Boolean =
     when (this?.route) {
-        DASHBOARD_ROUTE, MY_CLASS_ROUTE -> true
+        dashboardRoute, myClassRoute -> true
         else -> false
     }

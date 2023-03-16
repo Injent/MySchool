@@ -1,21 +1,11 @@
 package me.injent.myschool.core.network
 
 import kotlinx.serialization.KSerializer
-import kotlinx.serialization.builtins.ListSerializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
-import kotlinx.serialization.json.JsonTransformingSerializer
-import me.injent.myschool.core.network.model.NetworkEduGroup
-import me.injent.myschool.core.network.model.NetworkSchool
-
-object SchoolSerializer : JsonTransformingSerializer<List<NetworkSchool>>
-    (ListSerializer(NetworkSchool.serializer()))
-
-object EduGroupSerializer : JsonTransformingSerializer<List<NetworkEduGroup>>
-    (ListSerializer(NetworkEduGroup.serializer()))
 
 class IdSerializer : KSerializer<Long> {
     override val descriptor: SerialDescriptor

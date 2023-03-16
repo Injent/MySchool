@@ -10,7 +10,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import me.injent.myschool.sync.WorkController
 
 /**
  * Use it to initialize sync work.
@@ -22,8 +21,6 @@ object Sync {
             .initializeComponent(SyncInitializer::class.java)
     }
 }
-
-const val SyncWorkName = "synchronization"
 
 object SyncInitializer : Initializer<WorkManager> {
     override fun create(@ApplicationContext context: Context): WorkManager {

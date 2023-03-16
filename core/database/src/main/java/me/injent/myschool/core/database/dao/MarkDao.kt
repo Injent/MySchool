@@ -11,6 +11,8 @@ import me.injent.myschool.core.database.model.MarkEntity
 interface MarkDao {
     @Upsert
     suspend fun saveMarks(marks: List<MarkEntity>)
+    @Upsert
+    suspend fun saveMark(mark: MarkEntity)
     @Query("SELECT value FROM marks WHERE person_id = :personId AND subject_id = :subjectId AND value != 'НЗ'")
     suspend fun getPersonMarkValuesBySubject(personId: Long, subjectId: Long): List<String>
     @Query("SELECT * FROM marks WHERE person_id = :personId AND subject_id = :subjectId")
@@ -19,4 +21,7 @@ interface MarkDao {
     fun getPersonAverageMark(personId: Long): Flow<List<String>>
     @Query("DELETE FROM marks WHERE date < :currentDateOfPeriod")
     suspend fun deleteDeprecatedMarks(currentDateOfPeriod: LocalDateTime)
+
+    @Query("SELECT EXISTS(SELECT id FROM marks WHERE id = :markId LIMIT 1)")
+    suspend fun contains(markId: Long): Boolean
 }

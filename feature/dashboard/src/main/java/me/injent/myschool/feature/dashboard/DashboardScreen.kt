@@ -15,15 +15,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.injent.myschool.core.designsystem.component.MsBackgroundWithImageOnTop
 import me.injent.myschool.core.model.Homework
-import me.injent.myschool.core.ui.HomeworkUiState
-import me.injent.myschool.core.ui.greeting
-import me.injent.myschool.core.ui.homeworks
 import me.injent.myschool.feature.homeworkdialog.HomeworkDialog
+
 
 @Composable
 internal fun DashboardRoute(
     viewModel: DashboardViewModel = hiltViewModel()
 ) {
+    val birthdaysUiState by viewModel.birthdaysUiState.collectAsStateWithLifecycle()
     val homeworkUiState by viewModel.homeworkUiState.collectAsStateWithLifecycle()
 
     var viewingHomework: Homework? by rememberSaveable { mutableStateOf(null) }
@@ -34,8 +33,11 @@ internal fun DashboardRoute(
         )
     }
 
+    NotificationPermRequest()
+
     DashboardScreen(
         homeworkUiState = homeworkUiState,
+        birthdaysUiState = birthdaysUiState,
         onClick = { homework ->
             viewingHomework = homework
         }
@@ -45,6 +47,7 @@ internal fun DashboardRoute(
 @Composable
 private fun DashboardScreen(
     homeworkUiState: HomeworkUiState,
+    birthdaysUiState: BirthdaysUiState,
     onClick: (Homework) -> Unit
 ) {
     MsBackgroundWithImageOnTop(painter = painterResource(me.injent.myschool.core.ui.R.drawable.bg_students)) {
@@ -57,6 +60,9 @@ private fun DashboardScreen(
             homeworks(
                 homeworkUiState = homeworkUiState,
                 onClick = onClick
+            )
+            birthdays(
+                birthdaysUiState = birthdaysUiState
             )
         }
     }

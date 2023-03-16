@@ -17,7 +17,6 @@ data class PersonEntity(
     val personId: Long,
     @ColumnInfo(name = "short_name")
     val shortName: String,
-    val locale: String,
     val birthday: LocalDate? = null,
     val sex: Sex,
     val roles: List<String>,
@@ -28,7 +27,6 @@ fun PersonEntity.asExternalModel() = Person(
     id = id,
     personId = personId,
     shortName = shortName,
-    locale = locale,
     birthday = birthday,
     sex = sex,
     roles = roles,

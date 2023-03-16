@@ -12,8 +12,6 @@ class HomeworkDialogViewModel @Inject constructor(
     private val downloader: Downloader
 ) : ViewModel() {
 
-
-
     fun downloadFile(
         file: Attachment,
         onDownloadComplitionListener: OnDownloadComplitionListener

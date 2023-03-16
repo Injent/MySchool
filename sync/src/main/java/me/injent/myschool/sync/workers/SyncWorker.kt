@@ -1,21 +1,17 @@
 package me.injent.myschool.sync.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.hilt.work.HiltWorker
 import androidx.work.*
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import me.injent.myschool.core.common.network.Dispatcher
 import me.injent.myschool.core.common.network.MsDispatchers.IO
 import me.injent.myschool.core.data.repository.*
 import me.injent.myschool.sync.initializers.SyncConstraints
 import me.injent.myschool.sync.initializers.syncForegroundInfo
-import java.time.Duration
 
 @HiltWorker
 class SyncWorker @AssistedInject constructor(
@@ -26,12 +22,13 @@ class SyncWorker @AssistedInject constructor(
     private val subjectRepository: SubjectRepository,
     private val markRepository: MarkRepository,
     private val userDataRepository: UserDataRepository,
+    private val userContextRepository: UserContextRepository,
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result = withContext(dispatcher) {
         return@withContext try {
             val isSynchronized = listOf(
-                userDataRepository.synchronize(),
+                userContextRepository.synchronize(),
                 personRepository.synchronize(),
                 subjectRepository.synchronize(),
                 markRepository.synchronize(),
@@ -50,10 +47,11 @@ class SyncWorker @AssistedInject constructor(
         }
     }
 
-    override suspend fun getForegroundInfo()
-        = appContext.syncForegroundInfo()
+    override suspend fun getForegroundInfo() =
+        appContext.syncForegroundInfo()
 
     companion object {
+        const val WorkName = "synchronization"
         fun startUpSyncWork() = OneTimeWorkRequestBuilder<SyncWorker>()
             .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .setConstraints(SyncConstraints)

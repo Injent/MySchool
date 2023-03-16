@@ -4,9 +4,8 @@ import android.content.Intent
 import androidx.navigation.*
 import androidx.navigation.compose.composable
 import me.injent.myschool.feature.authorization.AuthorizationRoute
-import me.injent.myschool.feature.authorization.BuildConfig
 
-const val AUTHORIZATION_ROUTE = "authorization_route"
+const val authorizationRoute = "authorization_route"
 const val REDIRECT_URL = "http://myschool"
 const val AUTH_URL = "https://login.dnevnik.ru/oauth2?response_type=token" +
         "&client_id=bb97b3e445a340b9b9cab4b9ea0dbd6f" +
@@ -14,12 +13,12 @@ const val AUTH_URL = "https://login.dnevnik.ru/oauth2?response_type=token" +
         "&redirect_uri=$REDIRECT_URL"
 
 fun NavController.navigateToAuthorization() {
-    navigate(AUTHORIZATION_ROUTE)
+    navigate(authorizationRoute)
 }
 
 fun NavGraphBuilder.authorizationScreen(onAuthorization: () -> Unit) {
     composable(
-        route = AUTHORIZATION_ROUTE,
+        route = authorizationRoute,
         deepLinks = listOf(
             navDeepLink {
                 uriPattern = "$REDIRECT_URL/#access_token={token}&state="

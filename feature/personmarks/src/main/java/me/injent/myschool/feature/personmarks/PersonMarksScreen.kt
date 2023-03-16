@@ -1,9 +1,7 @@
 package me.injent.myschool.feature.personmarks
 
 import androidx.compose.animation.*
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.*
 import androidx.compose.foundation.rememberScrollState
@@ -16,29 +14,27 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import me.injent.myschool.core.designsystem.icon.MsIcons
-import me.injent.myschool.core.designsystem.theme.hint
 import me.injent.myschool.core.designsystem.theme.topMedium
-import me.injent.myschool.core.model.Mark
 import me.injent.myschool.core.model.Sex
 import me.injent.myschool.core.model.alias.SubjectsToMarks
 import me.injent.myschool.core.ui.*
 
 @Composable
-internal fun ProfileRoute(
+internal fun PersonMarksRoute(
     onBack: () -> Unit,
     onLeaderboardClick: (subjectId: Long) -> Unit,
     viewModel: PersonMarksViewModel = hiltViewModel()
 ) {
     val subjectsAndMarks by viewModel.personMarksUiState.collectAsStateWithLifecycle()
     val personUiState by viewModel.personUiState.collectAsStateWithLifecycle()
-    ProfileScreen(
+
+    PersonMarksScreen(
         personMarksUiState = subjectsAndMarks,
         personUiState = personUiState,
         onBack = onBack,
@@ -48,7 +44,7 @@ internal fun ProfileRoute(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProfileScreen(
+private fun PersonMarksScreen(
     personMarksUiState: PersonMarksUiState,
     personUiState: PersonUiState,
     onBack: () -> Unit,
@@ -71,7 +67,7 @@ private fun ProfileScreen(
     ) { padding ->
         Column(
             modifier = Modifier
-                .padding(padding)
+                .padding(top = padding.calculateTopPadding())
                 .fillMaxSize()
                 .clip(MaterialTheme.shapes.topMedium)
                 .background(MaterialTheme.colorScheme.surface)
@@ -80,7 +76,7 @@ private fun ProfileScreen(
             when (personUiState) {
                 is PersonUiState.Success -> {
                     Text(
-                        text = if (personUiState.person.sex == Sex.MALE) {
+                        text = if (personUiState.person.sex == Sex.Male) {
                             stringResource(id = R.string.male_student_marks)
                         } else {
                             stringResource(id = R.string.female_student_marks)       

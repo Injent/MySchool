@@ -6,5 +6,6 @@ import kotlinx.serialization.Serializable
 data class NetworkLesson(
     val id: Long,
     val title: String,
-    val teachers: List<Long>
+    val teachers: List<Long>,
+    val subject: NetworkSubject? = null
 )

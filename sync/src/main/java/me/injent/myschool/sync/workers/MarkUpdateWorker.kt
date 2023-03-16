@@ -2,7 +2,10 @@ package me.injent.myschool.sync.workers
 
 import android.content.Context
 import androidx.hilt.work.HiltWorker
-import androidx.work.*
+import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
+import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkerParameters
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -10,8 +13,12 @@ import kotlinx.coroutines.withContext
 import me.injent.myschool.core.common.network.Dispatcher
 import me.injent.myschool.core.common.network.MsDispatchers.IO
 import me.injent.myschool.core.data.repository.MarkRepository
-import me.injent.myschool.core.data.repository.UserDataRepository
-import me.injent.myschool.sync.initializers.SyncConstraints
+import me.injent.myschool.core.data.repository.ReceivedMarksResult
+import me.injent.myschool.core.data.repository.UserContextRepository
+import me.injent.myschool.sync.R
+import me.injent.myschool.sync.initializers.MarkUpdateWorkConstraints
+import me.injent.myschool.sync.initializers.markUpdateForegroundInfo
+import me.injent.myschool.sync.initializers.showMarkUpdateNotification
 import java.time.Duration
 
 @HiltWorker
@@ -19,34 +26,49 @@ class MarkUpdateWorker @AssistedInject constructor(
     @Assisted private val appContext: Context,
     @Assisted workerParams: WorkerParameters,
     @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
-    private val userDataRepository: UserDataRepository,
+    private val userContextRepository: UserContextRepository,
     private val markRepository: MarkRepository
 ) : CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
-        try {
-            val isSynchronized = listOf(
-                userDataRepository.synchronize(),
-                markRepository.synchronize()
-            ).all { it }
+        return@withContext try {
+            val isSynchronized = userContextRepository.synchronize()
 
-            if (isSynchronized) {
-                Result.success()
+            if (!isSynchronized) Result.retry()
+
+            when (val result = markRepository.receiveNewMarks()) {
+                ReceivedMarksResult.Error -> {
+                    Result.retry()
+                }
+                is ReceivedMarksResult.MultipleMarks -> {
+                    appContext.showMarkUpdateNotification(
+                        appContext.getString(
+                            R.string.mark_update_notification_decription_multiple_marks
+                        ) + " " + result.count
+                    )
+                    Result.success()
+                }
+                is ReceivedMarksResult.NewMark -> {
+                    appContext.showMarkUpdateNotification(
+                        result.subjectName + " " + result.value
+                    )
+                    Result.success()
+                }
+                ReceivedMarksResult.NotChanged -> Result.success()
             }
-            Result.retry()
         } catch (e: Exception) {
+            e.printStackTrace()
             Result.retry()
         }
     }
 
-    override suspend fun getForegroundInfo(): ForegroundInfo {
-        return super.getForegroundInfo()
-    }
+    override suspend fun getForegroundInfo(): ForegroundInfo =
+        appContext.markUpdateForegroundInfo()
 
     companion object {
-        fun startUpMarkUpdateWork() = PeriodicWorkRequestBuilder<MarkUpdateWorker>(Duration.ofSeconds(40))
-            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-            .setConstraints(SyncConstraints)
+        const val WorkName = "mark_receiving"
+        fun startUpMarkUpdateWork() = PeriodicWorkRequestBuilder<MarkUpdateWorker>(Duration.ofMinutes(30))
+            .setConstraints(MarkUpdateWorkConstraints)
             .build()
     }
 }

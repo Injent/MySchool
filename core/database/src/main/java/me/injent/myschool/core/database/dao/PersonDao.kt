@@ -1,9 +1,11 @@
 package me.injent.myschool.core.database.dao
 
 import androidx.room.Dao
+import androidx.room.MapInfo
 import androidx.room.Query
 import androidx.room.Upsert
 import kotlinx.coroutines.flow.Flow
+import kotlinx.datetime.LocalDate
 import me.injent.myschool.core.database.model.PersonEntity
 import me.injent.myschool.core.database.model.PersonIdAndName
 
@@ -22,6 +24,9 @@ interface PersonDao {
     fun getPersonsIdAndName(): List<PersonIdAndName>
     @Query("SELECT * FROM persons WHERE person_id = :personId LIMIT 1")
     fun getPerson(personId: Long): Flow<PersonEntity?>
+    @MapInfo(keyColumn = "short_name", valueColumn = "birthday")
+    @Query("SELECT short_name, birthday FROM persons")
+    fun getClosestBirthdays(): Flow<Map<String, LocalDate?>>
     @Query("DELETE FROM persons")
     suspend fun deleteAll()
 }

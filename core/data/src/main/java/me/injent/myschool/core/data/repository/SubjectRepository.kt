@@ -1,6 +1,8 @@
 package me.injent.myschool.core.data.repository
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import me.injent.myschool.core.data.model.asEntity
 import me.injent.myschool.core.data.util.RepoDependency
@@ -12,23 +14,24 @@ import me.injent.myschool.core.network.DnevnikNetworkDataSource
 import me.injent.myschool.core.network.model.NetworkSubject
 import javax.inject.Inject
 
-@RepoDependency(UserDataRepository::class)
 interface SubjectRepository : Syncable {
     val subjects: Flow<List<Subject>>
     fun getSubject(subjectId: Long): Flow<Subject>
 }
 
+@RepoDependency(UserContextRepository::class)
 class OfflineFirstSubjectRepository @Inject constructor(
     private val networkDataSource: DnevnikNetworkDataSource,
     private val subjectDao: SubjectDao,
-    private val userDataRepository: UserDataRepository
+    private val userContextRepository: UserContextRepository
 ) : SubjectRepository {
     override suspend fun synchronize(): Boolean = try {
-        val eduGroupId = userDataRepository.getUserContext()!!.eduGroup.id
-        val subjects = networkDataSource.getSubjects(eduGroupId).map(NetworkSubject::asEntity)
+        val groupId = userContextRepository.userContext.first()!!.group.id
+        val subjects = networkDataSource.getSubjects(groupId).map(NetworkSubject::asEntity)
         subjectDao.saveSubjects(subjects)
         true
     } catch (e: Exception) {
+        Log.e("SubjectRepository", "Failed to sync")
         e.printStackTrace()
         false
     }

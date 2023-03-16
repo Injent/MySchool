@@ -2,6 +2,7 @@ package me.injent.myschool.core.network.model
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import me.injent.myschool.core.common.util.withLocalOffset
 import me.injent.myschool.core.model.Homework
 
 @Serializable
@@ -25,7 +26,7 @@ fun NetworkHomeworkData.asExternalModelList(): List<Homework> {
                 text = homework.text,
                 subject = subject.asExternalModel(),
                 files = files.map(NetworkAttachment::asExternalModel),
-                sentDate = homework.sentDate,
+                sentDate = homework.sentDate.withLocalOffset(),
                 teacher = teacher.asExternalModel()
             )
         }

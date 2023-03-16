@@ -29,11 +29,9 @@ class PersonMarksViewModel @Inject constructor(
         userDataRepository.userData,
         subjectRepository.subjects
     ) { userData, subjects ->
-        val filteredSubjects = subjects.filterNot { userData.bannedSubjects.contains(it) }
-
         val subjectsToMarks = mutableListOf<SingleSubjectAndMarks>()
-        for (subject in filteredSubjects) {
-            val marks = markRepository.getPersonMarksBySubject(personId, subject.id).first()
+        for (subject in subjects) {
+            val marks = markRepository.getPersonMarksBySubjectStream(personId, subject.id).first()
             if (marks.isNotEmpty())
                 subjectsToMarks.add(Pair(subject, marks))
         }

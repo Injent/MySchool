@@ -4,7 +4,6 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import me.injent.myschool.core.model.Mark
 import me.injent.myschool.core.network.DnevnikApi
 import me.injent.myschool.core.network.DnevnikNetworkDataSource
 import me.injent.myschool.core.network.model.*
@@ -21,12 +20,25 @@ import javax.inject.Singleton
  * Retrofit API declaration for Dnevnik API
  */
 private interface RetrofitDnevnikApi {
-    @GET(DnevnikApi.CONTEXT)
-    suspend fun getUserContext(): NetworkUserContext
+    @GET("/mobile/v7.0/users/{userId}/context")
+    suspend fun getUserContext(@Path("userId") userId: Long): ContextPersonResponse
 
-    @GET(DnevnikApi.PERSON)
+    @GET("/mobile/v7.0/persons/{personId}/groups/{groupId}/periods/{periodId}/periodMarks")
+    suspend fun getPersonMarks(
+        @Path("personId") personId: Long,
+        @Path("groupId") groupId: Long,
+        @Path("periodId") periodId: Long
+    ): PersonMarksResponse
+
+    @GET("/v2/users/me/classmates")
+    suspend fun getClassmates(): List<Long>
+
+    @GET("/v2/users/me")
+    suspend fun getMyUserId(): UserIdResponse
+
+    @GET("/v2/users/{userId}")
     suspend fun getPerson(
-        @Path(DnevnikApi.USER_ID) userId: Long
+        @Path("userId") userId: Long
     ): NetworkPerson
 
     @GET(DnevnikApi.PEOPLE_IN_EDUGROUP)
@@ -34,18 +46,10 @@ private interface RetrofitDnevnikApi {
         @Path(DnevnikApi.EDUGROUP_ID) eduGroupId: Long
     ): List<NetworkShortUserInfo>
 
-    @GET(DnevnikApi.REPORTING_PERIODS)
-    suspend fun getReportingPeriods(
-        @Path(DnevnikApi.EDUGROUP_ID) eduGroupId: Long
-    ): List<NetworkReportingPeriod>
-
-    @GET(DnevnikApi.CLASSMATES)
-    suspend fun getClassmates(): List<Long>
-
     @GET(DnevnikApi.SUBJECTS)
     suspend fun getSubjects(@Path(DnevnikApi.EDUGROUP_ID) eduGroupId: Long): List<NetworkSubject>
 
-    @GET(DnevnikApi.PERSON_MARK_BY_PERIOD)
+    @GET(DnevnikApi.PERSON_MARK_BY_PERIOD_AND_SUBJECT)
     suspend fun getPersonMarksBySubjectAndPeriod(
         @Path(DnevnikApi.PERSON_ID) personId: Long,
         @Path(DnevnikApi.SUBJECT_ID) subjectId: Long,
@@ -69,10 +73,21 @@ private interface RetrofitDnevnikApi {
 
     @GET(DnevnikApi.HOMEWORKS)
     suspend fun getHomeworks(
-        @Path(DnevnikApi.SCHOOL_ID) schoolId: Int,
+        @Path(DnevnikApi.SCHOOL_ID) schoolId: Long,
         @Query("startDate") from: LocalDateTime,
         @Query("endDate") to: LocalDateTime
     ): NetworkHomeworkData
+
+    @GET(DnevnikApi.PERSON_MARKS_BY_PERIOD)
+    suspend fun getPersonMarksByPeriod(
+        @Path(DnevnikApi.PERSON_ID) personId: Long,
+        @Path(DnevnikApi.SCHOOL_ID) schoolId: Long,
+        @Path(DnevnikApi.FROM_PERIOD) from: LocalDateTime,
+        @Path(DnevnikApi.TO_PERIOD) to: LocalDateTime
+    ): List<NetworkMark>
+
+    @GET("/v2/lessons/{lessonId}")
+    suspend fun getLesson(@Path("lessonId") lessonId: Long): NetworkLesson
 }
 
 /**
@@ -93,8 +108,11 @@ class RetrofitDnevnik @Inject constructor(
         .build()
         .create(RetrofitDnevnikApi::class.java)
 
-    override suspend fun getUserContext(): NetworkUserContext =
-        api.getUserContext()
+    override suspend fun getMyUserId(): UserIdResponse =
+        api.getMyUserId()
+
+    override suspend fun getContextPerson(userId: Long): ContextPersonResponse =
+        api.getUserContext(userId)
 
     override suspend fun getClassmates(): List<Long> =
         api.getClassmates()
@@ -104,9 +122,6 @@ class RetrofitDnevnik @Inject constructor(
 
     override suspend fun getPersonsInEduGroup(eduGroupId: Long): List<NetworkShortUserInfo> =
         api.getPeopleInEduGroup(eduGroupId)
-
-    override suspend fun getReportingPeriods(eduGroupId: Long): List<NetworkReportingPeriod> =
-        api.getReportingPeriods(eduGroupId)
 
     override suspend fun getSubjects(eduGroupId: Long): List<NetworkSubject> =
         api.getSubjects(eduGroupId)
@@ -136,7 +151,7 @@ class RetrofitDnevnik @Inject constructor(
         )
 
     override suspend fun getHomeworks(
-        schoolId: Int,
+        schoolId: Long,
         from: LocalDateTime,
         to: LocalDateTime
     ): NetworkHomeworkData =
@@ -155,4 +170,20 @@ class RetrofitDnevnik @Inject constructor(
     ) {
         TODO("Not yet implemented")
     }
+
+    override suspend fun getPersonMarksByPeriod(
+        personId: Long,
+        schoolId: Long,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): List<NetworkMark> =
+        api.getPersonMarksByPeriod(
+            personId,
+            schoolId,
+            from,
+            to
+        )
+
+    override suspend fun getLesson(lessonId: Long): NetworkLesson =
+        api.getLesson(lessonId)
 }

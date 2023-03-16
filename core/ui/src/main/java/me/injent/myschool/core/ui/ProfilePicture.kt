@@ -2,10 +2,7 @@ package me.injent.myschool.core.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredSize
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Person
@@ -28,7 +25,7 @@ fun ProfilePicture(
 ) {
     Box(
         modifier = modifier
-            .requiredSize(40.dp)
+            .sizeIn(minWidth = 40.dp, minHeight = 40.dp)
             .clip(CircleShape)
             .clickable(onClick = onClick)
             .background(MaterialTheme.colorScheme.primary)

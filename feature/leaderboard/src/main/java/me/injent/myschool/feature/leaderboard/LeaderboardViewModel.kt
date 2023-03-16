@@ -1,6 +1,5 @@
 package me.injent.myschool.feature.leaderboard
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -44,7 +43,7 @@ private fun leaderboardUiState(
     subjectRepository: SubjectRepository
 ) : Flow<LeaderboardUiState> {
     val subjectStream = subjectRepository.getSubject(subjectId)
-    val personsStream = personRepository.getPersonsStream()
+    val personsStream = personRepository.persons
 
     return combine(
         subjectStream,

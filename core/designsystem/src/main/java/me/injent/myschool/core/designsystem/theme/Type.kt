@@ -31,6 +31,13 @@ val Typography = Typography(
         lineHeight = 22.sp,
         letterSpacing = 0.5.sp
     ),
+    titleSmall = TextStyle(
+        fontFamily = InterFont,
+        fontWeight = FontWeight.Light,
+        fontSize = 18.sp,
+        lineHeight = 22.sp,
+        letterSpacing = 0.5.sp
+    ),
     bodyLarge = TextStyle(
         fontFamily = FontFamily.SansSerif,
         fontWeight = FontWeight.Light,

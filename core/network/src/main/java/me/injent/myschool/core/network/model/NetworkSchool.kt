@@ -5,7 +5,7 @@ import me.injent.myschool.core.model.School
 
 @Serializable
 data class NetworkSchool(
-    val id: Int,
+    val id: Long,
     val name: String,
     val type: String,
     val groupIds: List<Long>

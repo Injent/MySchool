@@ -2,14 +2,14 @@ package me.injent.myschool
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import me.injent.myschool.core.common.SessionManager
+import me.injent.myschool.core.data.repository.UserDataRepository
 import me.injent.myschool.core.data.util.NetworkMonitor
 import me.injent.myschool.feature.authorization.AuthState
+import me.injent.myschool.sync.startPeriodicMarkUpdateWork
 import javax.inject.Inject
 
 @HiltViewModel
@@ -32,7 +32,9 @@ class MainActivityViewModel @Inject constructor(
                     AuthState.NOT_AUTHED
                 }
             }
-            !isOnline && !token.isNullOrEmpty() -> AuthState.SUCCESS
+            !isOnline && !token.isNullOrEmpty() -> {
+                AuthState.SUCCESS
+            }
             else -> AuthState.CHECKING_TOKEN
         }
     }

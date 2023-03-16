@@ -54,7 +54,7 @@ private fun LeaderboardScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
+                .padding(top = padding.calculateTopPadding())
         ) {
             topPersons(
                 leaderboardUiState = leaderboardUiState,
@@ -183,7 +183,7 @@ private fun LeaderboardTopAppBar(
         },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = Color.Transparent,
-            navigationIconContentColor = MaterialTheme.colorScheme.hint,
+            navigationIconContentColor = MaterialTheme.colorScheme.secondary,
             titleContentColor = MaterialTheme.colorScheme.onBackground
         )
     )

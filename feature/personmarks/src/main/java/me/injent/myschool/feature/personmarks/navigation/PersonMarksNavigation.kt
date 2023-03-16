@@ -2,7 +2,7 @@ package me.injent.myschool.feature.personmarks.navigation
 
 import androidx.navigation.*
 import androidx.navigation.compose.composable
-import me.injent.myschool.feature.personmarks.ProfileRoute
+import me.injent.myschool.feature.personmarks.PersonMarksRoute
 
 const val PERSON_MARKS_ROUTE = "person_marks_route"
 const val PERSON_ID = "personId"
@@ -11,7 +11,7 @@ fun NavController.navigateToProfile(personId: Long) {
     navigate("$PERSON_MARKS_ROUTE/$personId")
 }
 
-fun NavGraphBuilder.profileScreen(
+fun NavGraphBuilder.personMarksScreen(
     onBack: () -> Unit,
     onLeaderboardClick: (subjectId: Long) -> Unit
 ) {
@@ -23,7 +23,7 @@ fun NavGraphBuilder.profileScreen(
             }
         )
     ) {
-        ProfileRoute(
+        PersonMarksRoute(
             onBack = onBack,
             onLeaderboardClick = onLeaderboardClick
         )

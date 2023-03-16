@@ -12,9 +12,6 @@
                 android:name="androidx.work.WorkManagerInitializer"
                 android:value="@string/androidx_startup"
                 tools:node="remove" />
-<!--            <meta-data-->
-<!--                android:name="me.injent.myschool.sync.initializers.SyncInitializer"-->
-<!--                android:value="androidx.startup" />-->
         </provider>
     </application>
 </manifest>

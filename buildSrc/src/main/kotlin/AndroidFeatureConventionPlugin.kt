@@ -24,6 +24,9 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
                 implementation(Dependencies.LIFECYCLE_RUNTIME_KTX)
                 implementation(Dependencies.COMPOSE_COMPILER)
                 implementation(Dependencies.DATETIME)
+                implementation(Dependencies.WORK)
+                implementation(Dependencies.ACCOMPANIST_PLACEHOLDER)
+                implementation(Dependencies.ACCOMPANIST_PERMISSIONS)
             }
         }
     }

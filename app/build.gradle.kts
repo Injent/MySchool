@@ -50,6 +50,7 @@ dependencies {
     implementation(project(":feature:myclass"))
     implementation(project(":feature:leaderboard"))
     implementation(project(":feature:dashboard"))
+    implementation(project(":feature:profile"))
 
     implementation(Dependencies.CORE_KTX)
     implementation(Dependencies.ACTIVITY_COMPOSE)
@@ -57,4 +58,5 @@ dependencies {
     implementation(Dependencies.CORE_SPLASHSCREEN)
     implementation(Dependencies.HILT_WORK)
     implementation(Dependencies.WINDOW_SIZE_CLASS)
+    implementation(Dependencies.ACCOMPANIST_PERMISSIONS)
 }

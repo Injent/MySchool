@@ -28,6 +28,7 @@
             <option value="$PROJECT_DIR$/feature/leaderboard" />
             <option value="$PROJECT_DIR$/feature/myclass" />
             <option value="$PROJECT_DIR$/feature/personmarks" />
+            <option value="$PROJECT_DIR$/feature/profile" />
             <option value="$PROJECT_DIR$/feature/usersearch" />
             <option value="$PROJECT_DIR$/sync" />
           </set>

@@ -9,7 +9,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import me.injent.myschool.core.data.util.SyncStatusMonitor
-import me.injent.myschool.sync.WorkController
 import me.injent.myschool.sync.monitor.SyncWorkStatusMonitor
 
 @Module
@@ -18,7 +17,7 @@ object SyncModule {
     @Provides
     fun providesWorkController(
         @ApplicationContext context: Context
-    ): WorkController = WorkController(WorkManager.getInstance(context))
+    ): WorkManager = WorkManager.getInstance(context)
 
     @Module
     @InstallIn(SingletonComponent::class)

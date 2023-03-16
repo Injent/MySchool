@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="notification_name">Synchronization</string>
-    <string name="notification_title">My School</string>
-    <string name="notification_description">Синхронизация данных</string>
+    <string name="sync_notification_name">Synchronization</string>
+    <string name="sync_notification_title">My School</string>
+    <string name="sync_notification_description">Синхронизация данных</string>
+
+    <string name="mark_update_notification_name">MarkUpdate</string>
+    <string name="mark_update_notification_title">Новая оценка</string>
+    <string name="mark_update_notification_decription_multiple_marks">Новых оценок</string>
 </resources>

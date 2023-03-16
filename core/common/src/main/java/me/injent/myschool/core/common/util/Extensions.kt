@@ -16,3 +16,7 @@ fun LocalDateTime.Companion.currentDateTimeAtEndOfDay() =
 fun Long.toFormattedFileSize(context: Context): String {
     return Formatter.formatFileSize(context, this)
 }
+
+fun LocalDateTime.withLocalOffset(): LocalDateTime {
+    return this.toInstant(TimeZone.UTC).toLocalDateTime(TimeZone.currentSystemDefault())
+}

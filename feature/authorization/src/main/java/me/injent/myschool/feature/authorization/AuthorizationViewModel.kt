@@ -1,20 +1,24 @@
 package me.injent.myschool.feature.authorization
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import me.injent.myschool.core.common.SessionManager
 import me.injent.myschool.core.common.sync.SyncState
-import me.injent.myschool.core.data.repository.PersonRepository
-import me.injent.myschool.core.data.repository.UserDataRepository
 import me.injent.myschool.core.data.util.SyncStatusMonitor
-import me.injent.myschool.sync.WorkController
+import me.injent.myschool.sync.initializers.showMarkUpdateNotification
+import me.injent.myschool.sync.startOneTimeSyncWork
+import me.injent.myschool.sync.startPeriodicMarkUpdateWork
 import javax.inject.Inject
 
 @HiltViewModel
@@ -22,7 +26,7 @@ class AuthorizationViewModel @Inject constructor(
     @ApplicationContext context: Context,
     savedStateHandle: SavedStateHandle,
     syncStatusMonitor: SyncStatusMonitor,
-    workController: WorkController
+    workManager: WorkManager
 ) : ViewModel() {
 
     private val token: String? = savedStateHandle[TOKEN]
@@ -32,7 +36,10 @@ class AuthorizationViewModel @Inject constructor(
             when (it) {
                 SyncState.IDLE -> AuthState.NOT_AUTHED
                 SyncState.SYNCING -> AuthState.LOADING
-                SyncState.SUCCESS -> AuthState.SUCCESS
+                SyncState.SUCCESS -> {
+                    workManager.startPeriodicMarkUpdateWork()
+                    AuthState.SUCCESS
+                }
             }
         }
         .stateIn(
@@ -46,7 +53,7 @@ class AuthorizationViewModel @Inject constructor(
             viewModelScope.launch {
                 SessionManager(context).saveToken(token)
                 delay(100)
-                workController.startOneTimeSyncWork()
+                workManager.startOneTimeSyncWork()
             }
         }
     }

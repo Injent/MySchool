@@ -7,11 +7,11 @@ import me.injent.myschool.core.network.model.*
  * Interface representing network calls to the Dnevnik backend
  */
 interface DnevnikNetworkDataSource {
-    suspend fun getUserContext(): NetworkUserContext
+    suspend fun getMyUserId(): UserIdResponse
+    suspend fun getContextPerson(userId: Long): ContextPersonResponse
     suspend fun getClassmates(): List<Long>
     suspend fun getPerson(userId: Long): NetworkPerson
     suspend fun getPersonsInEduGroup(eduGroupId: Long): List<NetworkShortUserInfo>
-    suspend fun getReportingPeriods(eduGroupId: Long): List<NetworkReportingPeriod>
     suspend fun getSubjects(eduGroupId: Long): List<NetworkSubject>
     suspend fun getPersonMarksBySubjectAndPeriod(
         personId: Long,
@@ -29,7 +29,7 @@ interface DnevnikNetworkDataSource {
     ): List<NetworkMark>
 
     suspend fun getHomeworks(
-        schoolId: Int,
+        schoolId: Long,
         from: LocalDateTime,
         to: LocalDateTime
     ): NetworkHomeworkData
@@ -41,4 +41,13 @@ interface DnevnikNetworkDataSource {
         toDate: LocalDateTime? = null,
         limit: Int? = null
     )
+
+    suspend fun getPersonMarksByPeriod(
+        personId: Long,
+        schoolId: Long,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): List<NetworkMark>
+
+    suspend fun getLesson(lessonId: Long): NetworkLesson
 }

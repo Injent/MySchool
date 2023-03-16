@@ -25,7 +25,7 @@ fun Mark(
     color: Color? = null,
     alpha: Float = .75f
 ) {
-    val backgroundColor by animateColorAsState(targetValue = when (value.toFloat()) {
+    val backgroundColor by animateColorAsState(targetValue = when (value.toFloatOrNull() ?: -1f) {
         in 4f..5f -> MaterialTheme.colorScheme.positive
         in 3f..3.99f -> MaterialTheme.colorScheme.warning
         in 0f..2.99f -> MaterialTheme.colorScheme.negative

@@ -29,6 +29,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.injent.myschool.core.designsystem.theme.MySchoolTheme
 import me.injent.myschool.feature.authorization.AuthState
+import me.injent.myschool.sync.initializers.showMarkUpdateNotification
 import me.injent.myschool.sync.workers.SyncWorker
 import me.injent.myschool.ui.MsApp
 import javax.inject.Inject

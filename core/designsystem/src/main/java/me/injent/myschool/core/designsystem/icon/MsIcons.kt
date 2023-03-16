@@ -18,4 +18,5 @@ object MsIcons {
     val File = R.drawable.ic_file
     val AttachFile = R.drawable.ic_attach_file
     val Folder = R.drawable.ic_folder
+    val Place = R.drawable.ic_place
 }

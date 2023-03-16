@@ -4,11 +4,12 @@ import androidx.datastore.core.DataStore
 import kotlinx.datetime.toLocalDateTime
 import kotlinx.datetime.Clock
 import kotlinx.datetime.TimeZone
-import me.injent.myschool.core.datastore.model.*
+import me.injent.myschool.core.model.UserContext
+import me.injent.myschool.core.model.datastore.UserData
 import javax.inject.Inject
 
 class MsPreferencesDataSource @Inject constructor(
-    private val dataStore: DataStore<SaveableUserData>
+    private val dataStore: DataStore<UserData>
 ) {
     val userData = dataStore.data
 
@@ -19,28 +20,15 @@ class MsPreferencesDataSource @Inject constructor(
         }
     }
 
-    suspend fun setUserContext(userContext: SaveableUserContext) {
+    suspend fun setUserContext(userContext: UserContext) {
         dataStore.updateData {
             it.copy(userContext = userContext)
-        }
-    }
-
-    suspend fun banSubject(subject: SaveableSubject) {
-        dataStore.updateData {
-            if (it.bannedSubjects.contains(subject)) return@updateData it
-            it.copy(bannedSubjects = it.bannedSubjects + subject)
         }
     }
 
     suspend fun setInitizalized() {
         dataStore.updateData {
             it.copy(isInitialized = true)
-        }
-    }
-
-    suspend fun setCurrentPeriod(period: SaveableReportingPeriod) {
-        dataStore.updateData {
-            it.copy(period = period)
         }
     }
 }

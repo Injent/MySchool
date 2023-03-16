@@ -4,6 +4,7 @@ import kotlinx.datetime.*
 import java.time.format.DateTimeFormatter
 
 const val DEFAULT_DATE_FORMAT = "dd.MM.yyyy"
+const val BIRTHDAY_DATE_FORMAT = "dd MMM yyyy"
 const val DEFAULT_DATE_TIME_FORMAT = "dd MMM, HH:mm"
 
 fun LocalDate?.format(pattern: String): String? {
