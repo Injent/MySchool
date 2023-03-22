@@ -13,6 +13,7 @@ import me.injent.myschool.feature.leaderboard.navigation.navigateToLeaderboard
 import me.injent.myschool.feature.personmarks.navigation.navigateToProfile
 import me.injent.myschool.feature.personmarks.navigation.personMarksScreen
 import me.injent.myschool.feature.profile.navigation.profileScreen
+import me.injent.myschool.feature.statistics.navigation.statisticsScreen
 import me.injent.myschool.feature.students.navigation.myClassGraph
 
 @Composable
@@ -26,7 +27,10 @@ fun MsNavHost(
         startDestination = startDestination,
         modifier = modifier
     ) {
-        authorizationScreen(onAuthorization = { navController.navigateToDashboard(null) })
+        authorizationScreen(onAuthorization = {
+            navController.navigateToDashboard(null)
+            navController.clearBackStack(authorizationRoute)
+        })
         dashboardScreen()
         myClassGraph(
             onPersonClick = { navController.navigateToProfile(it) }
@@ -39,6 +43,7 @@ fun MsNavHost(
                 onLeaderboardClick = { navController.navigateToLeaderboard(it) }
             )
         }
+        statisticsScreen()
         profileScreen()
     }
 }

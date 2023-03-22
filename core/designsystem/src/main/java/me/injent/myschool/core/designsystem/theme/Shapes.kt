@@ -7,5 +7,5 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
 
 @get:Composable
-val Shapes.topMedium: Shape
+val Shapes.topCurvedMedium: Shape
     get() = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)

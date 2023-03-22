@@ -15,8 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -132,7 +130,7 @@ private fun BoxScope.AuthStateBoxContent(authState: AuthState) {
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .width(80.dp)
-                    .height(6.dp)
+                    .height(4.dp)
                     .clip(MaterialTheme.shapes.extraSmall),
                 color = MaterialTheme.colorScheme.hint,
                 trackColor = MaterialTheme.colorScheme.primary

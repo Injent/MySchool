@@ -41,7 +41,7 @@ interface DataModule {
 
     @Binds
     fun bindsHomeworkRepository(
-        onlineHomeworkRepository: OnlineHomeworkRepository
+        remoteHomeworkRepository: RemoteHomeworkRepository
     ): HomeworkRepository
 
     @Binds
@@ -53,4 +53,9 @@ interface DataModule {
     fun bindsDownloader(
         downloader: AndroidDownloader
     ): Downloader
+
+    @Binds
+    fun bindsStatisticRepository(
+        statisticsRepositoryImpl: StatisticsRepositoryImpl
+    ): StatisticRepository
 }

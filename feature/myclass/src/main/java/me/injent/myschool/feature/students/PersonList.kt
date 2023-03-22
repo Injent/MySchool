@@ -17,7 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -102,6 +101,7 @@ private fun PersonItem(
             shortName = name
         )
         Spacer(modifier = Modifier.width(8.dp))
+        val fontStyle = MaterialTheme.typography.bodyLarge
         Text(
             text = buildAnnotatedString {
                 if (place < 10) {
@@ -109,7 +109,7 @@ private fun PersonItem(
                 }
                 append(place.toString())
             },
-            style = MaterialTheme.typography.bodyMedium,
+            style = fontStyle,
             color = MaterialTheme.colorScheme.secondary
         )
         Icon(
@@ -120,11 +120,11 @@ private fun PersonItem(
             } else {
                 MaterialTheme.colorScheme.secondary
             },
-            modifier = Modifier.size(MaterialTheme.typography.titleMedium.fontSize.value.dp)
+            modifier = Modifier.size(MaterialTheme.typography.bodyLarge.fontSize.value.dp)
         )
         Text(
             text = name,
-            style = MaterialTheme.typography.bodyMedium,
+            style = fontStyle,
             color = MaterialTheme.colorScheme.primary
         )
         Box(Modifier.weight(1f)) {
@@ -171,7 +171,7 @@ private fun LoadingPersonItem() {
         )
         Spacer(modifier = Modifier.width(8.dp))
 
-        val fontStyle = MaterialTheme.typography.bodyMedium
+        val fontStyle = MaterialTheme.typography.bodyLarge
         Text(
             text = "00  #",
             style = fontStyle,

@@ -15,21 +15,20 @@ import dagger.hilt.components.SingletonComponent
  * Use it to initialize sync work.
  * Used only in Application.onCreate method
  */
-object Sync {
-    fun initialize(context: Context) {
-        AppInitializer.getInstance(context)
-            .initializeComponent(SyncInitializer::class.java)
-    }
-}
+//object Sync {
+//    fun initialize(context: Context) {
+//        AppInitializer.getInstance(context)
+//            .initializeComponent(SyncInitializer::class.java)
+//    }
+//}
 
-object SyncInitializer : Initializer<WorkManager> {
-    override fun create(@ApplicationContext context: Context): WorkManager {
+class SyncInitializer : Initializer<Unit> {
+    override fun create(@ApplicationContext context: Context) {
         val workerFactory = getWorkerFactory(appContext = context.applicationContext)
         val config = Configuration.Builder()
             .setWorkerFactory(workerFactory)
             .build()
         WorkManager.initialize(context, config)
-        return WorkManager.getInstance(context)
     }
     override fun dependencies(): List<Class<out Initializer<*>>> {
         return emptyList()

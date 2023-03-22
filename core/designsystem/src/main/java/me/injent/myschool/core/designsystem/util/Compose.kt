@@ -7,7 +7,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.constraintlayout.compose.MotionScene
 
-fun Modifier.conditional(condition: Boolean, modifier: Modifier.() -> Modifier): Modifier {
+@Composable
+fun Modifier.conditional(condition: Boolean, modifier: @Composable Modifier.() -> Modifier): Modifier {
     return if (condition) {
         then(modifier())
     } else this

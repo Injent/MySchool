@@ -26,6 +26,7 @@ import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
 import me.injent.myschool.core.ui.AnimatedCollapsingContent
+import me.injent.myschool.core.ui.height
 import me.injent.myschool.feature.myclass.R
 
 @Composable
@@ -50,8 +51,7 @@ private fun MyClassScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         modifier = Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection)
-            .systemBarsPadding(),
+            .nestedScroll(scrollBehavior.nestedScrollConnection),
         topBar = {
             MyClassTopAppBar(
                 scrollBehavior = scrollBehavior,
@@ -77,9 +77,10 @@ private fun MyClassTopAppBar(
 ) {
     AnimatedCollapsingContent(
         scrollBehavior = scrollBehavior,
-        pinnedHeight = 56.dp,
+        pinnedHeight = TopAppBarDefaults.height,
         maxHeight = 128.dp,
-        motionSceneResId = R.raw.collapsing_image_with_search_scene
+        motionSceneResId = R.raw.collapsing_image_with_search_scene,
+        modifier = Modifier
     ) { progress ->
         val colorTransition = MaterialTheme.colorScheme.background.copy(progress)
         Image(

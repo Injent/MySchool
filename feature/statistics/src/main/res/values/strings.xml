@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="average_mark_during_day">Средняя оценка на протяжении дня</string>
+    <string name="average_mark_during_week">Средняя оценка на протяжении недели</string>
+</resources>

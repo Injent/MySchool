@@ -1,13 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-include(":feature:profile")
-
-
-include(":feature:homeworkdialog")
-
-
-include(":feature:dashboard")
-
 pluginManagement {
     repositories {
         google()
@@ -39,5 +31,9 @@ include(":feature:leaderboard")
 include(":feature:personmarks")
 include(":feature:authorization")
 include(":feature:usersearch")
+include(":feature:statistics")
+include(":feature:profile")
+include(":feature:homeworkdialog")
+include(":feature:dashboard")
 
 include(":sync")

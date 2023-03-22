@@ -12,17 +12,14 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import me.injent.myschool.core.designsystem.component.AutoResizableText
-import me.injent.myschool.core.designsystem.icon.MsIcons
 import me.injent.myschool.core.designsystem.theme.hint
 import me.injent.myschool.core.designsystem.theme.positive
 import me.injent.myschool.core.model.PersonAndMarkValue
+import me.injent.myschool.core.ui.DefaultTopAppBar
 
 @Composable
 internal fun LeaderboardRoute(
@@ -43,12 +40,18 @@ private fun LeaderboardScreen(
     onBack: () -> Unit
 ) {
     val leaderboardListState = rememberLeaderboardListState()
+
     Scaffold(
         topBar = {
-            LeaderboardTopAppBar(
-                leaderboardUiState = leaderboardUiState,
-                onBack = onBack
-            )
+            when (leaderboardUiState) {
+                is LeaderboardUiState.Success -> {
+                    DefaultTopAppBar(
+                        onBack = onBack,
+                        title = "${leaderboardUiState.subjectName} • ${stringResource(R.string.progress)}",
+                    )
+                }
+                else -> Unit
+            }
         }
     ) { padding ->
         LazyColumn(
@@ -79,7 +82,7 @@ private fun LazyListScope.topPersons(
                 PersonInLeaderboardItem(
                     place = index + 1,
                     personAndMarkValue = personAndMarkValue,
-                    successPercentage = leaderboardUiState.counter.successPercentageInClass(personAndMarkValue.value),
+                    successPercentage = leaderboardUiState.counter.markInPercentage(personAndMarkValue.value),
                     isAnimPlayed = state.isAnimationPlayed(index)
                 )
                 LaunchedEffect(state) {
@@ -153,42 +156,6 @@ private fun PersonInLeaderboardItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun LeaderboardTopAppBar(
-    leaderboardUiState: LeaderboardUiState,
-    onBack: () -> Unit
-) {
-    TopAppBar(
-        title = {
-            when (leaderboardUiState) {
-                LeaderboardUiState.Loading -> Unit
-                LeaderboardUiState.Error -> Unit
-                is LeaderboardUiState.Success -> {
-                    AutoResizableText(
-                        text = "${leaderboardUiState.subjectName} " +
-                                "• ${stringResource(id = R.string.progress)}",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                }
-            }
-        },
-        navigationIcon = {
-            IconButton(onClick = onBack) {
-                Icon(
-                    imageVector = MsIcons.ArrowBack,
-                    contentDescription = null
-                )
-            }
-        },
-        colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = Color.Transparent,
-            navigationIconContentColor = MaterialTheme.colorScheme.secondary,
-            titleContentColor = MaterialTheme.colorScheme.onBackground
-        )
-    )
-}
-
 @Composable
 fun rememberLeaderboardListState(): LeaderboardListState {
     return remember { LeaderboardListState() }
@@ -197,8 +164,8 @@ fun rememberLeaderboardListState(): LeaderboardListState {
 data class LeaderboardListState(
     private val playedAnimations: MutableSet<Int> = mutableSetOf()
 ) {
-    fun isAnimationPlayed(index: Int): Boolean
-        = playedAnimations.contains(index)
+    fun isAnimationPlayed(index: Int): Boolean =
+        playedAnimations.contains(index)
 
     fun playAnimation(index: Int) {
         playedAnimations.add(index)

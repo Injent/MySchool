@@ -32,9 +32,12 @@ class MarkUpdateWorker @AssistedInject constructor(
 
     override suspend fun doWork(): Result = withContext(ioDispatcher) {
         return@withContext try {
-            val isSynchronized = userContextRepository.synchronize()
+            val isSynchronized = listOf(
+                userContextRepository.synchronize(),
+                markRepository.receiveClassmatesMarks()
+            ).all { it }
 
-            if (!isSynchronized) Result.retry()
+            if (!isSynchronized) Result.failure()
 
             when (val result = markRepository.receiveNewMarks()) {
                 ReceivedMarksResult.Error -> {

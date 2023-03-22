@@ -20,7 +20,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import me.injent.myschool.core.designsystem.icon.MsIcons
-import me.injent.myschool.core.designsystem.theme.topMedium
+import me.injent.myschool.core.designsystem.theme.topCurvedMedium
 import me.injent.myschool.core.model.Sex
 import me.injent.myschool.core.model.alias.SubjectsToMarks
 import me.injent.myschool.core.ui.*
@@ -51,14 +51,19 @@ private fun PersonMarksScreen(
     onLeaderboardClick: (subjectId: Long) -> Unit,
 ) {
     Scaffold(
-        modifier = Modifier,
         topBar = {
             when (personUiState) {
                 is PersonUiState.Success -> {
-                    ProfileTopAppBar(
+                    DefaultTopAppBar(
                         onBack = onBack,
-                        onProfileClick = {  },
-                        personShortName = personUiState.person.shortName
+                        title = personUiState.person.shortName,
+                        actions = {
+                            ProfilePicture(
+                                shortName = personUiState.person.shortName,
+                                onClick = {  },
+                                modifier = Modifier.padding(ButtonDefaults.IconSpacing)
+                            )
+                        },
                     )
                 }
                 else -> Unit
@@ -69,7 +74,7 @@ private fun PersonMarksScreen(
             modifier = Modifier
                 .padding(top = padding.calculateTopPadding())
                 .fillMaxSize()
-                .clip(MaterialTheme.shapes.topMedium)
+                .clip(MaterialTheme.shapes.topCurvedMedium)
                 .background(MaterialTheme.colorScheme.surface)
                 .verticalScroll(rememberScrollState()),
         ) {
@@ -81,7 +86,7 @@ private fun PersonMarksScreen(
                         } else {
                             stringResource(id = R.string.female_student_marks)       
                         },
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MaterialTheme.typography.titleSmall,
                         color = MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.padding(16.dp)
                     )

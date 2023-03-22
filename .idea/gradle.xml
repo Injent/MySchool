@@ -7,6 +7,7 @@
         <option name="testRunner" value="GRADLE" />
         <option name="distributionType" value="DEFAULT_WRAPPED" />
         <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="gradleJvm" value="corretto-18" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
@@ -29,6 +30,7 @@
             <option value="$PROJECT_DIR$/feature/myclass" />
             <option value="$PROJECT_DIR$/feature/personmarks" />
             <option value="$PROJECT_DIR$/feature/profile" />
+            <option value="$PROJECT_DIR$/feature/statistics" />
             <option value="$PROJECT_DIR$/feature/usersearch" />
             <option value="$PROJECT_DIR$/sync" />
           </set>

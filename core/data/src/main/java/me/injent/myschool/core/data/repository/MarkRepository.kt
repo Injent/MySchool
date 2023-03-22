@@ -8,6 +8,7 @@ import me.injent.myschool.core.common.util.DIGITS_NUMBER_IN_MARK
 import me.injent.myschool.core.data.model.asEntity
 import me.injent.myschool.core.data.util.RepoDependency
 import me.injent.myschool.core.database.dao.MarkDao
+import me.injent.myschool.core.database.dao.PersonDao
 import me.injent.myschool.core.database.dao.SubjectDao
 import me.injent.myschool.core.database.model.MarkEntity
 import me.injent.myschool.core.database.model.SubjectEntity
@@ -21,12 +22,9 @@ import javax.inject.Inject
 interface MarkRepository : Syncable {
     suspend fun getPersonFinalMarkBySubject(personId: Long, subjectId: Long): Float
     fun getPersonMarksBySubjectStream(personId: Long, subjectId: Long): Flow<List<Mark>>
-    fun getPersonAverageMarkStream(personId: Long): Flow<Float>
-
-    /**
-     * Returns true if has new marks
-     */
+    suspend fun getPersonAverageMarkValue(personId: Long): Float
     suspend fun receiveNewMarks(): ReceivedMarksResult
+    suspend fun receiveClassmatesMarks(): Boolean
 }
 
 sealed interface ReceivedMarksResult {
@@ -43,7 +41,8 @@ class OfflineFirstMarkRepository @Inject constructor(
     private val networkDataSource: DnevnikNetworkDataSource,
     private val subjectDao: SubjectDao,
     private val markDao: MarkDao,
-    private val userContextRepository: UserContextRepository
+    private val userContextRepository: UserContextRepository,
+    private val personDao: PersonDao
 ) : MarkRepository {
 
     override suspend fun synchronize(): Boolean = try {
@@ -114,6 +113,36 @@ class OfflineFirstMarkRepository @Inject constructor(
         }
     }
 
+    override suspend fun receiveClassmatesMarks(): Boolean = try {
+        val myPersonId: Long
+        val schoolId: Long
+        val period: Period
+        userContextRepository.userContext.first()!!.run {
+            myPersonId = this.personId
+            schoolId = this.school.id
+            period = this.reportingPeriodGroup.periods.find(Period::isCurrent)!!
+        }
+
+        for (personId in personDao.getClassmatesPersonIds(myPersonId)) {
+            val marks = networkDataSource.getPersonMarksByPeriod(
+                personId = personId,
+                schoolId = schoolId,
+                from = period.dateStart,
+                to = period.dateFinish
+            ).filterNot { markDao.contains(it.id) }
+
+            marks.forEach { mark ->
+                val subjectId = networkDataSource.getLesson(mark.lessonId).subject!!.id
+                markDao.saveMark(mark.asEntity(subjectId))
+            }
+        }
+
+        true
+    } catch (e: Exception) {
+        e.printStackTrace()
+        false
+    }
+
     override suspend fun getPersonFinalMarkBySubject(personId: Long, subjectId: Long): Float {
         return markDao.getPersonMarkValuesBySubject(personId, subjectId)
             .ifEmpty { return 0f }
@@ -127,12 +156,7 @@ class OfflineFirstMarkRepository @Inject constructor(
             .map { it.map(MarkEntity::asExternalModel) }
     }
 
-    override fun getPersonAverageMarkStream(personId: Long): Flow<Float> {
+    override suspend fun getPersonAverageMarkValue(personId: Long): Float {
         return markDao.getPersonAverageMark(personId)
-            .map {
-                it.mapNotNull(String::toFloatOrNull)
-                    .average()
-                    .toString().take(4).toFloat()
-            }
     }
 }

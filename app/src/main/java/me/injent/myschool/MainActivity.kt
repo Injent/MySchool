@@ -2,37 +2,26 @@ package me.injent.myschool
 
 import android.app.Application
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import androidx.work.WorkManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.injent.myschool.core.designsystem.theme.MySchoolTheme
 import me.injent.myschool.feature.authorization.AuthState
-import me.injent.myschool.sync.initializers.showMarkUpdateNotification
-import me.injent.myschool.sync.workers.SyncWorker
+import me.injent.myschool.sync.startPeriodicMarkUpdateWork
 import me.injent.myschool.ui.MsApp
-import javax.inject.Inject
 
 /**
  * [Application] class for SchoolStat
@@ -53,6 +42,10 @@ class MainActivity : ComponentActivity() {
                 viewModel.authState
                     .onEach {
                         authState = it
+                        if (authState == AuthState.SUCCESS) {
+                            WorkManager.getInstance(this@MainActivity)
+                                .startPeriodicMarkUpdateWork()
+                        }
                     }
                     .collect()
             }
@@ -66,15 +59,10 @@ class MainActivity : ComponentActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            if (authState != AuthState.CHECKING_TOKEN && authState != AuthState.NETWORK_ERROR) {
-                MySchoolTheme {
-                    MsApp(
-                        authState = authState,
-                        windowSizeClass =
-                            @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
-                            calculateWindowSizeClass(this),
-                    )
-                }
+            MySchoolTheme {
+                MsApp(
+                    authState = authState,
+                )
             }
         }
     }

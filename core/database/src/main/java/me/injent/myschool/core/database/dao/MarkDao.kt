@@ -17,11 +17,22 @@ interface MarkDao {
     suspend fun getPersonMarkValuesBySubject(personId: Long, subjectId: Long): List<String>
     @Query("SELECT * FROM marks WHERE person_id = :personId AND subject_id = :subjectId")
     fun getPersonMarkBySubject(personId: Long, subjectId: Long): Flow<List<MarkEntity>>
-    @Query("SELECT value FROM marks WHERE person_id = :personId")
-    fun getPersonAverageMark(personId: Long): Flow<List<String>>
+    @Query("SELECT ROUND(AVG(CAST(value AS INTEGER)), 2) FROM marks WHERE person_id = :personId AND value NOT NULL AND value GLOB '[0-9]*'")
+    suspend fun getPersonAverageMark(personId: Long): Float
     @Query("DELETE FROM marks WHERE date < :currentDateOfPeriod")
     suspend fun deleteDeprecatedMarks(currentDateOfPeriod: LocalDateTime)
-
     @Query("SELECT EXISTS(SELECT id FROM marks WHERE id = :markId LIMIT 1)")
     suspend fun contains(markId: Long): Boolean
+    @Query("SELECT ROUND(AVG(CAST(value AS INTEGER)), 2) FROM marks WHERE person_id = :personId AND value NOT NULL AND value GLOB '[0-9]*' AND date >= :startDateTime AND date <= :endDateTime")
+    suspend fun getPersonAverageMark(
+        personId: Long,
+        startDateTime: LocalDateTime,
+        endDateTime: LocalDateTime
+    ): Float
+
+    @Query("SELECT ROUND(AVG(CAST(value AS INTEGER)), 2) FROM marks WHERE person_id = :personId AND value NOT NULL AND value GLOB '[0-9]*' AND date <= :beforeDate")
+    suspend fun getPersonAverageMark(
+        personId: Long,
+        beforeDate: LocalDateTime,
+    ): Float
 }

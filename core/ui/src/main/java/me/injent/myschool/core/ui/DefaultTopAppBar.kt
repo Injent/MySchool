@@ -1,27 +1,29 @@
 package me.injent.myschool.core.ui
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
+import me.injent.myschool.core.designsystem.component.AutoResizableText
 import me.injent.myschool.core.designsystem.icon.MsIcons
-import me.injent.myschool.core.designsystem.theme.hint
+
+@OptIn(ExperimentalMaterial3Api::class)
+val TopAppBarDefaults.height: Dp
+    @Composable get() = 56.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileTopAppBar(
+fun DefaultTopAppBar(
     onBack: () -> Unit,
-    onProfileClick: () -> Unit,
+    title: String,
     modifier: Modifier = Modifier,
-    personShortName: String,
+    actions: @Composable RowScope.() -> Unit = {},
     containerColor: Color = Color.Transparent,
     contentColor: Color = MaterialTheme.colorScheme.secondary,
-    titleColor: Color = MaterialTheme.colorScheme.onBackground,
-    scrollBehavior: TopAppBarScrollBehavior? = null
+    titleColor: Color = MaterialTheme.colorScheme.onBackground
 ) {
     TopAppBar(
         modifier = modifier,
@@ -31,14 +33,10 @@ fun ProfileTopAppBar(
             titleContentColor = titleColor
         ),
         title = {
-            Box {
-                Text(
-                    text = personShortName,
-                    style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(Alignment.TopStart)
-                )
-            }
+            AutoResizableText(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+            )
         },
         navigationIcon = {
             IconButton(
@@ -51,14 +49,6 @@ fun ProfileTopAppBar(
                 )
             }
         },
-        actions = {
-            ProfilePicture(
-                shortName = personShortName,
-                onClick = onProfileClick,
-                modifier = Modifier
-                    .padding(ButtonDefaults.IconSpacing)
-            )
-        },
-        scrollBehavior = scrollBehavior
+        actions = actions,
     )
 }

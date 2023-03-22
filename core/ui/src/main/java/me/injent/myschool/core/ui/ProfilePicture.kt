@@ -33,8 +33,8 @@ fun ProfilePicture(
         Text(
             text = "${shortName.first()}${shortName.last()}",
             color = MaterialTheme.colorScheme.onPrimary,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.SemiBold,
             modifier = Modifier.align(Alignment.Center)
         )
     }

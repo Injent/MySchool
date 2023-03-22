@@ -1,14 +1,10 @@
 package me.injent.myschool.core.data.util
 
-import me.injent.myschool.core.data.repository.Syncable
 import kotlin.reflect.KClass
 
 /**
- * Applying [RepoDependency] to a [Syncable] repository means that annotated repository needs
- * to be synchronized after completed synchronization of class provided in annotation
- *
- * @param depends a repository which implements [Syncable] that needs to be synchronized before
- * annotated repository synchronization
+ * Applying [RepoDependency] to a repository means that annotated repository must
+ * be used only after completed synchronization of class provided in annotation
  */
 @Target(AnnotationTarget.CLASS)
-annotation class RepoDependency(vararg val depends: KClass<out Syncable>)
+annotation class RepoDependency(vararg val depends: KClass<*>)

@@ -4,17 +4,15 @@ import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.*
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import me.injent.myschool.R
@@ -30,10 +28,7 @@ import me.injent.myschool.navigation.RootDestination
 @Composable
 fun MsApp(
     authState: AuthState,
-    windowSizeClass: WindowSizeClass,
-    appState: MsAppState = rememberMsAppState(
-        windowSizeClass = windowSizeClass
-    ),
+    appState: MsAppState = rememberMsAppState(),
 ) {
     MsBackground {
         val context = LocalContext.current
@@ -41,30 +36,32 @@ fun MsApp(
             if (authState != AuthState.NETWORK_ERROR) return@LaunchedEffect
             Toast.makeText(context, context.getString(R.string.network_error), Toast.LENGTH_LONG).show()
         }
+
         Scaffold(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.onBackground,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             bottomBar = {
-                if (true) {
+                if (appState.shouldShowBottomNavigation) {
                     MsBottomNavigation(
                         destinations = appState.rootDestinations,
                         onNavigate = appState::navigateTo,
-                        currentDestination = appState.currentDestination
+                        currentDestination = appState.currentDestination,
+                        modifier = Modifier.navigationBarsPadding()
                     )
                 }
             }
         ) { padding ->
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
                     .consumeWindowInsets(padding)
                     .windowInsetsPadding(
                         WindowInsets.safeDrawing.only(
-                            WindowInsetsSides.Horizontal
-                        )
-                    )
+                            WindowInsetsSides.Horizontal,
+                        ),
+                    ),
             ) {
                 MsNavHost(
                     navController = appState.navController,
@@ -72,10 +69,12 @@ fun MsApp(
                         authorizationRoute
                     } else {
                         dashboardRoute
-                    }
+                    },
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
+
     }
 }
 
@@ -88,7 +87,6 @@ private fun MsBottomNavigation(
 ) {
     Row(
         modifier = modifier
-            .navigationBarsPadding()
             .height(56.dp)
             .fillMaxWidth()
             .background(MaterialTheme.colorScheme.surface),
@@ -115,15 +113,15 @@ private fun MsBottomNavigation(
                 )
                 Text(
                     text = stringResource(destination.titleTextId),
-                    style = MaterialTheme.typography.bodySmall,
-                    fontSize = 12.sp
+                    style = MaterialTheme.typography.labelMedium,
                 )
             }
         }
     }
 }
 
-fun NavDestination?.isChildOfRootDestination(destination: RootDestination?) =
-    this?.hierarchy?.any {
+fun NavDestination?.isChildOfRootDestination(destination: RootDestination?): Boolean {
+    return this?.hierarchy?.any {
         it.route?.contains(destination?.route ?: return@any false, true) ?: false
     } ?: false
+}

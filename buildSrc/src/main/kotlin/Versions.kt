@@ -3,9 +3,7 @@ object Versions {
     const val MIN_ANDROID_SDK = 23
     const val KOTLIN = "1.8.10"
 
-    const val ACCOMPANIST_SYSTEM_UI_CONTROLLER = "0.28.0"
-    const val ACCOMPANIST_PLACEHOLDER = "0.29.2-rc"
-    const val ACCOMPANIST_PERMISSIONS = "0.29.2-rc"
+    const val ACCOMPANIST = "0.29.2-rc"
     const val HILT = "2.44.2"
     const val KTOR = "2.2.3"
     const val RETROFIT = "2.9.0"

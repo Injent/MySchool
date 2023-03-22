@@ -1,7 +1,6 @@
 package me.injent.myschool.feature.dashboard
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
@@ -24,6 +23,7 @@ internal fun DashboardRoute(
 ) {
     val birthdaysUiState by viewModel.birthdaysUiState.collectAsStateWithLifecycle()
     val homeworkUiState by viewModel.homeworkUiState.collectAsStateWithLifecycle()
+    val myName by viewModel.myName.collectAsStateWithLifecycle()
 
     var viewingHomework: Homework? by rememberSaveable { mutableStateOf(null) }
     viewingHomework?.let { homework ->
@@ -40,7 +40,8 @@ internal fun DashboardRoute(
         birthdaysUiState = birthdaysUiState,
         onClick = { homework ->
             viewingHomework = homework
-        }
+        },
+        myName = myName
     )
 }
 
@@ -48,6 +49,7 @@ internal fun DashboardRoute(
 private fun DashboardScreen(
     homeworkUiState: HomeworkUiState,
     birthdaysUiState: BirthdaysUiState,
+    myName: String,
     onClick: (Homework) -> Unit
 ) {
     MsBackgroundWithImageOnTop(painter = painterResource(me.injent.myschool.core.ui.R.drawable.bg_students)) {
@@ -56,7 +58,7 @@ private fun DashboardScreen(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            greeting("Елисей")
+            greeting(myName)
             homeworks(
                 homeworkUiState = homeworkUiState,
                 onClick = onClick

@@ -20,7 +20,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
 import me.injent.myschool.core.common.util.BIRTHDAY_DATE_FORMAT
@@ -143,7 +142,7 @@ private fun HomeworkItem(
             )
             Text(
                 text = homework.sentDate.format(DEFAULT_DATE_TIME_FORMAT),
-                fontSize = 10.sp,
+                style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.secondary
             )
         }
@@ -154,7 +153,7 @@ private fun HomeworkItem(
         ) {
             GradientOverflowText(
                 text = homework.text,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary,
                 gradientColor = MaterialTheme.colorScheme.surface,
                 collapsedLines = 2,

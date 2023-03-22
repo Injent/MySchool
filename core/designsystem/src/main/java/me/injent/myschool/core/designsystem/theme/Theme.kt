@@ -65,8 +65,8 @@ fun MySchoolTheme(
 
     val sysUiController = rememberSystemUiController()
     SideEffect {
-        sysUiController.setSystemBarsColor(
-            color = colorScheme.background.copy(alpha = .95f)
+        sysUiController.setNavigationBarColor(
+            color = colorScheme.background
         )
     }
 
@@ -76,7 +76,7 @@ fun MySchoolTheme(
             val window = (view.context as Activity).window
             val insets = WindowCompat.getInsetsController(window, view)
             window.statusBarColor = Color.Transparent.toArgb()
-            window.navigationBarColor = Color.Transparent.toArgb()
+            window.navigationBarColor = colorScheme.surface.toArgb()
             insets.isAppearanceLightStatusBars = true
             insets.isAppearanceLightNavigationBars = true
         }

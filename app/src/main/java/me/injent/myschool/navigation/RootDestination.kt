@@ -2,11 +2,11 @@ package me.injent.myschool.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.ui.res.stringResource
 import me.injent.myschool.R
 import me.injent.myschool.core.designsystem.icon.MsIcons
 import me.injent.myschool.feature.dashboard.navigation.dashboardRoute
 import me.injent.myschool.feature.profile.navigation.profileRoute
+import me.injent.myschool.feature.statistics.navigation.statisticsRoute
 import me.injent.myschool.feature.students.navigation.myClassGraphRoutePattern
 
 enum class RootDestination(
@@ -31,7 +31,7 @@ enum class RootDestination(
         titleTextId = R.string.statistics,
         selectedIcon = MsIcons.Statistics,
         unselectedIcon = MsIcons.Statistics,
-        route = ""
+        route = statisticsRoute
     ),
     PROFILE(
         titleTextId = R.string.profile,

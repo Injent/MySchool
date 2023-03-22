@@ -1,31 +1,34 @@
 package me.injent.myschool.ui
 
-import androidx.compose.material3.windowsizeclass.WindowSizeClass
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import kotlinx.coroutines.CoroutineScope
+import me.injent.myschool.feature.authorization.navigation.authorizationRoute
 import me.injent.myschool.feature.dashboard.navigation.dashboardRoute
 import me.injent.myschool.feature.dashboard.navigation.navigateToDashboard
 import me.injent.myschool.feature.profile.navigation.navigateToProfile
+import me.injent.myschool.feature.profile.navigation.profileRoute
+import me.injent.myschool.feature.statistics.navigation.navigateToStatistics
+import me.injent.myschool.feature.statistics.navigation.statisticsRoute
 import me.injent.myschool.feature.students.navigation.myClassGraphRoutePattern
-import me.injent.myschool.feature.students.navigation.myClassRoute
 import me.injent.myschool.feature.students.navigation.navigateToMyClass
 import me.injent.myschool.navigation.RootDestination
 
 @Composable
 fun rememberMsAppState(
-    windowSizeClass: WindowSizeClass,
     coroutineScope: CoroutineScope = rememberCoroutineScope(),
     navController: NavHostController = rememberNavController()
 ) : MsAppState {
-    return remember(coroutineScope, navController, windowSizeClass) {
-        MsAppState(navController, coroutineScope, windowSizeClass)
+    return remember(coroutineScope, navController) {
+        MsAppState(navController, coroutineScope)
     }
 }
 
@@ -33,7 +36,6 @@ fun rememberMsAppState(
 class MsAppState(
     val navController: NavHostController,
     val coroutineScope: CoroutineScope,
-    val windowSizeClass: WindowSizeClass,
 ) {
     val rootDestinations: List<RootDestination>
         get() = RootDestination.values().asList()
@@ -47,11 +49,13 @@ class MsAppState(
             currentDestination?.route == dashboardRoute -> RootDestination.DASHBOARD
             currentDestination?.route?.startsWith(myClassGraphRoutePattern)
                 ?: false -> RootDestination.MYCLASS
+            currentDestination?.route == profileRoute -> RootDestination.PROFILE
+            currentDestination?.route == statisticsRoute -> RootDestination.STATISTICS
             else -> null
         }
 
     val shouldShowBottomNavigation: Boolean
-        @Composable get() = currentDestination.isChildOfRootDestination(currentRootDestination)
+        @Composable get() = currentDestination.isDestinationWithBottomNavigation()
 
     fun navigateTo(destination: RootDestination) {
         val rootNavOptions = navOptions {
@@ -67,13 +71,10 @@ class MsAppState(
             RootDestination.DASHBOARD -> navController.navigateToDashboard(rootNavOptions)
             RootDestination.MYCLASS -> navController.navigateToMyClass(rootNavOptions)
             RootDestination.PROFILE -> navController.navigateToProfile(rootNavOptions)
-            RootDestination.STATISTICS -> {}
+            RootDestination.STATISTICS -> navController.navigateToStatistics(rootNavOptions)
         }
     }
 }
 
 private fun NavDestination?.isDestinationWithBottomNavigation(): Boolean =
-    when (this?.route) {
-        dashboardRoute, myClassRoute -> true
-        else -> false
-    }
+    this?.route != authorizationRoute

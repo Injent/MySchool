@@ -27,6 +27,8 @@ interface PersonDao {
     @MapInfo(keyColumn = "short_name", valueColumn = "birthday")
     @Query("SELECT short_name, birthday FROM persons")
     fun getClosestBirthdays(): Flow<Map<String, LocalDate?>>
+    @Query("SELECT person_id FROM persons WHERE person_id != :myPersonId")
+    suspend fun getClassmatesPersonIds(myPersonId: Long): List<Long>
     @Query("DELETE FROM persons")
     suspend fun deleteAll()
 }

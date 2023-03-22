@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":feature:leaderboard"))
     implementation(project(":feature:dashboard"))
     implementation(project(":feature:profile"))
+    implementation(project(":feature:statistics"))
 
     implementation(Dependencies.CORE_KTX)
     implementation(Dependencies.ACTIVITY_COMPOSE)

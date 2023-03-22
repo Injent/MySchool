@@ -4,16 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.injent.myschool.core.designsystem.theme.positive
-import me.injent.myschool.core.ui.ProfilePicture
 
 @Composable
 internal fun ProfileRoute(
@@ -31,28 +30,29 @@ internal fun ProfileRoute(
 private fun ProfileScreen(
     profileUiState: ProfileUiState
 ) {
-    Scaffold(
-        topBar = {
-
-        }
-    ) { innerPadding ->
-        Column(
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+    ) {
+        Spacer(
             modifier = Modifier
-                .padding(top = innerPadding.calculateTopPadding())
-                .fillMaxSize()
-                .background(MaterialTheme.colorScheme.surface)
-        ) {
-            Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(128.dp)
-                    .background(MaterialTheme.colorScheme.positive)
-            )
-            ProfileInfo(
-                profileUiState = profileUiState,
-                modifier = Modifier.offset(y = (-16).dp)
-            )
-        }
+                .fillMaxWidth()
+                .height(128.dp)
+                .background(MaterialTheme.colorScheme.positive)
+        )
+        ProfileInfo(
+            profileUiState = profileUiState,
+            modifier = Modifier.offset(y = (-16).dp)
+        )
+        Spacer(Modifier.height(64.dp))
+        Text(
+            text = "В разработке",
+            style = MaterialTheme.typography.labelMedium,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
     }
 }
 

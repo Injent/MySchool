@@ -11,7 +11,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 
 @Composable
 fun MsBackground(
@@ -20,8 +19,7 @@ fun MsBackground(
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = color,
-
+        color = color
     ) {
         content()
     }

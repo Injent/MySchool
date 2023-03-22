@@ -8,7 +8,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -17,9 +16,8 @@ import androidx.compose.ui.unit.dp
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
-import com.google.accompanist.placeholder.placeholder
 import me.injent.myschool.core.designsystem.icon.MsIcons
-import me.injent.myschool.core.designsystem.theme.topMedium
+import me.injent.myschool.core.designsystem.theme.topCurvedMedium
 import me.injent.myschool.core.model.UserContext
 import me.injent.myschool.core.ui.ProfilePicture
 
@@ -49,7 +47,7 @@ private fun LoadingProfileInfo() {
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.surface,
-                shape = MaterialTheme.shapes.topMedium
+                shape = MaterialTheme.shapes.topCurvedMedium
             )
     ) {
         ProfilePicture(
@@ -113,7 +111,7 @@ private fun ProfileInfo(
             .fillMaxWidth()
             .background(
                 color = MaterialTheme.colorScheme.surface,
-                shape = MaterialTheme.shapes.topMedium
+                shape = MaterialTheme.shapes.topCurvedMedium
             )
     ) {
         ProfilePicture(

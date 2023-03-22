@@ -46,22 +46,19 @@ private fun myClassUiState(
             when (result) {
                 Result.Loading -> MyClassUiState.Loading
                 is Result.Success -> {
+                    val personsTop = result.data.second.toMutableList()
+                        .map { person ->
+                            val markValue = markRepository.getPersonAverageMarkValue(person.personId)
+                            PersonAndMarkValue(person.personId, person.shortName, markValue)
+                        }
+                        .sortedByDescending(PersonAndMarkValue::value)
+
                     val myPersonId = result.data.first.userContext!!.personId
-
-                    val personNamesAndMarks = mutableListOf<PersonAndMarkValue>()
-                    for (person in result.data.second) {
-                        val mark = markRepository.getPersonAverageMarkStream(person.personId).first()
-                        personNamesAndMarks.add(
-                            PersonAndMarkValue(person.personId, person.shortName, mark)
-                        )
-                    }
-
-                    val sortedTopList = personNamesAndMarks.sortedByDescending(PersonAndMarkValue::value)
-                    val myPlace = sortedTopList.indexOfFirst { it.personId == myPersonId }
+                    val myPlace = personsTop.indexOfFirst { it.personId == myPersonId }
 
                     MyClassUiState.Success(
                         myPlace = myPlace + 1,
-                        personsAndMarks = sortedTopList
+                        personsAndMarks = personsTop
                     )
                 }
                 is Result.Error -> MyClassUiState.Error
