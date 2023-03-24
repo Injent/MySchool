@@ -13,16 +13,16 @@ import kotlinx.serialization.encoding.Encoder
 data class Period(
     val id: Long,
     val isCurrent: Boolean,
-    @Serializable(LongToLocalDateTimeSerializer::class)
+    @Serializable(EpochToLocalDateTimeSerializer::class)
     val dateFinish: LocalDateTime,
-    @Serializable(LongToLocalDateTimeSerializer::class)
+    @Serializable(EpochToLocalDateTimeSerializer::class)
     val dateStart: LocalDateTime,
     val number: Int,
     val studyYear: Int,
     val type: PeriodType
 )
 
-class LongToLocalDateTimeSerializer : KSerializer<LocalDateTime> {
+class EpochToLocalDateTimeSerializer : KSerializer<LocalDateTime> {
     override val descriptor: SerialDescriptor
         get() = PrimitiveSerialDescriptor("LongToLocalDateTime", PrimitiveKind.LONG)
 

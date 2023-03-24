@@ -69,8 +69,7 @@ fun MsApp(
                         authorizationRoute
                     } else {
                         dashboardRoute
-                    },
-                    modifier = Modifier.weight(1f)
+                    }
                 )
             }
         }

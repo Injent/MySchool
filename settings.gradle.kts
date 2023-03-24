@@ -1,5 +1,8 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":feature:markdetails")
+
+
 pluginManagement {
     repositories {
         google()

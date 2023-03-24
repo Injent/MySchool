@@ -78,16 +78,23 @@ private interface RetrofitDnevnikApi {
         @Query("endDate") to: LocalDateTime
     ): NetworkHomeworkData
 
-    @GET(DnevnikApi.PERSON_MARKS_BY_PERIOD)
+    @GET("/v2/persons/{person}/schools/{school}/marks/{from}/{to}")
     suspend fun getPersonMarksByPeriod(
-        @Path(DnevnikApi.PERSON_ID) personId: Long,
-        @Path(DnevnikApi.SCHOOL_ID) schoolId: Long,
-        @Path(DnevnikApi.FROM_PERIOD) from: LocalDateTime,
-        @Path(DnevnikApi.TO_PERIOD) to: LocalDateTime
+        @Path("person") personId: Long,
+        @Path("school") schoolId: Long,
+        @Path("from") from: LocalDateTime,
+        @Path("to") to: LocalDateTime
     ): List<NetworkMark>
 
-    @GET("/v2/lessons/{lessonId}")
-    suspend fun getLesson(@Path("lessonId") lessonId: Long): NetworkLesson
+    @GET("/v2/lessons/{lesson}")
+    suspend fun getLesson(@Path("lesson") lessonId: Long): NetworkLesson
+
+    @GET("https://api.dnevnik.ru/mobile/v7.0/persons/{personId}/groups/{groupId}/marks/{markId}/markDetails")
+    suspend fun getMarkDetails(
+        @Path("personId") personId: Long,
+        @Path("groupId") groupId: Long,
+        @Path("markId") markId: Long
+    ): MarkDetailsResponse
 }
 
 /**
@@ -131,8 +138,7 @@ class RetrofitDnevnik @Inject constructor(
         subjectId: Long,
         from: LocalDateTime,
         to: LocalDateTime
-    ): List<NetworkMark> =
-        api.getPersonMarksBySubjectAndPeriod(personId, subjectId, from, to)
+    ): List<NetworkMark> = api.getPersonMarksBySubjectAndPeriod(personId, subjectId, from, to)
 
     override suspend fun getAverageMark(personId: Long, periodId: Long): Float =
         api.getAverageMark(personId, periodId).replace(',', '.').toFloat()
@@ -142,24 +148,13 @@ class RetrofitDnevnik @Inject constructor(
         subjectId: Long,
         from: LocalDateTime,
         to: LocalDateTime
-    ): List<NetworkMark> =
-        api.getEduGroupMarksBySubject(
-            eduGroupId,
-            subjectId,
-            from,
-            to
-        )
+    ): List<NetworkMark> = api.getEduGroupMarksBySubject(eduGroupId, subjectId, from, to)
 
     override suspend fun getHomeworks(
         schoolId: Long,
         from: LocalDateTime,
         to: LocalDateTime
-    ): NetworkHomeworkData =
-        api.getHomeworks(
-            schoolId = schoolId,
-            from = from,
-            to = to
-        )
+    ): NetworkHomeworkData = api.getHomeworks(schoolId, from, to)
 
     override suspend fun getRecentMarks(
         personId: Long,
@@ -176,14 +171,14 @@ class RetrofitDnevnik @Inject constructor(
         schoolId: Long,
         from: LocalDateTime,
         to: LocalDateTime
-    ): List<NetworkMark> =
-        api.getPersonMarksByPeriod(
-            personId,
-            schoolId,
-            from,
-            to
-        )
+    ): List<NetworkMark> = api.getPersonMarksByPeriod(personId, schoolId, from, to)
 
     override suspend fun getLesson(lessonId: Long): NetworkLesson =
         api.getLesson(lessonId)
+
+    override suspend fun getMarkDetails(
+        personId: Long,
+        periodId: Long,
+        markId: Long
+    ): MarkDetailsResponse = api.getMarkDetails(personId, periodId, markId)
 }

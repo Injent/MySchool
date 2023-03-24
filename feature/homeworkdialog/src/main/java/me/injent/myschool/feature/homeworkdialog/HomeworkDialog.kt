@@ -1,15 +1,13 @@
 package me.injent.myschool.feature.homeworkdialog
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -87,7 +85,10 @@ fun HomeworkDialog(
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
                 Divider(color = MaterialTheme.colorScheme.outlineVariant)
-                Files(files = homework.files)
+                Files(
+                    files = homework.files,
+                    viewModel = viewModel
+                )
 
             }
             Divider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -101,7 +102,7 @@ fun HomeworkDialog(
 @Composable
 private fun Files(
     files: List<Attachment>,
-    viewModel: HomeworkDialogViewModel = hiltViewModel()
+    viewModel: HomeworkDialogViewModel
 ) {
     for (file in files) {
         var enabled by remember { mutableStateOf(true) }

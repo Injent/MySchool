@@ -13,9 +13,12 @@ interface MarkDao {
     suspend fun saveMarks(marks: List<MarkEntity>)
     @Upsert
     suspend fun saveMark(mark: MarkEntity)
-    @Query("SELECT value FROM marks WHERE person_id = :personId AND subject_id = :subjectId AND value != 'НЗ'")
-    suspend fun getPersonMarkValuesBySubject(personId: Long, subjectId: Long): List<String>
-    @Query("SELECT * FROM marks WHERE person_id = :personId AND subject_id = :subjectId")
+
+    @Query("SELECT * FROM marks WHERE id = :markId LIMIT 1")
+    fun getMark(markId: Long): Flow<MarkEntity>
+    @Query("SELECT ROUND(AVG(CAST(value AS INTEGER)), 2) FROM marks WHERE person_id = :personId AND subject_id = :subjectId AND value GLOB '[0-9]*'")
+    suspend fun getPersonAverageMarkBySubject(personId: Long, subjectId: Long): Float
+    @Query("SELECT * FROM marks WHERE person_id = :personId AND subject_id = :subjectId ORDER BY date")
     fun getPersonMarkBySubject(personId: Long, subjectId: Long): Flow<List<MarkEntity>>
     @Query("SELECT ROUND(AVG(CAST(value AS INTEGER)), 2) FROM marks WHERE person_id = :personId AND value NOT NULL AND value GLOB '[0-9]*'")
     suspend fun getPersonAverageMark(personId: Long): Float

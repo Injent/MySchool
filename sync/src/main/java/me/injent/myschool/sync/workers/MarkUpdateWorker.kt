@@ -37,7 +37,7 @@ class MarkUpdateWorker @AssistedInject constructor(
                 markRepository.receiveClassmatesMarks()
             ).all { it }
 
-            if (!isSynchronized) Result.failure()
+            if (!isSynchronized) return@withContext Result.failure()
 
             when (val result = markRepository.receiveNewMarks()) {
                 ReceivedMarksResult.Error -> {
@@ -47,7 +47,7 @@ class MarkUpdateWorker @AssistedInject constructor(
                     appContext.showMarkUpdateNotification(
                         appContext.getString(
                             R.string.mark_update_notification_decription_multiple_marks
-                        ) + " " + result.count
+                        ) + " " + result.marksCount
                     )
                     Result.success()
                 }
@@ -70,8 +70,10 @@ class MarkUpdateWorker @AssistedInject constructor(
 
     companion object {
         const val WorkName = "mark_receiving"
-        fun startUpMarkUpdateWork() = PeriodicWorkRequestBuilder<MarkUpdateWorker>(Duration.ofMinutes(30))
-            .setConstraints(MarkUpdateWorkConstraints)
-            .build()
+
+        fun startUpMarkUpdateWork() =
+            PeriodicWorkRequestBuilder<MarkUpdateWorker>(Duration.ofMinutes(30))
+                .setConstraints(MarkUpdateWorkConstraints)
+                .build()
     }
 }

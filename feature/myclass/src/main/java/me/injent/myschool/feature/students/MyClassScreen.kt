@@ -51,7 +51,8 @@ private fun MyClassScreen(
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
         modifier = Modifier
-            .nestedScroll(scrollBehavior.nestedScrollConnection),
+            .nestedScroll(scrollBehavior.nestedScrollConnection)
+            .statusBarsPadding(),
         topBar = {
             MyClassTopAppBar(
                 scrollBehavior = scrollBehavior,

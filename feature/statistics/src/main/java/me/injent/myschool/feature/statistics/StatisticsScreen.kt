@@ -30,13 +30,13 @@ internal fun StatisticsRoute(
 private fun StatisticsScreen(
     statisticsUiState: StatisticsUiState
 ) {
-    Column(Modifier.padding(16.dp)) {
+    Column(Modifier.padding(horizontal = 16.dp).statusBarsPadding()) {
         Text(
             text = stringResource(R.string.average_mark_during_week),
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onBackground
         )
-        Spacer(Modifier.height(32.dp))
+        Spacer(Modifier.height(64.dp))
 
         GradeGraph(
             marks = when (statisticsUiState) {

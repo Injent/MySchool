@@ -50,4 +50,10 @@ interface DnevnikNetworkDataSource {
     ): List<NetworkMark>
 
     suspend fun getLesson(lessonId: Long): NetworkLesson
+
+    suspend fun getMarkDetails(
+        personId: Long,
+        periodId: Long,
+        markId: Long
+    ): MarkDetailsResponse
 }

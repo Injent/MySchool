@@ -52,6 +52,7 @@ dependencies {
     implementation(project(":feature:dashboard"))
     implementation(project(":feature:profile"))
     implementation(project(":feature:statistics"))
+    implementation(project(":feature:markdetails"))
 
     implementation(Dependencies.CORE_KTX)
     implementation(Dependencies.ACTIVITY_COMPOSE)

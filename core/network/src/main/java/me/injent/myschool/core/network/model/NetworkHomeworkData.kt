@@ -1,7 +1,9 @@
 package me.injent.myschool.core.network.model
 
+import kotlinx.datetime.TimeZone
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import me.injent.myschool.core.common.util.atTimeZone
 import me.injent.myschool.core.common.util.withLocalOffset
 import me.injent.myschool.core.model.Homework
 
@@ -26,7 +28,7 @@ fun NetworkHomeworkData.asExternalModelList(): List<Homework> {
                 text = homework.text,
                 subject = subject.asExternalModel(),
                 files = files.map(NetworkAttachment::asExternalModel),
-                sentDate = homework.sentDate.withLocalOffset(),
+                sentDate = homework.sentDate.atTimeZone(TimeZone.currentSystemDefault()),
                 teacher = teacher.asExternalModel()
             )
         }

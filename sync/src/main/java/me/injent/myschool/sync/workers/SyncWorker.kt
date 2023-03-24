@@ -36,7 +36,6 @@ class SyncWorker @AssistedInject constructor(
 
             return@withContext if (isSynchronized) {
                 userDataRepository.setInitizalized()
-                userDataRepository.updateSyncTime()
                 Result.success()
             } else {
                 Result.failure()

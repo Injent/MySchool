@@ -17,6 +17,11 @@ fun Long.toFormattedFileSize(context: Context): String {
     return Formatter.formatFileSize(context, this)
 }
 
-fun LocalDateTime.withLocalOffset(): LocalDateTime {
-    return this.toInstant(TimeZone.UTC).toLocalDateTime(TimeZone.currentSystemDefault())
+fun LocalDateTime.atTimeZone(zone: TimeZone): LocalDateTime {
+    return this
+        .toJavaLocalDateTime()
+        .atZone(TimeZone.currentSystemDefault().toJavaZoneId())
+        .withZoneSameInstant(zone.toJavaZoneId())
+        .toLocalDateTime()
+        .toKotlinLocalDateTime()
 }

@@ -7,6 +7,6 @@ import me.injent.myschool.core.model.UserContext
 @Serializable
 data class UserData(
     val userContext: UserContext? = null,
-    val lastSyncTime: LocalDateTime? = null,
+    val lastMarksSyncDateTime: LocalDateTime? = null,
     val isInitialized: Boolean = false
 )

@@ -4,12 +4,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navOptions
 import me.injent.myschool.feature.authorization.navigation.authorizationRoute
 import me.injent.myschool.feature.authorization.navigation.authorizationScreen
 import me.injent.myschool.feature.dashboard.navigation.dashboardScreen
 import me.injent.myschool.feature.dashboard.navigation.navigateToDashboard
 import me.injent.myschool.feature.leaderboard.navigation.leaderBoardScreen
 import me.injent.myschool.feature.leaderboard.navigation.navigateToLeaderboard
+import me.injent.myschool.feature.markpage.navigation.markDetails
 import me.injent.myschool.feature.personmarks.navigation.navigateToProfile
 import me.injent.myschool.feature.personmarks.navigation.personMarksScreen
 import me.injent.myschool.feature.profile.navigation.profileScreen
@@ -28,9 +30,9 @@ fun MsNavHost(
         modifier = modifier
     ) {
         authorizationScreen(onAuthorization = {
-            navController.navigateToDashboard(null)
-            navController.clearBackStack(authorizationRoute)
+            navController.navigateToDashboard(navOptions { popUpTo(0) })
         })
+
         dashboardScreen()
         myClassGraph(
             onPersonClick = { navController.navigateToProfile(it) }
@@ -45,5 +47,7 @@ fun MsNavHost(
         }
         statisticsScreen()
         profileScreen()
+
+        markDetails()
     }
 }

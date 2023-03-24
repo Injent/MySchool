@@ -83,7 +83,7 @@ private fun LoadingProfileInfo() {
             )
         ) {
             Icon(
-                painter = painterResource(MsIcons.Place),
+                painter = painterResource(MsIcons.Location),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.secondary,
                 modifier = Modifier.size(with(LocalDensity.current) {
@@ -133,7 +133,7 @@ private fun ProfileInfo(
         )
         Row (horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             Icon(
-                painter = painterResource(MsIcons.Place),
+                painter = painterResource(MsIcons.Location),
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.secondary
             )

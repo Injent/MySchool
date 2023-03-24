@@ -65,7 +65,7 @@ fun PersonList(
                         isMe = myClassUiState.myPlace == index + 1
                     )
                     Divider(
-                        modifier = Modifier.padding(start = 64.dp),
+                        modifier = Modifier.padding(horizontal = 64.dp),
                         color = MaterialTheme.colorScheme.outlineVariant
                     )
                 }
