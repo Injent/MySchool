@@ -19,14 +19,12 @@ import androidx.core.view.WindowCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.work.WorkManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import me.injent.myschool.core.designsystem.theme.MySchoolTheme
 import me.injent.myschool.feature.authorization.AuthState
-import me.injent.myschool.sync.startPeriodicMarkUpdateWork
 import me.injent.myschool.ui.MsApp
 
 @AndroidEntryPoint
@@ -45,10 +43,6 @@ class MainActivity : ComponentActivity() {
                 viewModel.authState
                     .onEach {
                         authState = it
-                        if (authState == AuthState.SUCCESS) {
-                            WorkManager.getInstance(this@MainActivity)
-                                .startPeriodicMarkUpdateWork()
-                        }
                     }
                     .collect()
             }

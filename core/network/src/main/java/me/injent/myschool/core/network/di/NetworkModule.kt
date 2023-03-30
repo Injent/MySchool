@@ -8,8 +8,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
+import me.injent.myschool.core.network.ApiProvider
 import me.injent.myschool.core.network.DnevnikNetworkDataSource
 import me.injent.myschool.core.network.retrofit.AuthInterceptor
+import me.injent.myschool.core.network.retrofit.RetrofitApiProvider
 import me.injent.myschool.core.network.retrofit.RetrofitDnevnik
 import okhttp3.OkHttpClient
 import javax.inject.Singleton
@@ -42,5 +44,8 @@ object NetworkModule {
          */
         @Binds
         fun RetrofitDnevnik.binds(): DnevnikNetworkDataSource
+
+        @Binds
+        fun RetrofitApiProvider.binds(): ApiProvider
     }
 }

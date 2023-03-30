@@ -10,5 +10,6 @@ fun NetworkMark.asEntity(dbSubjectId: Long) = MarkEntity(
     personId = personId,
     workId = workId,
     lessonId = lessonId,
+    mood = mood,
     dbSubjectId = dbSubjectId
 )

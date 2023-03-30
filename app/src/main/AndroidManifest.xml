@@ -5,6 +5,9 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
+    <uses-permission android:name="android.permission.USE_CREDENTIALS"/>
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS"/>
     
     <application
         android:name=".MsApplication"
@@ -35,6 +38,17 @@
                     android:host="@string/redirect_host"
                     android:pathPrefix="/" />
             </intent-filter>
+
+            <intent-filter android:label="@string/auth_deeplink_label">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <data android:scheme="https"
+                    android:host="dnevnik.ru"
+                    android:pathPrefix="/user/" />
+            </intent-filter>
         </activity>
+
     </application>
 </manifest>

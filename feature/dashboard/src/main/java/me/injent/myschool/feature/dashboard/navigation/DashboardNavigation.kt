@@ -12,8 +12,12 @@ fun NavController.navigateToDashboard(navOptions: NavOptions?) {
     navigate(dashboardRoute, navOptions)
 }
 
-fun NavGraphBuilder.dashboardScreen() {
+fun NavGraphBuilder.dashboardScreen(
+    onMarkClick: (markId: Long) -> Unit
+) {
     composable(route = dashboardRoute) {
-        DashboardRoute()
+        DashboardRoute(
+            onMarkClick = onMarkClick
+        )
     }
 }

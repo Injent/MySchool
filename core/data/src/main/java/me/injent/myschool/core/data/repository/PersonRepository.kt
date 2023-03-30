@@ -3,6 +3,7 @@ package me.injent.myschool.core.data.repository
 import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
@@ -16,11 +17,13 @@ import me.injent.myschool.core.datastore.MsPreferencesDataSource
 import me.injent.myschool.core.model.Person
 import me.injent.myschool.core.network.DnevnikNetworkDataSource
 import me.injent.myschool.core.network.model.NetworkPerson
+import me.injent.myschool.core.network.model.asExternalModel
 import javax.inject.Inject
 
 interface PersonRepository : Syncable {
     val persons: Flow<List<Person>>
     fun getPerson(personId: Long): Flow<Person?>
+    fun getPersonByUserId(userId: Long): Flow<Person?>
     fun getClosestBirthdays(limit: Int): Flow<Map<String, LocalDate>>
 }
 
@@ -37,7 +40,9 @@ class OfflineFirstPersonRepository @Inject constructor(
         val persons = mutableListOf<NetworkPerson>()
         for (userId in userIds) {
             try {
-                persons.add(networkDataSource.getPerson(userId))
+                networkDataSource.getPerson(userId)?.run {
+                    persons.add(this)
+                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }
@@ -56,21 +61,27 @@ class OfflineFirstPersonRepository @Inject constructor(
     override fun getPerson(personId: Long): Flow<Person?> =
         personDao.getPerson(personId).map { it?.asExternalModel() }
 
-    override fun getClosestBirthdays(limit: Int): Flow<Map<String, LocalDate>> =
-        personDao.getClosestBirthdays()
-            .map { personToBirthday ->
-                val currentDate = LocalDateTime.currentLocalDateTime().date
-                val closestBirthdays = mutableMapOf<String, LocalDate>()
-                for ((person, birthday) in personToBirthday) {
+    override fun getPersonByUserId(userId: Long): Flow<Person?> = flow {
+        emit(networkDataSource.getPerson(userId)?.asExternalModel())
+    }
+
+    override fun getClosestBirthdays(limit: Int): Flow<Map<String, LocalDate>> {
+        val currentDate = LocalDateTime.currentLocalDateTime().date
+        return personDao.getClosestBirthdays()
+            .map { flow ->
+                flow.map { (person, birthday) ->
                     if (birthday != null &&
-                        birthday.monthNumber > currentDate.monthNumber &&
+                        birthday.monthNumber >= currentDate.monthNumber &&
                         birthday.dayOfMonth >= currentDate.dayOfMonth) {
-                        closestBirthdays[person] = birthday
+                        Pair(person, birthday)
+                    } else {
+                        null
                     }
                 }
-                return@map closestBirthdays
-                    .toList().sortedBy { it.second.toEpochDays() }
+                    .filterNotNull()
+                    .sortedBy { (_, date) -> date.toEpochDays() }
                     .take(limit)
                     .toMap()
             }
+    }
 }

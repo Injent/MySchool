@@ -1,5 +1,12 @@
 @file:Suppress("UnstableApiUsage")
 
+include(":core:auth")
+
+
+
+include(":feature:diary")
+
+
 include(":feature:markdetails")
 
 
@@ -33,7 +40,7 @@ include(":feature:myclass")
 include(":feature:leaderboard")
 include(":feature:personmarks")
 include(":feature:authorization")
-include(":feature:usersearch")
+include(":feature:userprofile")
 include(":feature:statistics")
 include(":feature:profile")
 include(":feature:homeworkdialog")

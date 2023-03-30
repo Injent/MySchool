@@ -1,4 +1,4 @@
-package com.injent.schoolstat
+package me.injent.myschool
 
 import Versions
 import com.android.build.api.dsl.CommonExtension

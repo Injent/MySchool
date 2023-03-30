@@ -18,7 +18,8 @@ data class MarkEntity(
     @ColumnInfo(name = "work_id")
     val workId: Long,
     @ColumnInfo(name = "lesson_id")
-    val lessonId: Long,
+    val lessonId: Long?,
+    val mood: Mark.Mood,
     @ColumnInfo(name = "subject_id")
     val dbSubjectId: Long
 )
@@ -30,5 +31,6 @@ fun MarkEntity.asExternalModel() = Mark(
     personId = personId,
     workId = workId,
     lessonId = lessonId,
+    mood = mood,
     dbSubjectId = dbSubjectId
 )

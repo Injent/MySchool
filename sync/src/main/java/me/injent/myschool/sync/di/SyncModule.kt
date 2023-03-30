@@ -15,7 +15,7 @@ import me.injent.myschool.sync.monitor.SyncWorkStatusMonitor
 @InstallIn(SingletonComponent::class)
 object SyncModule {
     @Provides
-    fun providesWorkController(
+    fun providesWorkManager(
         @ApplicationContext context: Context
     ): WorkManager = WorkManager.getInstance(context)
 

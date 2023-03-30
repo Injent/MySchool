@@ -24,7 +24,8 @@ import me.injent.myschool.core.database.util.*
     StringListConverter::class,
     LocalDateConverter::class,
     LocalDateTimeConverter::class,
-    SexConverter::class
+    SexConverter::class,
+    MarkMoodConverter::class
 )
 abstract class MsDatabase : RoomDatabase() {
     abstract fun personDao(): PersonDao

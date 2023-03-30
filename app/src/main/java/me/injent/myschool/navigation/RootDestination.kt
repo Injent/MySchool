@@ -8,6 +8,7 @@ import me.injent.myschool.feature.dashboard.navigation.dashboardRoute
 import me.injent.myschool.feature.profile.navigation.profileRoute
 import me.injent.myschool.feature.statistics.navigation.statisticsRoute
 import me.injent.myschool.feature.students.navigation.myClassGraphRoutePattern
+import me.injent.myschool.feature.students.navigation.myClassRoute
 
 enum class RootDestination(
     @StringRes val titleTextId: Int,

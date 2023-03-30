@@ -4,6 +4,7 @@ import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFact
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import me.injent.myschool.core.network.BuildConfig
 import me.injent.myschool.core.network.DnevnikApi
 import me.injent.myschool.core.network.DnevnikNetworkDataSource
 import me.injent.myschool.core.network.model.*
@@ -32,6 +33,13 @@ private interface RetrofitDnevnikApi {
 
     @GET("/v2/users/me/classmates")
     suspend fun getClassmates(): List<Long>
+
+    @GET("/v2/users/me/feed")
+    suspend fun getUserFeed(
+        @Query("date") date: LocalDateTime,
+        @Query("childPersonId") personId: Long,
+        @Query("limit") limit: Int
+    ): NetworkUserFeed
 
     @GET("/v2/users/me")
     suspend fun getMyUserId(): UserIdResponse
@@ -89,12 +97,27 @@ private interface RetrofitDnevnikApi {
     @GET("/v2/lessons/{lesson}")
     suspend fun getLesson(@Path("lesson") lessonId: Long): NetworkLesson
 
-    @GET("https://api.dnevnik.ru/mobile/v7.0/persons/{personId}/groups/{groupId}/marks/{markId}/markDetails")
+    @GET("/mobile/v7.0/persons/{personId}/groups/{groupId}/marks/{markId}/markDetails")
     suspend fun getMarkDetails(
         @Path("personId") personId: Long,
         @Path("groupId") groupId: Long,
         @Path("markId") markId: Long
     ): MarkDetailsResponse
+
+    @GET("/v2/persons/{personId}/edu-groups")
+    suspend fun getPersonGroups(@Path("personId") personId: Long): List<NetworkGroup>
+
+    @GET("/v2/edu-groups/{groupId}/reporting-periods")
+    suspend fun getReportingPeriodGroup(@Path("groupId") groupId: Long): List<NetworkPeriod>
+
+    @GET("/v2/persons/{personId}/group/{groupId}/recentmarks")
+    suspend fun getRecentMarks(
+        @Path("personId") personId: Long,
+        @Path("groupId") groupId: Long,
+        @Query("fromDate") fromDate: LocalDateTime? = null,
+        @Query("subject") subjectId: Long? = null,
+        @Query("limit") limit: Int = 10
+    ): RecentMarksResponse
 }
 
 /**
@@ -106,7 +129,7 @@ class RetrofitDnevnik @Inject constructor(
     client: OkHttpClient
 ) : DnevnikNetworkDataSource {
     private val api = Retrofit.Builder()
-        .baseUrl(DnevnikApi.BASE_URL)
+        .baseUrl(BuildConfig.API_BASE_URL)
         .client(client)
         .addConverterFactory(
             @OptIn(ExperimentalSerializationApi::class)
@@ -117,6 +140,9 @@ class RetrofitDnevnik @Inject constructor(
 
     override suspend fun getMyUserId(): UserIdResponse =
         api.getMyUserId()
+
+    override suspend fun getUserFeed(date: LocalDateTime, personId: Long, limit: Int): NetworkUserFeed =
+        api.getUserFeed(date, personId, limit)
 
     override suspend fun getContextPerson(userId: Long): ContextPersonResponse =
         api.getUserContext(userId)
@@ -158,13 +184,11 @@ class RetrofitDnevnik @Inject constructor(
 
     override suspend fun getRecentMarks(
         personId: Long,
-        eduGroupId: Long,
+        groupId: Long,
         fromDate: LocalDateTime?,
-        toDate: LocalDateTime?,
-        limit: Int?
-    ) {
-        TODO("Not yet implemented")
-    }
+        subjectId: Long?,
+        limit: Int
+    ) = api.getRecentMarks(personId, groupId, fromDate, subjectId, limit)
 
     override suspend fun getPersonMarksByPeriod(
         personId: Long,
@@ -181,4 +205,11 @@ class RetrofitDnevnik @Inject constructor(
         periodId: Long,
         markId: Long
     ): MarkDetailsResponse = api.getMarkDetails(personId, periodId, markId)
+
+    override suspend fun getPersonGroups(personId: Long): List<NetworkGroup> {
+        return api.getPersonGroups(personId)
+    }
+
+    override suspend fun getReportingPeriod(groupId: Long): List<NetworkPeriod> =
+        api.getReportingPeriodGroup(groupId)
 }

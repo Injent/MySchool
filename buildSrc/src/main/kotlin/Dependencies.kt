@@ -75,12 +75,17 @@ fun DependencyHandler.compose() {
     implementation(Dependencies.COMPOSE_UI_TOOLING_PREVIEW)
     implementation(Dependencies.COMPOSE_MATERIAL3)
     implementation(Dependencies.CONSTRAINT_LAYOUT_COMPOSE)
+    debugImplementation(Dependencies.COMPOSE_UI_TOOLING)
 }
 
 fun DependencyHandler.retrofit() {
     implementation(Dependencies.RETROFIT)
     implementation(Dependencies.RETROFIT_KOTLINX_SERIALIZATION_CONVERTER)
     implementation(Dependencies.OKHTTP)
+}
+
+internal fun DependencyHandler.debugImplementation(dependency: String) {
+    add("debugImplementation", dependency)
 }
 
 internal fun DependencyHandler.implementation(dependency: String) {

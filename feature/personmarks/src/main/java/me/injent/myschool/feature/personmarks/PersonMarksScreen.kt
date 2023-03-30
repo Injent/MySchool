@@ -8,37 +8,32 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import kotlinx.coroutines.delay
-import me.injent.myschool.core.designsystem.icon.MsIcons
 import me.injent.myschool.core.designsystem.theme.topCurvedMedium
 import me.injent.myschool.core.model.Sex
-import me.injent.myschool.core.model.alias.SubjectsToMarks
 import me.injent.myschool.core.ui.*
 
 @Composable
 internal fun PersonMarksRoute(
     onBack: () -> Unit,
     onLeaderboardClick: (subjectId: Long) -> Unit,
+    onMarkClick: (markId: Long) -> Unit,
     viewModel: PersonMarksViewModel = hiltViewModel()
 ) {
-    val subjectsAndMarks by viewModel.personMarksUiState.collectAsStateWithLifecycle()
+    val personMarksUiState by viewModel.personMarksUiState.collectAsStateWithLifecycle()
     val personUiState by viewModel.personUiState.collectAsStateWithLifecycle()
 
     PersonMarksScreen(
-        personMarksUiState = subjectsAndMarks,
+        personMarksUiState = personMarksUiState,
         personUiState = personUiState,
         onBack = onBack,
         onLeaderboardClick = onLeaderboardClick,
+        onMarkClick = onMarkClick
     )
 }
 
@@ -49,6 +44,7 @@ private fun PersonMarksScreen(
     personUiState: PersonUiState,
     onBack: () -> Unit,
     onLeaderboardClick: (subjectId: Long) -> Unit,
+    onMarkClick: (markId: Long) -> Unit
 ) {
     Scaffold(
         topBar = {
@@ -60,7 +56,7 @@ private fun PersonMarksScreen(
                         actions = {
                             ProfilePicture(
                                 shortName = personUiState.person.shortName,
-                                onClick = {  },
+                                onClick = {},
                                 modifier = Modifier.padding(ButtonDefaults.IconSpacing)
                             )
                         },
@@ -78,106 +74,35 @@ private fun PersonMarksScreen(
                 .background(MaterialTheme.colorScheme.surface)
                 .verticalScroll(rememberScrollState()),
         ) {
-            when (personUiState) {
-                is PersonUiState.Success -> {
-                    Text(
-                        text = if (personUiState.person.sex == Sex.Male) {
+
+            Text(
+                text = when (personUiState) {
+                    is PersonUiState.Success -> {
+                        if (personUiState.person.sex == Sex.Male)
                             stringResource(id = R.string.male_student_marks)
-                        } else {
-                            stringResource(id = R.string.female_student_marks)       
-                        },
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        modifier = Modifier.padding(16.dp)
-                    )
-                }
-                else -> Unit
-            }
-            MarksListContainer(
-                personMarksUiState = personMarksUiState,
-                onLeaderboardClick = onLeaderboardClick
-            )
-        }
-    }
-}
-
-@Composable
-private fun ColumnScope.MarksListContainer(
-    personMarksUiState: PersonMarksUiState,
-    onLeaderboardClick: (subjectId: Long) -> Unit
-) {
-    when (personMarksUiState) {
-        PersonMarksUiState.Loading -> Unit
-        PersonMarksUiState.Error -> Unit
-        is PersonMarksUiState.Success -> {
-            val isVisible by produceState(initialValue = false) {
-                delay(1L)
-                value = true
-            }
-            AnimatedVisibility(
-                visible = isVisible,
-                enter = fadeIn(),
-                exit = fadeOut()
-            ) {
-                MarksList(
-                    subjectsToMarks = personMarksUiState.subjectsToMarks,
-                    onLeaderboardClick = onLeaderboardClick
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun MarksList(
-    subjectsToMarks: SubjectsToMarks,
-    onLeaderboardClick: (subjectId: Long) -> Unit
-) {
-    Column {
-        for ((subject, marks) in subjectsToMarks) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                Text(
-                    text = subject.name,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                        .align(Alignment.Center)
-                )
-                IconButton(
-                    onClick = { onLeaderboardClick(subject.id) },
-                    modifier = Modifier.align(Alignment.CenterEnd)
-                ) {
-                    Icon(
-                        painter = painterResource(id = MsIcons.Leaderboard),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
-            for (marksRow in marks.chunked(16)) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(color = MaterialTheme.colorScheme.surface)
-                        .padding(top = 12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                ) {
-                    Spacer(Modifier.width(16.dp))
-                    for (mark in marksRow) {
-                        Mark(
-                            value = mark.value,
-                            color = Color.White
-                        )
+                        else
+                            stringResource(id = R.string.female_student_marks)
                     }
-                    Spacer(Modifier.width(16.dp))
+                    else -> ""
+                },
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(16.dp)
+            )
+
+            MarksList(
+                personMarksUiState = personMarksUiState,
+                onLeaderboardClick = onLeaderboardClick,
+                onMarkClick = { markId ->
+                    /*
+                      User can view only own mark details
+                      This condition active when user viewing his/her's marks
+                    */
+                    if (personUiState is PersonUiState.Success && personUiState.isMe) {
+                        onMarkClick(markId)
+                    }
                 }
-            }
-            Spacer(Modifier.height(12.dp))
+            )
         }
     }
 }

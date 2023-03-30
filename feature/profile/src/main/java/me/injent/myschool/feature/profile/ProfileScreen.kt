@@ -25,7 +25,6 @@ internal fun ProfileRoute(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ProfileScreen(
     profileUiState: ProfileUiState

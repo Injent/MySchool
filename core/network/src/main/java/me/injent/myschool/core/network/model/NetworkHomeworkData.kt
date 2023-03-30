@@ -4,7 +4,6 @@ import kotlinx.datetime.TimeZone
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.injent.myschool.core.common.util.atTimeZone
-import me.injent.myschool.core.common.util.withLocalOffset
 import me.injent.myschool.core.model.Homework
 
 @Serializable

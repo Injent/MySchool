@@ -17,10 +17,12 @@ data class MarkDetails(
 
     data class Mark(
         val id: Long,
-        val value: String
+        val value: String,
+        val mood: me.injent.myschool.core.model.Mark.Mood
     )
 
     data class Category(
+        val mood: me.injent.myschool.core.model.Mark.Mood,
         val percent: Float,
         val studentCount: Int,
         val value: String

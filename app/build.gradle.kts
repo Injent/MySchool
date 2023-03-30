@@ -53,6 +53,7 @@ dependencies {
     implementation(project(":feature:profile"))
     implementation(project(":feature:statistics"))
     implementation(project(":feature:markdetails"))
+    implementation(project(":feature:userprofile"))
 
     implementation(Dependencies.CORE_KTX)
     implementation(Dependencies.ACTIVITY_COMPOSE)

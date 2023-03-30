@@ -30,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import me.injent.myschool.feature.authorization.navigation.AUTH_URL
 import me.injent.myschool.core.designsystem.component.MsButton
+import me.injent.myschool.core.designsystem.component.MsOutlinedTextField
 import me.injent.myschool.core.designsystem.theme.hint
 
 private const val TRANSITION_FROM_AUTH_SCREEN_DELAY = 1000L
@@ -56,7 +57,7 @@ private fun AuthorizationScreen(
     authState: AuthState
 ) {
     Box(
-        modifier = Modifier.fillMaxSize().systemBarsPadding()
+        modifier = Modifier.fillMaxSize()
     ) {
         Image(
             painter = painterResource(id = R.drawable.bg_auth),
@@ -80,6 +81,16 @@ private fun AuthorizationScreen(
                 painter = painterResource(id = R.drawable.dnevnik_logo),
                 contentDescription = null,
                 contentScale = ContentScale.FillWidth,
+                modifier = Modifier.fillMaxWidth()
+            )
+            MsOutlinedTextField(
+                text = stringResource(R.string.login_field),
+                onValueChange = {},
+                modifier = Modifier.fillMaxWidth()
+            )
+            MsOutlinedTextField(
+                text = stringResource(R.string.password_field),
+                onValueChange = {},
                 modifier = Modifier.fillMaxWidth()
             )
             Box(modifier = Modifier.height(ButtonDefaults.MinHeight)) {

@@ -8,9 +8,17 @@ data class Mark(
     val date: LocalDateTime,
     val personId: Long,
     val workId: Long,
-    val lessonId: Long,
+    val lessonId: Long?,
+    val mood: Mood,
     val dbSubjectId: Long? = null
-)
+) {
+    enum class Mood {
+        Good,
+        Average,
+        Bad,
+        NotSet
+    }
+}
 
 data class PersonAndMarkValue(
     val personId: Long,

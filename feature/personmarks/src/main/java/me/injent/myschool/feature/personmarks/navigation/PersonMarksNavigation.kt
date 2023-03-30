@@ -7,13 +7,14 @@ import me.injent.myschool.feature.personmarks.PersonMarksRoute
 const val PERSON_MARKS_ROUTE = "person_marks_route"
 const val PERSON_ID = "personId"
 
-fun NavController.navigateToProfile(personId: Long) {
+fun NavController.navigateToPersonMarks(personId: Long) {
     navigate("$PERSON_MARKS_ROUTE/$personId")
 }
 
 fun NavGraphBuilder.personMarksScreen(
     onBack: () -> Unit,
-    onLeaderboardClick: (subjectId: Long) -> Unit
+    onLeaderboardClick: (subjectId: Long) -> Unit,
+    onMarkClick: (markId: Long) -> Unit
 ) {
     composable(
         route = "$PERSON_MARKS_ROUTE/{$PERSON_ID}",
@@ -25,7 +26,8 @@ fun NavGraphBuilder.personMarksScreen(
     ) {
         PersonMarksRoute(
             onBack = onBack,
-            onLeaderboardClick = onLeaderboardClick
+            onLeaderboardClick = onLeaderboardClick,
+            onMarkClick = onMarkClick
         )
     }
 }

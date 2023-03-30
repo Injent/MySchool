@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import me.injent.myschool.core.datastore.MsPreferencesDataSource
 import me.injent.myschool.core.model.UserContext
+import me.injent.myschool.core.network.ApiProvider
 import me.injent.myschool.core.network.DnevnikNetworkDataSource
 import javax.inject.Inject
 

@@ -7,12 +7,28 @@ import dagger.hilt.components.SingletonComponent
 import me.injent.myschool.core.data.downloader.AndroidDownloader
 import me.injent.myschool.core.data.downloader.Downloader
 import me.injent.myschool.core.data.repository.*
+import me.injent.myschool.core.data.repository.remote.*
 import me.injent.myschool.core.data.util.ConnectivityManagerMonitor
 import me.injent.myschool.core.data.util.NetworkMonitor
 
 @Module
 @InstallIn(SingletonComponent::class)
 interface DataModule {
+
+    @Binds
+    fun bindsUserFeedRepository(
+        remoteUserFeedRepository: RemoteUserFeedRepository
+    ): UserFeedRepository
+
+    @Binds
+    fun bindsPeriodRepository(
+        periodRepository: RemoteReportingPeriodRepository
+    ): ReportingPeriodRepository
+
+    @Binds
+    fun bindsGroupRepository(
+        groupRepository: GroupRepositoryImpl
+    ): GroupRepository
 
     @Binds
     fun bindsUserContextRepository(
@@ -58,4 +74,9 @@ interface DataModule {
     fun bindsStatisticRepository(
         statisticsRepositoryImpl: StatisticsRepositoryImpl
     ): StatisticRepository
+
+    @Binds
+    fun bindsEsiaAuthorizationRepository(
+        authorizationRepositoryImpl: LoginRepositoryImpl
+    ): LoginRepository
 }

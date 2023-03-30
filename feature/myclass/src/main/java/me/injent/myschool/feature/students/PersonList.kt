@@ -29,7 +29,7 @@ import me.injent.myschool.core.designsystem.icon.MsIcons
 import me.injent.myschool.core.designsystem.theme.hint
 import me.injent.myschool.core.designsystem.theme.warning
 import me.injent.myschool.core.model.PersonAndMarkValue
-import me.injent.myschool.core.ui.Mark
+import me.injent.myschool.core.ui.MarkView
 import me.injent.myschool.core.ui.ProfilePicture
 
 sealed interface MyClassUiState {
@@ -128,7 +128,7 @@ private fun PersonItem(
             color = MaterialTheme.colorScheme.primary
         )
         Box(Modifier.weight(1f)) {
-            Mark(
+            MarkView(
                 value = mark.toString(),
                 alpha = .1f,
                 modifier = Modifier.align(Alignment.CenterEnd)
@@ -190,7 +190,7 @@ private fun LoadingPersonItem() {
                 )
         )
         Box(Modifier.weight(1f)) {
-            Mark(
+            MarkView(
                 value = "0.00",
                 alpha = .1f,
                 modifier = Modifier

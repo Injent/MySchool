@@ -1,5 +1,6 @@
 package me.injent.myschool.ui
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -19,6 +20,7 @@ import me.injent.myschool.feature.profile.navigation.profileRoute
 import me.injent.myschool.feature.statistics.navigation.navigateToStatistics
 import me.injent.myschool.feature.statistics.navigation.statisticsRoute
 import me.injent.myschool.feature.students.navigation.myClassGraphRoutePattern
+import me.injent.myschool.feature.students.navigation.myClassRoute
 import me.injent.myschool.feature.students.navigation.navigateToMyClass
 import me.injent.myschool.navigation.RootDestination
 
@@ -35,27 +37,27 @@ fun rememberMsAppState(
 @Stable
 class MsAppState(
     val navController: NavHostController,
-    val coroutineScope: CoroutineScope,
+    val coroutineScope: CoroutineScope
 ) {
     val rootDestinations: List<RootDestination>
         get() = RootDestination.values().asList()
 
     val currentDestination: NavDestination?
-        @Composable get() = navController
-            .currentBackStackEntryAsState().value?.destination
+        @Composable get() = navController.currentBackStackEntryAsState().value?.destination
 
     private val currentRootDestination: RootDestination?
-        @Composable get() = when {
-            currentDestination?.route == dashboardRoute -> RootDestination.DASHBOARD
-            currentDestination?.route?.startsWith(myClassGraphRoutePattern)
-                ?: false -> RootDestination.MYCLASS
-            currentDestination?.route == profileRoute -> RootDestination.PROFILE
-            currentDestination?.route == statisticsRoute -> RootDestination.STATISTICS
-            else -> null
+        @Composable get() = with("${currentDestination?.parent?.route ?: ""}/${currentDestination?.route ?: ""}") {
+            when {
+                contains(dashboardRoute) -> RootDestination.DASHBOARD
+                contains(myClassGraphRoutePattern) -> RootDestination.MYCLASS
+                contains(statisticsRoute) -> RootDestination.STATISTICS
+                contains(profileRoute) -> RootDestination.PROFILE
+                else -> null
+            }
         }
 
     val shouldShowBottomNavigation: Boolean
-        @Composable get() = currentDestination.isDestinationWithBottomNavigation()
+        @Composable get() = currentDestination.isChildOfRootDestination(currentRootDestination)
 
     fun navigateTo(destination: RootDestination) {
         val rootNavOptions = navOptions {
@@ -75,6 +77,3 @@ class MsAppState(
         }
     }
 }
-
-private fun NavDestination?.isDestinationWithBottomNavigation(): Boolean =
-    this?.route != authorizationRoute

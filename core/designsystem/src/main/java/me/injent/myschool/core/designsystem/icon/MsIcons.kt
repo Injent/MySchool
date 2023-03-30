@@ -19,8 +19,8 @@ object MsIcons {
     val AttachFile = R.drawable.ic_attach_file
     val Folder = R.drawable.ic_folder
     val Location = R.drawable.ic_place
-    val PlaceImageWhite = R.drawable.bg_place_image_white
-    val PlaceImageYellow = R.drawable.bg_place_image_yellow
-    val PlaceWidgetWhite = R.drawable.bg_place_widget_white
-    val PlaceWidgetYellow = R.drawable.bg_place_widget_yellow
+//    val PlaceImageWhite = R.drawable.bg_place_image_white
+//    val PlaceImageYellow = R.drawable.bg_place_image_yellow
+//    val PlaceWidgetWhite = R.drawable.bg_place_widget_white
+//    val PlaceWidgetYellow = R.drawable.bg_place_widget_yellow
 }

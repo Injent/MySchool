@@ -14,7 +14,9 @@ fun NavController.navigateToMarkDetails(markId: Long) {
     this.navigate("$markDetailsRoute/$markId")
 }
 
-fun NavGraphBuilder.markDetails() {
+fun NavGraphBuilder.markDetailsScreen(
+    onBack: () -> Unit
+) {
     composable(
         route = "$markDetailsRoute/{$MARK_ID}",
         arguments = listOf(
@@ -23,6 +25,8 @@ fun NavGraphBuilder.markDetails() {
             }
         )
     ) {
-        MarkDetailsRoute()
+        MarkDetailsRoute(
+            onBack = onBack
+        )
     }
 }

@@ -28,7 +28,7 @@ import me.injent.myschool.core.common.util.currentLocalDateTime
 import me.injent.myschool.core.common.util.format
 import me.injent.myschool.core.designsystem.component.GradientOverflowText
 import me.injent.myschool.core.designsystem.icon.MsIcons
-import me.injent.myschool.core.model.Homework
+import me.injent.myschool.core.model.UserFeed
 
 fun LazyGridScope.greeting(
     name: String,
@@ -61,36 +61,38 @@ fun LazyGridScope.greeting(
     }
 }
 
-sealed interface HomeworkUiState {
-    object Loading : HomeworkUiState
-    object Empty : HomeworkUiState
+sealed interface FeedUiState {
+    object Loading : FeedUiState
+    object Error : FeedUiState
     data class Success(
-        val homeworks: List<Homework>
-    ) : HomeworkUiState
+        val todayHomeworks: List<UserFeed.Homework>,
+        val todaySchedule: List<UserFeed.Schedule>,
+        val marksCards: List<UserFeed.MarkCard>
+    ) : FeedUiState
 }
 
 fun LazyGridScope.homeworks(
-    homeworkUiState: HomeworkUiState,
-    onClick: (Homework) -> Unit
+    feedUiState: FeedUiState,
+    onClick: (UserFeed.Homework) -> Unit
 ) {
-    when (homeworkUiState) {
-        HomeworkUiState.Loading -> Unit
-        HomeworkUiState.Empty -> Unit
-        is HomeworkUiState.Success -> {
+    when (feedUiState) {
+        FeedUiState.Loading -> Unit
+        FeedUiState.Error -> Unit
+        is FeedUiState.Success -> {
+            if (feedUiState.todayHomeworks.isEmpty()) return
             item {
                 Text(
                     text = stringResource(R.string.homeworks),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.onBackground
                 )
-            }
-            item {
+                Spacer(Modifier.height(16.dp))
                 Column(
                     modifier = Modifier
                         .clip(MaterialTheme.shapes.medium)
                         .background(MaterialTheme.colorScheme.surface)
                 ) {
-                    for (homework in homeworkUiState.homeworks) {
+                    for (homework in feedUiState.todayHomeworks) {
                         HomeworkItem(
                             homework = homework,
                             onClick = { onClick(homework) },
@@ -112,7 +114,7 @@ fun LazyGridScope.homeworks(
 @Composable
 private fun HomeworkItem(
     onClick: () -> Unit,
-    homework: Homework,
+    homework: UserFeed.Homework,
     contentPadding: PaddingValues
 ) {
     val interactionSource = remember { MutableInteractionSource() }
@@ -136,12 +138,12 @@ private fun HomeworkItem(
             verticalAlignment = Alignment.Top
         ) {
             Text(
-                text = homework.subject.name,
+                text = homework.subjectName,
                 style = MaterialTheme.typography.labelLarge,
                 color = MaterialTheme.colorScheme.tertiary
             )
             Text(
-                text = homework.sentDate.format(DEFAULT_DATE_TIME_FORMAT),
+                text = homework.work.sentDate?.format(DEFAULT_DATE_TIME_FORMAT) ?: "",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.secondary
             )
@@ -152,13 +154,13 @@ private fun HomeworkItem(
             verticalAlignment = Alignment.Top
         ) {
             GradientOverflowText(
-                text = homework.text,
+                text = homework.work.text,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.secondary,
                 gradientColor = MaterialTheme.colorScheme.surface,
                 collapsedLines = 2,
             )
-            if (homework.files.isNotEmpty()) {
+            if (false) { // TODO("Show files with new API")
                 Icon(
                     painter = painterResource(MsIcons.AttachFile),
                     contentDescription = null,
@@ -182,17 +184,17 @@ fun LazyGridScope.birthdays(
         BirthdaysUiState.Loading -> Unit
         is BirthdaysUiState.Success -> {
             item {
-                Text(
-                    text = stringResource(R.string.birthdays),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
-            item {
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        text = stringResource(R.string.birthdays),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                     for ((name, date) in birthdaysUiState.personToBirthday) {
                         Row (
-                            modifier = Modifier.fillMaxWidth().alpha(.9f)
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .alpha(.9f)
                         ) {
                             Text(
                                 text = "$name.",

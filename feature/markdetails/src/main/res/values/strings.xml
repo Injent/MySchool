@@ -2,4 +2,5 @@
 <resources>
     <string name="your_mark">Ваша оценка</string>
     <string name="classmates_marks">Оценки одноклассников</string>
+    <string name="classmates">учеников</string>
 </resources>

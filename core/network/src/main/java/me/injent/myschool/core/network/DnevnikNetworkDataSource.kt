@@ -8,9 +8,16 @@ import me.injent.myschool.core.network.model.*
  */
 interface DnevnikNetworkDataSource {
     suspend fun getMyUserId(): UserIdResponse
+
+    suspend fun getUserFeed(
+        date: LocalDateTime,
+        personId: Long,
+        limit: Int
+    ): NetworkUserFeed
+
     suspend fun getContextPerson(userId: Long): ContextPersonResponse
     suspend fun getClassmates(): List<Long>
-    suspend fun getPerson(userId: Long): NetworkPerson
+    suspend fun getPerson(userId: Long): NetworkPerson?
     suspend fun getPersonsInEduGroup(eduGroupId: Long): List<NetworkShortUserInfo>
     suspend fun getSubjects(eduGroupId: Long): List<NetworkSubject>
     suspend fun getPersonMarksBySubjectAndPeriod(
@@ -36,11 +43,11 @@ interface DnevnikNetworkDataSource {
 
     suspend fun getRecentMarks(
         personId: Long,
-        eduGroupId: Long,
+        groupId: Long,
         fromDate: LocalDateTime? = null,
-        toDate: LocalDateTime? = null,
-        limit: Int? = null
-    )
+        subjectId: Long? = null,
+        limit: Int = 10
+    ): RecentMarksResponse
 
     suspend fun getPersonMarksByPeriod(
         personId: Long,
@@ -51,9 +58,13 @@ interface DnevnikNetworkDataSource {
 
     suspend fun getLesson(lessonId: Long): NetworkLesson
 
+    suspend fun getPersonGroups(personId: Long): List<NetworkGroup>
+
     suspend fun getMarkDetails(
         personId: Long,
         periodId: Long,
         markId: Long
     ): MarkDetailsResponse
+
+    suspend fun getReportingPeriod(groupId: Long): List<NetworkPeriod>
 }

@@ -5,6 +5,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import me.injent.myschool.core.common.util.atTimeZone
 import me.injent.myschool.core.data.model.asEntity
 import me.injent.myschool.core.data.util.RepoDependency
 import me.injent.myschool.core.database.dao.MarkDao
@@ -13,26 +15,36 @@ import me.injent.myschool.core.database.dao.SubjectDao
 import me.injent.myschool.core.database.model.MarkEntity
 import me.injent.myschool.core.database.model.SubjectEntity
 import me.injent.myschool.core.database.model.asExternalModel
-import me.injent.myschool.core.model.Mark
-import me.injent.myschool.core.model.MarkDetails
-import me.injent.myschool.core.model.Period
+import me.injent.myschool.core.model.*
 import me.injent.myschool.core.network.DnevnikNetworkDataSource
+import me.injent.myschool.core.network.model.NetworkMark
 import me.injent.myschool.core.network.model.asExternalModel
 import javax.inject.Inject
+
+private const val MAX_MARKS_PERSUBJECT = 100
 
 @RepoDependency(UserContextRepository::class, SubjectRepository::class)
 interface MarkRepository : Syncable {
     suspend fun getPersonFinalMarkBySubject(personId: Long, subjectId: Long): Float
-    fun getPersonMarksBySubjectStream(personId: Long, subjectId: Long): Flow<List<Mark>>
+    suspend fun getPersonMarksBySubject(personId: Long, subjectId: Long): List<Mark>
     suspend fun getPersonAverageMarkValue(personId: Long): Float
     suspend fun receiveNewMarks(): ReceivedMarksResult
     suspend fun receiveClassmatesMarks(): Boolean
     fun getMark(markId: Long): Flow<Mark>
+    suspend fun getPersonMarksByPeriod(personId: Long, schoolId: Long, period: Period): List<Mark>
     suspend fun getMarkDetails(
         personId: Long,
         groupId: Long,
         markId: Long
     ): MarkDetails
+
+    suspend fun getRecentMarks(
+        personId: Long,
+        groupId: Long,
+        fromDate: LocalDateTime? = null,
+        subjectId: Long? = null,
+        limit: Int = MAX_MARKS_PERSUBJECT
+    ): RecentMarks
 }
 
 sealed interface ReceivedMarksResult {
@@ -109,7 +121,7 @@ class OfflineFirstMarkRepository @Inject constructor(
             if (marks.isNotEmpty()) {
                 val marksEntities = mutableListOf<MarkEntity>()
                 for (mark in marks) {
-                    val subject = networkDataSource.getLesson(mark.lessonId).subject!!
+                    val subject = networkDataSource.getLesson(mark.lessonId!!).subject!!
                     marksEntities.add(mark.asEntity(subject.id))
 
                     if (marks.size == 1) {
@@ -148,7 +160,7 @@ class OfflineFirstMarkRepository @Inject constructor(
             ).filterNot { markDao.contains(it.id) }
 
             marks.forEach { mark ->
-                val subjectId = networkDataSource.getLesson(mark.lessonId).subject!!.id
+                val subjectId = networkDataSource.getLesson(mark.lessonId!!).subject!!.id
                 markDao.saveMark(mark.asEntity(subjectId))
             }
         }
@@ -162,16 +174,35 @@ class OfflineFirstMarkRepository @Inject constructor(
     override fun getMark(markId: Long): Flow<Mark> =
         markDao.getMark(markId).map(MarkEntity::asExternalModel)
 
+    override suspend fun getPersonMarksByPeriod(personId: Long, schoolId: Long, period: Period): List<Mark> {
+        return networkDataSource.getPersonMarksByPeriod(
+            personId = personId,
+            schoolId = schoolId,
+            from = period.dateStart.atTimeZone(TimeZone.UTC),
+            to = period.dateFinish.atTimeZone(TimeZone.UTC)
+        ).map(NetworkMark::asExternalModel)
+    }
+
     override suspend fun getMarkDetails(personId: Long, groupId: Long, markId: Long): MarkDetails =
         networkDataSource.getMarkDetails(personId, groupId, markId).asExternalModel()
+
+    override suspend fun getRecentMarks(
+        personId: Long,
+        groupId: Long,
+        fromDate: LocalDateTime?,
+        subjectId: Long?,
+        limit: Int
+    ): RecentMarks =
+        networkDataSource.getRecentMarks(
+            personId, groupId, fromDate, subjectId, limit
+        ).asExternalModel()
 
     override suspend fun getPersonFinalMarkBySubject(personId: Long, subjectId: Long): Float =
         markDao.getPersonAverageMarkBySubject(personId, subjectId)
 
-    override fun getPersonMarksBySubjectStream(personId: Long, subjectId: Long): Flow<List<Mark>> {
-        return markDao.getPersonMarkBySubject(personId, subjectId)
-            .map { it.map(MarkEntity::asExternalModel) }
-    }
+    override suspend fun getPersonMarksBySubject(personId: Long, subjectId: Long): List<Mark> =
+        markDao.getPersonMarkBySubject(personId, subjectId)
+            .map(MarkEntity::asExternalModel)
 
     override suspend fun getPersonAverageMarkValue(personId: Long): Float =
         markDao.getPersonAverageMark(personId)

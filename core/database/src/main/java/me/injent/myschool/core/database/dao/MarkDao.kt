@@ -19,7 +19,7 @@ interface MarkDao {
     @Query("SELECT ROUND(AVG(CAST(value AS INTEGER)), 2) FROM marks WHERE person_id = :personId AND subject_id = :subjectId AND value GLOB '[0-9]*'")
     suspend fun getPersonAverageMarkBySubject(personId: Long, subjectId: Long): Float
     @Query("SELECT * FROM marks WHERE person_id = :personId AND subject_id = :subjectId ORDER BY date")
-    fun getPersonMarkBySubject(personId: Long, subjectId: Long): Flow<List<MarkEntity>>
+    suspend fun getPersonMarkBySubject(personId: Long, subjectId: Long): List<MarkEntity>
     @Query("SELECT ROUND(AVG(CAST(value AS INTEGER)), 2) FROM marks WHERE person_id = :personId AND value NOT NULL AND value GLOB '[0-9]*'")
     suspend fun getPersonAverageMark(personId: Long): Float
     @Query("DELETE FROM marks WHERE date < :currentDateOfPeriod")

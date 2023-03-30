@@ -23,13 +23,14 @@ import me.injent.myschool.core.common.util.toFormattedFileSize
 import me.injent.myschool.core.designsystem.component.MsTextButton
 import me.injent.myschool.core.model.Attachment
 import me.injent.myschool.core.model.Homework
+import me.injent.myschool.core.model.UserFeed
 import me.injent.myschool.core.ui.DocumentPreview
 import me.injent.myschool.core.ui.Tag
 
 @Composable
 fun HomeworkDialog(
     onDismiss: () -> Unit,
-    homework: Homework,
+    homework: UserFeed.Homework,
     viewModel: HomeworkDialogViewModel = hiltViewModel()
 ) {
     AlertDialog(
@@ -42,7 +43,7 @@ fun HomeworkDialog(
         tonalElevation = 0.dp,
         title = {
             Text(
-                text = homework.subject.name,
+                text = homework.subjectName,
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
                 textAlign = TextAlign.Center,
@@ -71,7 +72,7 @@ fun HomeworkDialog(
                         textStyle = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = "${stringResource(R.string.sent)} ${homework.teacher.shortName}.",
+                        text = "${stringResource(R.string.sent)} {teacher}.",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onBackground,
                         overflow = TextOverflow.Ellipsis
@@ -79,14 +80,14 @@ fun HomeworkDialog(
                 }
                 Divider(color = MaterialTheme.colorScheme.outlineVariant)
                 Text(
-                    text = homework.text,
+                    text = homework.work.text,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
                 Divider(color = MaterialTheme.colorScheme.outlineVariant)
                 Files(
-                    files = homework.files,
+                    files = emptyList(),
                     viewModel = viewModel
                 )
 

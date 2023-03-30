@@ -11,12 +11,14 @@ import me.injent.myschool.feature.dashboard.navigation.dashboardScreen
 import me.injent.myschool.feature.dashboard.navigation.navigateToDashboard
 import me.injent.myschool.feature.leaderboard.navigation.leaderBoardScreen
 import me.injent.myschool.feature.leaderboard.navigation.navigateToLeaderboard
-import me.injent.myschool.feature.markpage.navigation.markDetails
-import me.injent.myschool.feature.personmarks.navigation.navigateToProfile
+import me.injent.myschool.feature.markpage.navigation.markDetailsScreen
+import me.injent.myschool.feature.markpage.navigation.navigateToMarkDetails
+import me.injent.myschool.feature.personmarks.navigation.navigateToPersonMarks
 import me.injent.myschool.feature.personmarks.navigation.personMarksScreen
 import me.injent.myschool.feature.profile.navigation.profileScreen
 import me.injent.myschool.feature.statistics.navigation.statisticsScreen
 import me.injent.myschool.feature.students.navigation.myClassGraph
+import me.injent.myschool.feature.usersearch.navigation.userProfileScreen
 
 @Composable
 fun MsNavHost(
@@ -33,21 +35,27 @@ fun MsNavHost(
             navController.navigateToDashboard(navOptions { popUpTo(0) })
         })
 
-        dashboardScreen()
+        dashboardScreen(
+            onMarkClick = { markId ->
+                navController.navigateToMarkDetails(markId)
+            }
+        )
         myClassGraph(
-            onPersonClick = { navController.navigateToProfile(it) }
+            onPersonClick = { personId -> navController.navigateToPersonMarks(personId) }
         ) {
             leaderBoardScreen(
                 onBack = { navController.popBackStack() }
             )
             personMarksScreen(
                 onBack = { navController.popBackStack() },
-                onLeaderboardClick = { navController.navigateToLeaderboard(it) }
+                onLeaderboardClick = { navController.navigateToLeaderboard(it) },
+                onMarkClick = { markId -> navController.navigateToMarkDetails(markId) }
             )
         }
         statisticsScreen()
         profileScreen()
 
-        markDetails()
+        markDetailsScreen(onBack = { navController.popBackStack() })
+//        userProfileScreen()
     }
 }

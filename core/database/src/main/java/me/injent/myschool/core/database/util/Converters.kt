@@ -2,9 +2,17 @@ package me.injent.myschool.core.database.util
 
 import androidx.room.TypeConverter
 import kotlinx.datetime.*
+import me.injent.myschool.core.model.Mark
 import me.injent.myschool.core.model.Sex
 
-class InstantConverter {
+internal class MarkMoodConverter {
+    @TypeConverter
+    fun markMoodToOrdinal(value: Mark.Mood): Int = value.ordinal
+    @TypeConverter
+    fun ordinalToMarkMood(value: Int): Mark.Mood = Mark.Mood.values()[value]
+}
+
+internal class InstantConverter {
     @TypeConverter
     fun longToInstant(value: Long?): Instant? =
         value?.let(Instant::fromEpochMilliseconds)
@@ -14,7 +22,7 @@ class InstantConverter {
         instant?.toEpochMilliseconds()
 }
 
-class StringListConverter {
+internal class StringListConverter {
     @TypeConverter
     fun stringListToString(value: List<String>): String =
         value.joinToString(";")
@@ -28,7 +36,7 @@ class StringListConverter {
         }
 }
 
-class LocalDateConverter {
+internal class LocalDateConverter {
     @TypeConverter
     fun localDateToInt(value: LocalDate?): Int? =
         value?.toEpochDays()
@@ -37,7 +45,7 @@ class LocalDateConverter {
         value?.let { LocalDate.fromEpochDays(it) }
 }
 
-class LocalDateTimeConverter {
+internal class LocalDateTimeConverter {
     @TypeConverter
     fun localDateTimeToLong(value: LocalDateTime?): Long? =
         value?.toInstant(TimeZone.currentSystemDefault())?.epochSeconds
@@ -46,7 +54,7 @@ class LocalDateTimeConverter {
         value?.let { Instant.fromEpochSeconds(value).toLocalDateTime(TimeZone.currentSystemDefault()) }
 }
 
-class SexConverter {
+internal class SexConverter {
     @TypeConverter
     fun sexToOrdinal(value: Sex): Int = value.ordinal
     @TypeConverter
