@@ -12,8 +12,8 @@ fun NavController.navigateToProfile(navOptions: NavOptions?) {
     this.navigate(profileRoute, navOptions)
 }
 
-fun NavGraphBuilder.profileScreen() {
+fun NavGraphBuilder.profileScreen(onLogout: () -> Unit) {
     composable(route = profileRoute) {
-        ProfileRoute()
+        ProfileRoute(onLogout = onLogout)
     }
 }

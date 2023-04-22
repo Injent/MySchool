@@ -1,30 +1,20 @@
 package me.injent.myschool.feature.students
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithContent
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.google.accompanist.placeholder.PlaceholderHighlight
-import com.google.accompanist.placeholder.material.placeholder
-import com.google.accompanist.placeholder.material.shimmer
 import me.injent.myschool.core.ui.AnimatedCollapsingContent
 import me.injent.myschool.core.ui.height
 import me.injent.myschool.feature.myclass.R
@@ -39,6 +29,7 @@ internal fun MyClassRoute(
     MyClassScreen(
         myClassUiState = myClassUiState,
         onPersonClick = onPersonClick,
+        onSelectPeriod = viewModel::selectPeriod
     )
 }
 
@@ -47,6 +38,7 @@ internal fun MyClassRoute(
 private fun MyClassScreen(
     myClassUiState: MyClassUiState,
     onPersonClick: (personId: Long) -> Unit,
+    onSelectPeriod: (PeriodChip) -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     Scaffold(
@@ -56,7 +48,8 @@ private fun MyClassScreen(
         topBar = {
             MyClassTopAppBar(
                 scrollBehavior = scrollBehavior,
-                myClassUiState = myClassUiState
+                myClassUiState = myClassUiState,
+                onSelectPeriod = onSelectPeriod
             )
         }
     ) { padding ->
@@ -74,7 +67,8 @@ private fun MyClassScreen(
 @Composable
 private fun MyClassTopAppBar(
     scrollBehavior: TopAppBarScrollBehavior,
-    myClassUiState: MyClassUiState
+    myClassUiState: MyClassUiState,
+    onSelectPeriod: (PeriodChip) -> Unit
 ) {
     AnimatedCollapsingContent(
         scrollBehavior = scrollBehavior,
@@ -100,45 +94,32 @@ private fun MyClassTopAppBar(
             contentScale = ContentScale.FillWidth
         )
 
-        val context = LocalContext.current
-        val myPlaceText = remember(myClassUiState) {
-            if (myClassUiState is MyClassUiState.Success) {
-                context.getString(R.string.your_place)
-                    .replace("{place}", myClassUiState.myPlace.toString())
-            } else {
-                null
-            }
+        val myPlace = if (myClassUiState is MyClassUiState.Success) {
+            "${myClassUiState.myPlace}-ое ${stringResource(R.string.your_place)}"
+        } else {
+            ""
         }
+
         Text(
-            text = myPlaceText ?: context.getString(R.string.your_place),
-            style = MaterialTheme.typography.titleMedium,
+            text = myPlace,
+            style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onBackground,
-            modifier = Modifier
-                .layoutId("my_place")
-                .placeholder(
-                    visible = myPlaceText == null,
-                    highlight = PlaceholderHighlight.shimmer()
-                )
+            modifier = Modifier.layoutId("my_place")
         )
-        Box(
+
+        val scrollState = rememberScrollState()
+        Row(
             modifier = Modifier
-                .layoutId("search")
-                .fillMaxWidth(0.5f)
-                .height(36.dp)
-                .background(Color.Black.copy(.15f), CircleShape)
+                .layoutId("periods")
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.surface)
                 .padding(horizontal = 16.dp)
+                .horizontalScroll(scrollState),
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            Text(
-                text = "Поиск",
-                color = MaterialTheme.colorScheme.surface,
-                modifier = Modifier.align(Alignment.Center)
-            )
-            Icon(
-                imageVector = Icons.Rounded.Search,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.surface,
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
+            PeriodChips(
+                myClassUiState = myClassUiState,
+                onSelect = onSelectPeriod,
             )
         }
     }

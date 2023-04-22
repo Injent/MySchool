@@ -2,4 +2,10 @@
 <resources>
     <string name="average_mark_during_day">Средняя оценка на протяжении дня</string>
     <string name="average_mark_during_week">Средняя оценка на протяжении недели</string>
+    <string name="best_students_by_subjects">Лучшие ученики по предметам</string>
+    <string name="half_year">Полугодие</string>
+    <string name="quarter">Четверть</string>
+    <string name="semester">Семестр</string>
+    <string name="trimester">Триместр</string>
+    <string name="module">Модуль</string>
 </resources>

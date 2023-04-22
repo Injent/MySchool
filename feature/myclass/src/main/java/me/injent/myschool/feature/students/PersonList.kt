@@ -1,45 +1,28 @@
 package me.injent.myschool.feature.students
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
 import me.injent.myschool.core.designsystem.icon.MsIcons
-import me.injent.myschool.core.designsystem.theme.hint
 import me.injent.myschool.core.designsystem.theme.warning
 import me.injent.myschool.core.model.PersonAndMarkValue
 import me.injent.myschool.core.ui.MarkView
 import me.injent.myschool.core.ui.ProfilePicture
-
-sealed interface MyClassUiState {
-    object Loading : MyClassUiState
-    object Error : MyClassUiState
-    data class Success(
-        val myPlace: Int,
-        val personsAndMarks: List<PersonAndMarkValue>
-    ) : MyClassUiState
-}
 
 @Composable
 fun PersonList(
@@ -50,24 +33,22 @@ fun PersonList(
     when (myClassUiState) {
         MyClassUiState.Loading -> { LoadingPersonList(modifier) }
         is MyClassUiState.Success -> {
-            LazyColumn(
-                modifier = modifier.background(MaterialTheme.colorScheme.surface),
+            Surface(
+                modifier = modifier
             ) {
-                itemsIndexed(
-                    items = myClassUiState.personsAndMarks,
-                    key = { _, item -> item.personId }
-                ) { index, (personId, name, mark) ->
-                    PersonItem(
-                        onClick = { onPersonClick(personId) },
-                        name = name,
-                        mark = mark,
-                        place = index + 1,
-                        isMe = myClassUiState.myPlace == index + 1
-                    )
-                    Divider(
-                        modifier = Modifier.padding(horizontal = 64.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant
-                    )
+                LazyColumn {
+                    itemsIndexed(
+                        items = myClassUiState.personsAndMarks,
+                        key = { _, item -> item.personId }
+                    ) { index, personAndMarkValue ->
+                        Person(
+                            onClick = { onPersonClick(personAndMarkValue.personId) },
+                            personAndMarkValue = personAndMarkValue,
+                            place = index + 1,
+                            isMe = myClassUiState.myPlace == index + 1,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         }
@@ -76,130 +57,163 @@ fun PersonList(
 }
 
 @Composable
-private fun PersonItem(
+private fun Person(
     onClick: () -> Unit,
-    name: String,
-    mark: Float,
+    personAndMarkValue: PersonAndMarkValue,
     place: Int,
-    isMe: Boolean
+    isMe: Boolean,
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(
-                interactionSource = interactionSource,
-                indication = rememberRipple(color = MaterialTheme.colorScheme.hint),
-                onClick = onClick
-            )
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically
+    ConstraintLayout(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.medium)
+            .clickable(onClick = onClick)
+            .padding(contentPadding)
     ) {
+        val (avatar, placeText, cupIcon, name, markValue) = createRefs()
+
         ProfilePicture(
-            onClick = onClick,
-            shortName = name
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        val fontStyle = MaterialTheme.typography.bodyLarge
-        Text(
-            text = buildAnnotatedString {
-                if (place < 10) {
-                    withStyle(SpanStyle(color = Color.Transparent)) { append("0") }
+            avatarUrl = personAndMarkValue.avatarUrl,
+            name = personAndMarkValue.personName,
+            modifier = Modifier
+                .size(32.dp)
+                .constrainAs(avatar) {
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
                 }
-                append(place.toString())
-            },
-            style = fontStyle,
-            color = MaterialTheme.colorScheme.secondary
         )
+
+        val fontStyle = MaterialTheme.typography.bodyMedium
+
+        Text(
+            text = personAndMarkValue.personName,
+            style = fontStyle,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.constrainAs(name) {
+                start.linkTo(avatar.end, 16.dp)
+                top.linkTo(parent.top)
+            }
+        )
+
         Icon(
-            painter = painterResource(id = MsIcons.Cup),
+            painter = painterResource(MsIcons.Cup),
             contentDescription = null,
             tint = if (isMe) {
                 MaterialTheme.colorScheme.warning
             } else {
                 MaterialTheme.colorScheme.secondary
             },
-            modifier = Modifier.size(MaterialTheme.typography.bodyLarge.fontSize.value.dp)
+            modifier = Modifier
+                .size(fontStyle.fontSize.value.dp)
+                .constrainAs(cupIcon) {
+                    start.linkTo(name.start)
+                    top.linkTo(name.bottom, 2.dp)
+                }
         )
+
         Text(
-            text = name,
+            text = place.toString(),
             style = fontStyle,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier.constrainAs(placeText) {
+                start.linkTo(cupIcon.end)
+                top.linkTo(cupIcon.top)
+                bottom.linkTo(cupIcon.bottom)
+            }
         )
-        Box(Modifier.weight(1f)) {
-            MarkView(
-                value = mark.toString(),
-                alpha = .1f,
-                modifier = Modifier.align(Alignment.CenterEnd)
-            )
-        }
+
+        MarkView(
+            value = personAndMarkValue.value.toString(),
+            alpha = .15f,
+            modifier = Modifier
+                .clip(CircleShape)
+                .constrainAs(markValue) {
+                    end.linkTo(parent.end)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
+        )
     }
 }
 
 @Composable
 private fun LoadingPersonList(modifier: Modifier = Modifier) {
-    Column(modifier = modifier.background(MaterialTheme.colorScheme.surface)) {
-        repeat(20) {
-            LoadingPersonItem()
-            Divider(
-                modifier = Modifier.padding(start = 64.dp),
-                color = MaterialTheme.colorScheme.outlineVariant
-            )
+    Surface(
+        modifier = modifier
+    ) {
+        Column {
+            repeat(20) {
+                LoadingPersonItem(
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun LoadingPersonItem() {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 10.dp),
-        horizontalArrangement = Arrangement.spacedBy(4.dp),
-        verticalAlignment = Alignment.CenterVertically
+private fun LoadingPersonItem(
+    modifier: Modifier = Modifier,
+    contentPadding: PaddingValues = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
+) {
+    ConstraintLayout(
+        modifier = modifier.padding(contentPadding)
     ) {
-        ProfilePicture(
-            onClick = {},
-            shortName = "NS",
-            modifier = Modifier
-                .placeholder(
-                    visible = true,
-                    highlight = PlaceholderHighlight.shimmer(),
-                    shape = CircleShape
-                )
+        val placeholder = Modifier.placeholder(
+            visible = true,
+            highlight = PlaceholderHighlight.shimmer()
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        val (avatar, placeText, cupIcon, name, markValue) = createRefs()
 
-        val fontStyle = MaterialTheme.typography.bodyLarge
-        Text(
-            text = "00  #",
-            style = fontStyle,
-            modifier = Modifier.placeholder(
-                visible = true,
-                highlight = PlaceholderHighlight.shimmer()
-            )
-        )
-        Text(
-            text = "Sample N.",
-            style = fontStyle,
+        ProfilePicture(
+            avatarUrl = null,
             modifier = Modifier
-                .placeholder(
-                    visible = true,
-                    highlight = PlaceholderHighlight.shimmer()
-                )
+                .size(32.dp)
+                .clip(CircleShape)
+                .then(placeholder)
+                .constrainAs(avatar) {
+                    start.linkTo(parent.start)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
         )
-        Box(Modifier.weight(1f)) {
-            MarkView(
-                value = "0.00",
-                alpha = .1f,
-                modifier = Modifier
-                    .align(Alignment.CenterEnd)
-                    .placeholder(
-                        visible = true,
-                        highlight = PlaceholderHighlight.shimmer()
-                    )
-            )
-        }
+
+        val fontStyle = MaterialTheme.typography.bodyMedium
+
+        Text(
+            text = "Person Name",
+            style = fontStyle,
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier
+                .then(placeholder)
+                .constrainAs(name) {
+                    start.linkTo(avatar.end, 16.dp)
+                    top.linkTo(parent.top)
+                }
+        )
+        Text(
+            text = "",
+            style = fontStyle,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier
+                .constrainAs(placeText) {
+                    start.linkTo(cupIcon.end)
+                    top.linkTo(cupIcon.top)
+                    bottom.linkTo(cupIcon.bottom)
+                }
+        )
+        MarkView(
+            value = "#.##",
+            modifier = Modifier
+                .clip(CircleShape)
+                .then(placeholder)
+                .constrainAs(markValue) {
+                    end.linkTo(parent.end)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                }
+        )
     }
 }

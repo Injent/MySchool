@@ -5,6 +5,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,7 +38,12 @@ import me.injent.myschool.feature.markdetails.R
 @Composable
 internal fun MarkCard(markDetailsUiState: MarkDetailsUiState) {
     when (markDetailsUiState) {
-        MarkDetailsUiState.Loading -> Unit
+        MarkDetailsUiState.Loading -> Box(Modifier.fillMaxSize()) {
+            CircularProgressIndicator(
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.align(Alignment.Center)
+            )
+        }
         is MarkDetailsUiState.Success -> {
             if (markDetailsUiState.markDetails.markInfo.marks.size == 1) {
                 SingleMarkCard(state = markDetailsUiState)
@@ -45,7 +51,9 @@ internal fun MarkCard(markDetailsUiState: MarkDetailsUiState) {
                 DoubleMarkCard(state = markDetailsUiState)
             }
         }
-        MarkDetailsUiState.Error -> Unit
+        MarkDetailsUiState.Error -> {
+            Text(text = stringResource(R.string.failed_to_load_data))
+        }
     }
 }
 

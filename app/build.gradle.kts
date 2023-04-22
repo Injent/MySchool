@@ -3,6 +3,7 @@ plugins {
     id("injent.android.application")
     id("injent.android.application.compose")
     id("injent.android.hilt")
+    id("injent.android.application.firebase")
 }
 
 android {
@@ -14,19 +15,30 @@ android {
         versionCode = 1
         versionName = "1.0.0" // X.Y.Z; X = Major, Y = minor, Z = Patch level
 
-        //testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
+        }
+    }
+
+    signingConfigs {
+        val release = create("release") {
+            storeFile = file("$projectDir/release.keystore")
+            storePassword = "12345678"
+            keyAlias = "release"
+            keyPassword = "12345678"
         }
     }
 
     buildTypes {
         val release by getting {
             isMinifyEnabled = true
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = true
+            signingConfig = signingConfigs.getByName("release")
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
         val debug by getting {
             isMinifyEnabled = false
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
@@ -39,13 +51,16 @@ android {
 
 dependencies {
     implementation(project(":sync"))
+    implementation(project(":core:analytics"))
+    implementation(project(":core:auth"))
     implementation(project(":core:data"))
     implementation(project(":core:model"))
     implementation(project(":core:common"))
     implementation(project(":core:network"))
     implementation(project(":core:designsystem"))
     implementation(project(":core:ui"))
-    implementation(project(":feature:authorization"))
+
+    implementation(project(":feature:auth"))
     implementation(project(":feature:personmarks"))
     implementation(project(":feature:myclass"))
     implementation(project(":feature:leaderboard"))
@@ -54,6 +69,7 @@ dependencies {
     implementation(project(":feature:statistics"))
     implementation(project(":feature:markdetails"))
     implementation(project(":feature:userprofile"))
+    implementation(project(":feature:accounts"))
 
     implementation(Dependencies.CORE_KTX)
     implementation(Dependencies.ACTIVITY_COMPOSE)

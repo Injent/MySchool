@@ -63,7 +63,9 @@ private fun markDetailsUiState(
         )
 
         MarkDetailsUiState.Success(
-            markDetails = markDetails,
+            markDetails = markDetails.copy(
+                categories = markDetails.categories.sortedBy { it.mood.ordinal }
+            ),
             subject = subject
         )
     }

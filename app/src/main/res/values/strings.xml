@@ -1,8 +1,15 @@
 <resources>
-    <string name="app_name">MySchool</string>
+    <string name="app_name" translatable="false">MySchool</string>
     <string name="network_error">Нет подключения к сети</string>
     <string name="dashboard">Дашборд</string>
     <string name="my_class">Мой класс</string>
     <string name="statistics">Статистика</string>
     <string name="profile">Профиль</string>
+    <string name="account_type" translatable="false">me.injent.myschool</string>
+    <string name="authenticator_label" translatable="false">MySchool</string>
+    <string name="move_to_download">Загрузить</string>
+    <string name="later">Позже</string>
+    <string name="update">Обновление</string>
+    <string name="update_available">ДОСТУПНО ОБНОВЛЕНИЕ</string>
+    <string name="important_update">ОБЯЗАТЕЛЬНОЕ ОБНОВЛЕНИЕ</string>
 </resources>

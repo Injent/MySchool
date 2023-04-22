@@ -17,6 +17,7 @@ import javax.inject.Inject
 interface SubjectRepository : Syncable {
     val subjects: Flow<List<Subject>>
     fun getSubject(subjectId: Long): Flow<Subject>
+    suspend fun getSubjectName(subjectId: Long): String
 }
 
 @RepoDependency(UserContextRepository::class)
@@ -25,10 +26,11 @@ class OfflineFirstSubjectRepository @Inject constructor(
     private val subjectDao: SubjectDao,
     private val userContextRepository: UserContextRepository
 ) : SubjectRepository {
-    override suspend fun synchronize(): Boolean = try {
+    override suspend fun synchronize(onProgress: ((Int) -> Unit)?): Boolean = try {
         val groupId = userContextRepository.userContext.first()!!.group.id
         val subjects = networkDataSource.getSubjects(groupId).map(NetworkSubject::asEntity)
         subjectDao.saveSubjects(subjects)
+        onProgress?.invoke(100)
         true
     } catch (e: Exception) {
         Log.e("SubjectRepository", "Failed to sync")
@@ -41,4 +43,7 @@ class OfflineFirstSubjectRepository @Inject constructor(
 
     override fun getSubject(subjectId: Long): Flow<Subject> =
         subjectDao.getSubject(subjectId).map(SubjectEntity::asExternalModel)
+
+    override suspend fun getSubjectName(subjectId: Long): String =
+        subjectDao.getSubjectName(subjectId)
 }

@@ -5,21 +5,28 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import me.injent.myschool.core.network.ApiProvider
 import me.injent.myschool.core.network.BuildConfig
-import me.injent.myschool.core.network.model.auth.EsiaCredentials
-import me.injent.myschool.core.network.model.auth.EsiaLoginResponse
+import me.injent.myschool.core.network.model.NetworkUserContext
+import me.injent.myschool.core.network.model.UserIdResponse
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
-import retrofit2.http.Body
-import retrofit2.http.POST
+import retrofit2.http.*
 import javax.inject.Inject
 
 /**
  * Retrofit Service used for auth
  */
 private interface RetrofitApiProviderApi {
-    @POST("/v2/authorizations/bycredentials")
-    suspend fun authByCredentials(@Body credentials: EsiaCredentials): EsiaLoginResponse
+    @GET("/mobile/v7.0/users/{userId}/context")
+    suspend fun auth(
+        @Path("userId") userId: Long,
+        @Query("access_token") accessToken: String,
+    ): NetworkUserContext
+
+    @GET("/v2/users/me")
+    suspend fun userId(
+        @Query("access_token") accessToken: String,
+    ): UserIdResponse
 }
 
 class RetrofitApiProvider @Inject constructor(
@@ -36,6 +43,9 @@ class RetrofitApiProvider @Inject constructor(
         .build()
         .create(RetrofitApiProviderApi::class.java)
 
-    override suspend fun authByCredentials(credentials: EsiaCredentials): EsiaLoginResponse =
-        api.authByCredentials(credentials)
+    override suspend fun auth(accessToken: String, userId: Long): NetworkUserContext =
+        api.auth(userId, accessToken)
+
+    override suspend fun userId(accessToken: String): UserIdResponse =
+        api.userId(accessToken)
 }

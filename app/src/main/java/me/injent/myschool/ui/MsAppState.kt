@@ -1,18 +1,15 @@
 package me.injent.myschool.ui
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavDestination
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import kotlinx.coroutines.CoroutineScope
-import me.injent.myschool.feature.authorization.navigation.authorizationRoute
 import me.injent.myschool.feature.dashboard.navigation.dashboardRoute
 import me.injent.myschool.feature.dashboard.navigation.navigateToDashboard
 import me.injent.myschool.feature.profile.navigation.navigateToProfile
@@ -20,7 +17,6 @@ import me.injent.myschool.feature.profile.navigation.profileRoute
 import me.injent.myschool.feature.statistics.navigation.navigateToStatistics
 import me.injent.myschool.feature.statistics.navigation.statisticsRoute
 import me.injent.myschool.feature.students.navigation.myClassGraphRoutePattern
-import me.injent.myschool.feature.students.navigation.myClassRoute
 import me.injent.myschool.feature.students.navigation.navigateToMyClass
 import me.injent.myschool.navigation.RootDestination
 
@@ -40,7 +36,7 @@ class MsAppState(
     val coroutineScope: CoroutineScope
 ) {
     val rootDestinations: List<RootDestination>
-        get() = RootDestination.values().asList()
+        get() = RootDestination.values().asList().filter { it.route != profileRoute }
 
     val currentDestination: NavDestination?
         @Composable get() = navController.currentBackStackEntryAsState().value?.destination
@@ -60,14 +56,7 @@ class MsAppState(
         @Composable get() = currentDestination.isChildOfRootDestination(currentRootDestination)
 
     fun navigateTo(destination: RootDestination) {
-        val rootNavOptions = navOptions {
-            popUpTo(navController.graph.findStartDestination().id) {
-                saveState = true
-            }
-
-            launchSingleTop = true
-            restoreState = true
-        }
+        val rootNavOptions = rootNavOptions()
 
         when (destination) {
             RootDestination.DASHBOARD -> navController.navigateToDashboard(rootNavOptions)
@@ -76,4 +65,13 @@ class MsAppState(
             RootDestination.STATISTICS -> navController.navigateToStatistics(rootNavOptions)
         }
     }
+}
+
+fun rootNavOptions() = navOptions {
+    popUpTo(0) {
+        saveState = true
+    }
+
+    launchSingleTop = true
+    restoreState = true
 }

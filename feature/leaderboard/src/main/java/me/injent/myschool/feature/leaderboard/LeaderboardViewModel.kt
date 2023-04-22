@@ -5,14 +5,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
+import me.injent.myschool.core.common.util.MarkDataCounter
 import me.injent.myschool.core.data.repository.MarkRepository
 import me.injent.myschool.core.data.repository.PersonRepository
 import me.injent.myschool.core.data.repository.SubjectRepository
+import me.injent.myschool.core.data.repository.UserDataRepository
 import me.injent.myschool.core.model.PersonAndMarkValue
 import me.injent.myschool.feature.leaderboard.navigation.SUBJECT_ID
-import me.injent.myschool.core.common.result.Result
-import me.injent.myschool.core.common.result.asResult
-import me.injent.myschool.core.common.util.MarkDataCounter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,6 +19,7 @@ class LeaderboardViewModel @Inject constructor(
     personRepository: PersonRepository,
     markRepository: MarkRepository,
     subjectRepository: SubjectRepository,
+    userDataRepository: UserDataRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -27,7 +27,8 @@ class LeaderboardViewModel @Inject constructor(
         subjectId = savedStateHandle[SUBJECT_ID] ?: throw RuntimeException(),
         personRepository = personRepository,
         markRepository = markRepository,
-        subjectRepository = subjectRepository
+        subjectRepository = subjectRepository,
+        userDataRepository = userDataRepository
     )
         .stateIn(
             scope = viewModelScope,
@@ -40,7 +41,8 @@ private fun leaderboardUiState(
     subjectId: Long,
     personRepository: PersonRepository,
     markRepository: MarkRepository,
-    subjectRepository: SubjectRepository
+    subjectRepository: SubjectRepository,
+    userDataRepository: UserDataRepository
 ) : Flow<LeaderboardUiState> {
     val subjectStream = subjectRepository.getSubject(subjectId)
     val personsStream = personRepository.persons
@@ -48,32 +50,32 @@ private fun leaderboardUiState(
     return combine(
         subjectStream,
         personsStream,
-        ::Pair
-    )
-        .asResult()
-        .map { subjectToPersons ->
-            when (subjectToPersons) {
-                is Result.Success -> {
-                    val personsAndMarkValues = mutableListOf<PersonAndMarkValue>()
-                    for (person in subjectToPersons.data.second) {
-                        val mark = markRepository
-                            .getPersonFinalMarkBySubject(person.personId, subjectId)
-                        val personAndMark
-                            = PersonAndMarkValue(person.personId, person.shortName, mark)
-                        personsAndMarkValues.add(personAndMark)
-                    }
-                    val minMark = personsAndMarkValues.minOf(PersonAndMarkValue::value)
-                    val maxMark = personsAndMarkValues.maxOf(PersonAndMarkValue::value)
-                    LeaderboardUiState.Success(
-                        subjectToPersons.data.first.name,
-                        personsAndMarkValues.toList().sortedByDescending(PersonAndMarkValue::value),
-                        MarkDataCounter(minMark, maxMark)
-                    )
-                }
-                Result.Loading -> LeaderboardUiState.Loading
-                is Result.Error -> LeaderboardUiState.Error
+        userDataRepository.userData
+    ) { subject, persons, userData ->
+        val period = userData.selectedPeriod!!
+        val personsAndMarkValues = persons
+            .map { person ->
+                val mark = markRepository.getPersonFinalMarkBySubject(
+                    person.personId,
+                    subjectId,
+                    period
+                )
+                PersonAndMarkValue(
+                    personId = person.personId,
+                    personName = person.shortName,
+                    avatarUrl = person.avatarUrl,
+                    value = mark
+                )
             }
-        }
+
+        val minMark = personsAndMarkValues.minOf(PersonAndMarkValue::value)
+        val maxMark = personsAndMarkValues.maxOf(PersonAndMarkValue::value)
+        LeaderboardUiState.Success(
+            subject.name,
+            personsAndMarkValues.toList().sortedByDescending(PersonAndMarkValue::value),
+            MarkDataCounter(minMark, maxMark)
+        )
+    }
 }
 
 sealed interface LeaderboardUiState {

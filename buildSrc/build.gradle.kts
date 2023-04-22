@@ -1,5 +1,3 @@
-import org.gradle.kotlin.dsl.`kotlin-dsl`
-
 plugins {
     `kotlin-dsl`
 }
@@ -14,6 +12,8 @@ dependencies {
     implementation("com.android.tools.build:gradle:7.4.1")
     implementation(kotlin("gradle-plugin", "1.8.10"))
     implementation("com.squareup:javapoet:1.13.0")
+    implementation("com.google.firebase:firebase-crashlytics-gradle:2.9.5")
+    implementation("com.google.firebase:perf-plugin:1.4.2")
     implementation("com.google.devtools.ksp:com.google.devtools.ksp.gradle.plugin:1.8.10-1.0.9")
 }
 
@@ -50,6 +50,10 @@ gradlePlugin {
         register("androidRoomConventionPlugin") {
             id = "injent.android.room"
             implementationClass = "AndroidRoomConventionPlugin"
+        }
+        register("androidFirebase") {
+            id = "injent.android.application.firebase"
+            implementationClass = "FirebasePluginConvention"
         }
     }
 }

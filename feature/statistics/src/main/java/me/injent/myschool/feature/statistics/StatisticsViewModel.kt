@@ -6,43 +6,56 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import me.injent.myschool.core.data.repository.StatisticRepository
 import me.injent.myschool.core.data.repository.UserContextRepository
+import me.injent.myschool.core.data.repository.UserDataRepository
+import me.injent.myschool.core.model.Period
+import me.injent.myschool.core.model.Person
+import me.injent.myschool.core.model.Subject
 import javax.inject.Inject
 
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
     statisticRepository: StatisticRepository,
-    contextRepository: UserContextRepository
+    userContextRepository: UserContextRepository,
+    userDataRepository: UserDataRepository
 ) : ViewModel() {
 
-    val averageMarks = statisticsUiState(
-        contextRepository,
-        statisticRepository
+    private val _statisticsUiState = MutableStateFlow(StatisticsUiState())
+    val statisticsUiState: StateFlow<StatisticsUiState>
+        get() = _statisticsUiState.asStateFlow()
+
+    val bestStudentsBySubject = bestStudentsBySubject(
+        statisticRepository, userDataRepository, _statisticsUiState
     )
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
-            initialValue = StatisticsUiState.Loading
+            initialValue = emptyMap()
         )
+
+    fun setPeriod(period: Period) {
+        _statisticsUiState.update {
+            it.copy(selectedPeriod = period)
+        }
+    }
 }
 
-sealed interface StatisticsUiState {
-    object Loading : StatisticsUiState
-    data class Success(
-        val averageMarksByWeek: List<Float>
-    ) : StatisticsUiState
-    object Error : StatisticsUiState
-}
+data class StatisticsUiState(
+    val selectedPeriod: Period? = null
+)
 
-private fun statisticsUiState(
-    contextRepository: UserContextRepository,
-    statisticRepository: StatisticRepository
-): Flow<StatisticsUiState> {
-    return contextRepository.userContext
-        .map { userContext ->
-            if (userContext == null)
-                return@map StatisticsUiState.Error
-            val averagemarksByWeek =
-                statisticRepository.getAverageMarksByWeek(userContext.personId)
-            return@map StatisticsUiState.Success(averagemarksByWeek)
+private fun bestStudentsBySubject(
+    statisticRepository: StatisticRepository,
+    userDataRepository: UserDataRepository,
+    uiState: MutableStateFlow<StatisticsUiState>
+): Flow<Map<Subject, Person>> {
+    val dataFlow = userDataRepository.userData
+    return dataFlow.flatMapLatest { userData ->
+        uiState.update {
+            it.copy(selectedPeriod = userData.selectedPeriod!!)
+        }
+        statisticRepository.getBestStudentsBySubject(userData.selectedPeriod!!)
+    }
+        .map {
+            it.toList().sortedBy { (subject, _) -> subject.name }.toMap()
         }
 }

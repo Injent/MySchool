@@ -15,4 +15,6 @@ plugins {
     id("com.google.dagger.hilt.android") version Versions.HILT apply false
     id("org.jetbrains.kotlin.jvm") apply false
     id("com.google.devtools.ksp") apply false
+    id("com.google.gms.google-services") version "4.3.15" apply false
+    id("com.google.firebase.crashlytics") apply false
 }

@@ -8,8 +8,8 @@ import androidx.work.WorkManager
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.conflate
-import me.injent.myschool.core.data.util.SyncStatusMonitor
 import me.injent.myschool.core.common.sync.SyncState
+import me.injent.myschool.core.data.util.SyncStatusMonitor
 import me.injent.myschool.sync.workers.SyncWorker
 import javax.inject.Inject
 
@@ -22,11 +22,14 @@ class SyncWorkStatusMonitor @Inject constructor(
     override val isSyncing: Flow<SyncState> =
         WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(SyncWorker.WorkName)
             .map {
-                if (it.isEmpty()) return@map SyncState.IDLE
-                return@map when (it.first().state) {
-                    WorkInfo.State.RUNNING -> SyncState.SYNCING
-                    WorkInfo.State.SUCCEEDED -> SyncState.SUCCESS
-                    else -> SyncState.IDLE
+                if (it.isEmpty()) {
+                    SyncState.IDLE
+                } else {
+                    when (it.first().state) {
+                        WorkInfo.State.RUNNING -> SyncState.SYNCING
+                        WorkInfo.State.SUCCEEDED -> SyncState.SUCCESS
+                        else -> SyncState.IDLE
+                    }
                 }
             }
             .asFlow()

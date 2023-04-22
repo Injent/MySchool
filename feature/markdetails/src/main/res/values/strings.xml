@@ -3,4 +3,5 @@
     <string name="your_mark">Ваша оценка</string>
     <string name="classmates_marks">Оценки одноклассников</string>
     <string name="classmates">учеников</string>
+    <string name="failed_to_load_data">Неудалось загрузить данные</string>
 </resources>

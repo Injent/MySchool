@@ -1,6 +1,5 @@
 package me.injent.myschool.core.common.util
 
-import android.content.Context
 import android.icu.text.RelativeDateTimeFormatter
 import android.os.Build
 import kotlinx.datetime.*
@@ -9,10 +8,10 @@ import java.time.format.DateTimeFormatter
 
 const val DEFAULT_DATE_FORMAT = "dd.MM.yyyy"
 const val BIRTHDAY_DATE_FORMAT = "dd MMM yyyy"
+const val MONTH_DATE_FORMAT = "dd MMM"
 const val DEFAULT_DATE_TIME_FORMAT = "dd MMM, HH:mm"
 
-fun LocalDate?.format(pattern: String): String? {
-    if (this == null) return null
+fun LocalDate.format(pattern: String): String {
     val df = DateTimeFormatter.ofPattern(pattern)
     return df.format(this.toJavaLocalDate())
 }

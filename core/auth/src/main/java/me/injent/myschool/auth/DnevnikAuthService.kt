@@ -1,6 +1,5 @@
 package me.injent.myschool.auth
 
-import android.accounts.AccountManager.ACTION_AUTHENTICATOR_INTENT
 import android.app.Service
 import android.content.Intent
 import android.os.IBinder
@@ -12,9 +11,5 @@ class DnevnikAuthService : Service() {
 
     @Inject lateinit var authenticator: DnevnikAuthenticator
 
-    override fun onBind(intent: Intent): IBinder? {
-        return if (intent.action?.equals(ACTION_AUTHENTICATOR_INTENT) == true) {
-            authenticator.iBinder
-        } else null
-    }
+    override fun onBind(intent: Intent): IBinder = authenticator.iBinder
 }

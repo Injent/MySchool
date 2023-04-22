@@ -16,10 +16,20 @@ interface MarkDao {
 
     @Query("SELECT * FROM marks WHERE id = :markId LIMIT 1")
     fun getMark(markId: Long): Flow<MarkEntity>
-    @Query("SELECT ROUND(AVG(CAST(value AS INTEGER)), 2) FROM marks WHERE person_id = :personId AND subject_id = :subjectId AND value GLOB '[0-9]*'")
-    suspend fun getPersonAverageMarkBySubject(personId: Long, subjectId: Long): Float
-    @Query("SELECT * FROM marks WHERE person_id = :personId AND subject_id = :subjectId ORDER BY date")
-    suspend fun getPersonMarkBySubject(personId: Long, subjectId: Long): List<MarkEntity>
+    @Query("SELECT ROUND(AVG(CAST(value AS INTEGER)), 2) FROM marks WHERE person_id = :personId AND subject_id = :subjectId AND date >= :from AND date <= :to AND value GLOB '[0-9]*'")
+    suspend fun getPersonAverageMarkBySubject(
+        personId: Long,
+        subjectId: Long,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): Float
+    @Query("SELECT * FROM marks WHERE person_id = :personId AND subject_id = :subjectId AND date >= :from AND date <= :to ORDER BY date")
+    suspend fun getPersonMarkBySubject(
+        personId: Long,
+        subjectId: Long,
+        from: LocalDateTime,
+        to: LocalDateTime
+    ): List<MarkEntity>
     @Query("SELECT ROUND(AVG(CAST(value AS INTEGER)), 2) FROM marks WHERE person_id = :personId AND value NOT NULL AND value GLOB '[0-9]*'")
     suspend fun getPersonAverageMark(personId: Long): Float
     @Query("DELETE FROM marks WHERE date < :currentDateOfPeriod")
@@ -38,4 +48,21 @@ interface MarkDao {
         personId: Long,
         beforeDate: LocalDateTime,
     ): Float
+
+    @Query("""
+        SELECT person_id FROM marks 
+        WHERE subject_id = :subjectId 
+            AND value NOT NULL 
+            AND value GLOB '[0-9]*' 
+            AND date >= :startDate 
+            AND date <= :endDate
+        GROUP BY person_id
+        ORDER BY AVG(value) DESC
+        LIMIT 1
+    """)
+    suspend fun getBestPersonsIdBySubject(
+        subjectId: Long,
+        startDate: LocalDateTime,
+        endDate: LocalDateTime
+    ): List<Long>
 }

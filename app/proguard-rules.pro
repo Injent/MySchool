@@ -70,3 +70,5 @@
 -keep class androidx.security.** { *; }
 -keep class net.oqee.core.services.** { *; }
 -keep class com.google.crypto.** { *; }
+
+-keep class me.injent.myschool.core.data.version.** { *; }

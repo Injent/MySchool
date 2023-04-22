@@ -12,7 +12,7 @@ import me.injent.myschool.core.database.model.SubjectEntity
 import me.injent.myschool.core.database.util.*
 
 @Database(
-    version = 1,
+    version = DatabaseMigrations.DATABASE_VERSION,
     entities = [
         PersonEntity::class,
         SubjectEntity::class,

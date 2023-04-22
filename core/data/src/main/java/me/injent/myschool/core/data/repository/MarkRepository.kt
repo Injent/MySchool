@@ -1,11 +1,14 @@
 package me.injent.myschool.core.data.repository
 
 import android.util.Log
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
+import me.injent.myschool.core.common.network.Dispatcher
+import me.injent.myschool.core.common.network.MsDispatchers.IO
 import me.injent.myschool.core.common.util.atTimeZone
 import me.injent.myschool.core.data.model.asEntity
 import me.injent.myschool.core.data.util.RepoDependency
@@ -20,14 +23,25 @@ import me.injent.myschool.core.network.DnevnikNetworkDataSource
 import me.injent.myschool.core.network.model.NetworkMark
 import me.injent.myschool.core.network.model.asExternalModel
 import javax.inject.Inject
+import kotlin.math.roundToInt
 
 private const val MAX_MARKS_PERSUBJECT = 100
 
 @RepoDependency(UserContextRepository::class, SubjectRepository::class)
 interface MarkRepository : Syncable {
-    suspend fun getPersonFinalMarkBySubject(personId: Long, subjectId: Long): Float
-    suspend fun getPersonMarksBySubject(personId: Long, subjectId: Long): List<Mark>
-    suspend fun getPersonAverageMarkValue(personId: Long): Float
+    suspend fun getPersonFinalMarkBySubject(
+        personId: Long, subjectId: Long, period: Period
+    ): Float
+    suspend fun getPersonMarksBySubject(
+        personId: Long,
+        subjectId: Long,
+        period: Period
+    ): List<Mark>
+    suspend fun getPersonAverageMarkValue(
+        personId: Long,
+        dateStart: LocalDateTime,
+        dateFinish: LocalDateTime
+    ): Float
     suspend fun receiveNewMarks(): ReceivedMarksResult
     suspend fun receiveClassmatesMarks(): Boolean
     fun getMark(markId: Long): Flow<Mark>
@@ -45,15 +59,18 @@ interface MarkRepository : Syncable {
         subjectId: Long? = null,
         limit: Int = MAX_MARKS_PERSUBJECT
     ): RecentMarks
+
+    suspend fun downloadAllMarksByPeriod(periodId: Long): Boolean
 }
 
 sealed interface ReceivedMarksResult {
     object NotChanged : ReceivedMarksResult
     data class NewMark(
         val value: String,
-        val subjectName: String
+        val subjectName: String,
+        val markId: Long
     ) : ReceivedMarksResult
-    data class MultipleMarks(val marksCount: Int) : ReceivedMarksResult
+    data class MultipleMarks(val marks: List<NewMark>) : ReceivedMarksResult
     object Error : ReceivedMarksResult
 }
 
@@ -63,34 +80,47 @@ class OfflineFirstMarkRepository @Inject constructor(
     private val markDao: MarkDao,
     private val userContextRepository: UserContextRepository,
     private val userDataRepository: UserDataRepository,
-    private val personDao: PersonDao
+    private val personDao: PersonDao,
+    @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
 ) : MarkRepository {
 
-    override suspend fun synchronize(): Boolean = try {
+    override suspend fun synchronize(onProgress: ((Int) -> Unit)?): Boolean = try {
+        var progress = 0
         val groupId: Long
-        val period: Period
+        val periods: List<Period>
         userContextRepository.userContext.first()!!.run {
             groupId = group.id
-            period = reportingPeriodGroup.periods.find(Period::isCurrent)!!
+            periods = reportingPeriodGroup.periods
         }
 
-        markDao.deleteDeprecatedMarks(period.dateStart)
-
-        val subjectIds = subjectDao.getSubjects().first().map(SubjectEntity::id)
-        for (subjectId in subjectIds) {
-            val marks = networkDataSource.getEduGroupMarksBySubject(
-                groupId,
-                subjectId,
-                period.dateStart,
-                period.dateFinish
-            )
-            markDao.saveMarks(marks.map { it.asEntity(subjectId) })
+        for (period in periods) {
+            val subjectIds = subjectDao.getSubjects().first().map(SubjectEntity::id)
+            for (subjectId in subjectIds) {
+                val marks = networkDataSource.getEduGroupMarksBySubject(
+                    groupId,
+                    subjectId,
+                    period.dateStart,
+                    period.dateFinish
+                )
+                markDao.saveMarks(marks.map { it.asEntity(subjectId) })
+                progress++
+                val percentage =
+                    (((progress / 2f) / subjectIds.size) * 100)
+                        .roundToInt()
+                        .coerceIn(0, 100)
+                onProgress?.invoke(percentage)
+            }
         }
+
         true
     } catch (e: Exception) {
         Log.e("MarkRepository", "Failed to sync")
         e.printStackTrace()
         false
+    }
+
+    override suspend fun downloadAllMarksByPeriod(periodId: Long): Boolean {
+        TODO("Not yet implemented")
     }
 
     override suspend fun receiveNewMarks(): ReceivedMarksResult {
@@ -104,11 +134,13 @@ class OfflineFirstMarkRepository @Inject constructor(
                 personId = this.personId
                 schoolId = this.school.id
                 reportingPeriodGroup.periods.find(Period::isCurrent)!!.run {
-                    dateStart = this.dateStart
-                    dateEnd = userDataRepository.userData.first().lastMarksSyncDateTime
-                        ?: this.dateFinish
+                    dateStart = userDataRepository.userData.first().lastMarksSyncDateTime
+                        ?: this.dateStart
+                    dateEnd = this.dateFinish
                 }
             }
+
+            val markEntitiesToSave = mutableListOf<MarkEntity>()
 
             val marks = networkDataSource.getPersonMarksByPeriod(
                 personId = personId,
@@ -117,24 +149,35 @@ class OfflineFirstMarkRepository @Inject constructor(
                 to = dateEnd
             )
                 .filterNot { markDao.contains(it.id) }
-
-            if (marks.isNotEmpty()) {
-                val marksEntities = mutableListOf<MarkEntity>()
-                for (mark in marks) {
+                .map { mark ->
                     val subject = networkDataSource.getLesson(mark.lessonId!!).subject!!
-                    marksEntities.add(mark.asEntity(subject.id))
+                    markEntitiesToSave.add(mark.asEntity(subject.id))
 
-                    if (marks.size == 1) {
-                        markDao.saveMark(marksEntities.first())
-                        return ReceivedMarksResult.NewMark(mark.value, subject.name)
-                    }
+                    ReceivedMarksResult.NewMark(
+                        value = mark.value,
+                        markId = mark.id,
+                        subjectName = subject.name
+                    )
                 }
-                markDao.saveMarks(marksEntities)
-                return ReceivedMarksResult.MultipleMarks(marks.size)
-            }
 
             userDataRepository.updateMarksSyncDateTime()
-            return ReceivedMarksResult.NotChanged
+            return when {
+                marks.size > 1 -> {
+                    markDao.saveMarks(markEntitiesToSave)
+                    ReceivedMarksResult.MultipleMarks(marks)
+                }
+                marks.size == 1 -> {
+                    markDao.saveMark(markEntitiesToSave.single())
+
+                    val mark = marks.single()
+                    ReceivedMarksResult.NewMark(
+                        value = mark.value,
+                        subjectName = mark.subjectName,
+                        markId = mark.markId
+                    )
+                }
+                else -> ReceivedMarksResult.NotChanged
+            }
         } catch (e: Exception) {
             e.printStackTrace()
             return ReceivedMarksResult.Error
@@ -155,7 +198,8 @@ class OfflineFirstMarkRepository @Inject constructor(
             val marks = networkDataSource.getPersonMarksByPeriod(
                 personId = personId,
                 schoolId = schoolId,
-                from = period.dateStart,
+                from = userDataRepository.userData.first().lastMarksSyncDateTime
+                    ?: period.dateStart,
                 to = period.dateFinish
             ).filterNot { markDao.contains(it.id) }
 
@@ -164,7 +208,6 @@ class OfflineFirstMarkRepository @Inject constructor(
                 markDao.saveMark(mark.asEntity(subjectId))
             }
         }
-
         true
     } catch (e: Exception) {
         e.printStackTrace()
@@ -197,13 +240,23 @@ class OfflineFirstMarkRepository @Inject constructor(
             personId, groupId, fromDate, subjectId, limit
         ).asExternalModel()
 
-    override suspend fun getPersonFinalMarkBySubject(personId: Long, subjectId: Long): Float =
-        markDao.getPersonAverageMarkBySubject(personId, subjectId)
+    override suspend fun getPersonFinalMarkBySubject(
+        personId: Long,
+        subjectId: Long,
+        period: Period
+    ): Float = markDao.getPersonAverageMarkBySubject(personId, subjectId, period.dateStart, period.dateFinish)
 
-    override suspend fun getPersonMarksBySubject(personId: Long, subjectId: Long): List<Mark> =
-        markDao.getPersonMarkBySubject(personId, subjectId)
+    override suspend fun getPersonMarksBySubject(
+        personId: Long,
+        subjectId: Long,
+        period: Period
+    ): List<Mark> =
+        markDao.getPersonMarkBySubject(personId, subjectId, period.dateStart, period.dateFinish)
             .map(MarkEntity::asExternalModel)
 
-    override suspend fun getPersonAverageMarkValue(personId: Long): Float =
-        markDao.getPersonAverageMark(personId)
+    override suspend fun getPersonAverageMarkValue(
+        personId: Long,
+        dateStart: LocalDateTime,
+        dateFinish: LocalDateTime
+    ): Float = markDao.getPersonAverageMark(personId, dateStart, dateFinish)
 }

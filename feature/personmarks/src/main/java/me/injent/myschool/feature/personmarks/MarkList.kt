@@ -63,50 +63,78 @@ private fun MarksList(
 ) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         for ((subject, marks) in subjectsToMarks) {
-            Box(
+            SubjectSection(
+                subject = subject,
+                marks = marks,
+                onLeaderboardClick = onLeaderboardClick,
+                onMarkClick = onMarkClick
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+private fun SubjectSection(
+    subject: Subject,
+    marks: List<Mark>,
+    onLeaderboardClick: (subjectId: Long) -> Unit,
+    onMarkClick: (markId: Long) -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.primaryContainer)
+    ) {
+        val averageMarkValue by produceState(initialValue = "...") {
+            val averageMark = marks.map { it.value.toInt() }.average()
+            value = String.format("%.1f", averageMark)
+        }
+        MarkView(
+            value = averageMarkValue,
+            color = MaterialTheme.colorScheme.secondary,
+            backgroundColor = Color.Transparent,
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 16.dp)
+        )
+        Text(
+            text = subject.name,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .padding(vertical = 10.dp)
+                .align(Alignment.Center)
+        )
+        IconButton(
+            onClick = { onLeaderboardClick(subject.id) },
+            modifier = Modifier.align(Alignment.CenterEnd)
+        ) {
+            Icon(
+                painter = painterResource(MsIcons.Leaderboard),
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.secondary
+            )
+        }
+    }
+    FlowRow(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(color = MaterialTheme.colorScheme.surface)
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 12.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        marks.forEach { mark ->
+            MarkView(
+                value = mark.value,
+                color = Color.White,
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = MaterialTheme.colorScheme.primaryContainer)
-            ) {
-                Text(
-                    text = subject.name,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier
-                        .padding(vertical = 10.dp)
-                        .align(Alignment.Center)
-                )
-                IconButton(
-                    onClick = { onLeaderboardClick(subject.id) },
-                    modifier = Modifier.align(Alignment.CenterEnd)
-                ) {
-                    Icon(
-                        painter = painterResource(MsIcons.Leaderboard),
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.secondary
-                    )
-                }
-            }
-            FlowRow(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(color = MaterialTheme.colorScheme.surface)
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 12.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp),
-            ) {
-                marks.forEach { mark ->
-                    MarkView(
-                        value = mark.value,
-                        color = Color.White,
-                        modifier = Modifier
-                            .padding(top = 12.dp)
-                            .clickable {
-                                onMarkClick(mark.id)
-                            }
-                    )
-                }
-            }
+                    .padding(top = 12.dp)
+                    .clickable {
+                        onMarkClick(mark.id)
+                    }
+            )
         }
     }
 }

@@ -1,64 +1,61 @@
 package me.injent.myschool
 
-import android.content.pm.PackageManager
-import android.os.Build
+import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
+import me.injent.myschool.auth.AccountHelper
+import me.injent.myschool.auth.AuthState
+import me.injent.myschool.core.data.version.Update
+import me.injent.myschool.core.data.version.VersionController
 import me.injent.myschool.core.designsystem.theme.MySchoolTheme
-import me.injent.myschool.feature.authorization.AuthState
 import me.injent.myschool.ui.MsApp
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val viewModel: MainActivityViewModel by viewModels()
+    @Inject
+    lateinit var accountHelper: AccountHelper
+    @Inject
+    lateinit var versionController: VersionController
+
+    var update: Update? by mutableStateOf(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-
-        var authState by mutableStateOf(AuthState.CHECKING_TOKEN)
+        var authState: AuthState by mutableStateOf(AuthState.CheckingAccounts)
 
         lifecycleScope.launch {
-            lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
-                viewModel.authState
-                    .onEach {
-                        authState = it
-                    }
-                    .collect()
-            }
+            authState = accountHelper.checkAuth()
+            update = versionController.getUpdate()
         }
 
         splashScreen.setKeepOnScreenCondition {
-            authState == AuthState.CHECKING_TOKEN || authState == AuthState.NETWORK_ERROR
+            authState == AuthState.CheckingAccounts
         }
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            if (authState != AuthState.CHECKING_TOKEN && authState != AuthState.NETWORK_ERROR) {
+            if (authState !is AuthState.CheckingAccounts) {
                 MySchoolTheme {
                     MsApp(
                         authState = authState,
+                        update = update
                     )
                 }
             }
@@ -69,20 +66,21 @@ class MainActivity : ComponentActivity() {
 
     private fun requestPermissions() {
         val requestPermissionLauncher =
-            registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-                if (!isGranted) {
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
+                val allIsGranted = permissions.all { it.value }
+                if (!allIsGranted) {
                     TODO("Handle permission deny")
                 }
             }
 
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-            if (ContextCompat.checkSelfPermission(
-                    applicationContext,
-                    android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                requestPermissionLauncher.launch(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
-            }
+        val permissionRequest = mutableListOf<String>()
+        if (SDK_INT <= 28) {
+            permissionRequest.add(android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
         }
+        if (SDK_INT >= 33) {
+            permissionRequest.add(android.Manifest.permission.POST_NOTIFICATIONS)
+        }
+
+        requestPermissionLauncher.launch(permissionRequest.toTypedArray())
     }
 }

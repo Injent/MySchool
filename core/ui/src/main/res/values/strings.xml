@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="material_hasnt_preview">У материала нет предпросмотра</string>
+    <string name="lesson">Урок</string>
+    <string name="without_theme">Без темы</string>
+    <string name="today">Сегодня</string>
+    <string name="tomorrow">Завтра</string>
+    <string name="no_lessons">Уроков нет</string>
+    <string name="follow_updates">Следите за обновлениями</string>
+    <string name="telegram_link">https://t.me/myschool_channel</string>
 </resources>

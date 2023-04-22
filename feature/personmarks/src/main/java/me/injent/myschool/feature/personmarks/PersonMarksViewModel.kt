@@ -14,7 +14,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PersonMarksViewModel @Inject constructor(
-    private val markRepository: MarkRepository,
+    markRepository: MarkRepository,
     personRepository: PersonRepository,
     subjectRepository: SubjectRepository,
     userDataRepository: UserDataRepository,
@@ -27,6 +27,7 @@ class PersonMarksViewModel @Inject constructor(
         personId = personId,
         subjectRepository = subjectRepository,
         markRepository = markRepository,
+        userDataRepository = userDataRepository,
     )
         .stateIn(
             scope = viewModelScope,
@@ -35,7 +36,7 @@ class PersonMarksViewModel @Inject constructor(
         )
 
     val personUiState: StateFlow<PersonUiState> = combine(
-        personRepository.getPerson(personId),
+        personRepository.getPersonStream(personId),
         contextRepository.userContext
     ) { person, userContext ->
         if (person != null && userContext != null)
@@ -73,16 +74,23 @@ sealed interface PersonMarksUiState {
 private fun personMarksUiState(
     personId: Long,
     subjectRepository: SubjectRepository,
-    markRepository: MarkRepository
+    markRepository: MarkRepository,
+    userDataRepository: UserDataRepository
 ): Flow<PersonMarksUiState> {
-    return subjectRepository.subjects
-        .map { subjects ->
-            val subjectToMarks = subjects.associateWith { subject ->
-                markRepository.getPersonMarksBySubject(personId, subject.id)
-            }.filter { (_, marks) -> marks.isNotEmpty() }
-
-            PersonMarksUiState.Success(
-                subjectToMarks
+    return combine(
+        subjectRepository.subjects,
+        userDataRepository.userData
+    ) { subjects, userData ->
+        val subjectToMarks = subjects.associateWith { subject ->
+            markRepository.getPersonMarksBySubject(
+                personId,
+                subject.id,
+                userData.selectedPeriod!!
             )
-        }
+        }.filter { (_, marks) -> marks.isNotEmpty() }
+
+        PersonMarksUiState.Success(
+            subjectToMarks
+        )
+    }
 }

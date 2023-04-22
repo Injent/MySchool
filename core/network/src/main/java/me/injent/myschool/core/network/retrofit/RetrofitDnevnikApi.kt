@@ -21,8 +21,6 @@ import javax.inject.Singleton
  * Retrofit API declaration for Dnevnik API
  */
 private interface RetrofitDnevnikApi {
-    @GET("/mobile/v7.0/users/{userId}/context")
-    suspend fun getUserContext(@Path("userId") userId: Long): ContextPersonResponse
 
     @GET("/mobile/v7.0/persons/{personId}/groups/{groupId}/periods/{periodId}/periodMarks")
     suspend fun getPersonMarks(
@@ -34,15 +32,11 @@ private interface RetrofitDnevnikApi {
     @GET("/v2/users/me/classmates")
     suspend fun getClassmates(): List<Long>
 
-    @GET("/v2/users/me/feed")
+    @GET("/mobile/v4/persons/{personId}/groups/{groupId}/important")
     suspend fun getUserFeed(
-        @Query("date") date: LocalDateTime,
-        @Query("childPersonId") personId: Long,
-        @Query("limit") limit: Int
+        @Path("groupId") groupId: Long,
+        @Path("personId") personId: Long
     ): NetworkUserFeed
-
-    @GET("/v2/users/me")
-    suspend fun getMyUserId(): UserIdResponse
 
     @GET("/v2/users/{userId}")
     suspend fun getPerson(
@@ -102,7 +96,7 @@ private interface RetrofitDnevnikApi {
         @Path("personId") personId: Long,
         @Path("groupId") groupId: Long,
         @Path("markId") markId: Long
-    ): MarkDetailsResponse
+    ): NetworkMarkDetails
 
     @GET("/v2/persons/{personId}/edu-groups")
     suspend fun getPersonGroups(@Path("personId") personId: Long): List<NetworkGroup>
@@ -118,6 +112,24 @@ private interface RetrofitDnevnikApi {
         @Query("subject") subjectId: Long? = null,
         @Query("limit") limit: Int = 10
     ): RecentMarksResponse
+
+    @GET("/mobile/v3/persons/{personId}/schools/{schoolId}/groups/{groupId}/diary")
+    suspend fun getPersonSchedule(
+        @Path("personId") personId: Long,
+        @Path("schoolId") schoolId: Long,
+        @Path("groupId") groupId: Long,
+        @Query("startDate") startDate: Long,
+        @Query("finishDate") finishDate: Long
+    ): NetworkSchedule
+
+    @GET("/v2/users/me/school/homeworks")
+    suspend fun getHomeworkData(@Query("homeworkId") homeworkId: Long): NetworkHomeworkData
+
+    @GET("/mobile/v4/users/{userId}/avatar")
+    suspend fun getAvatarUrl(@Path("userId") userId: Long): AvatarResponse
+
+    @GET("/mobile/v7.0/chat/closecontacts")
+    suspend fun getChatContacts(): ChatContactsResponse
 }
 
 /**
@@ -138,14 +150,8 @@ class RetrofitDnevnik @Inject constructor(
         .build()
         .create(RetrofitDnevnikApi::class.java)
 
-    override suspend fun getMyUserId(): UserIdResponse =
-        api.getMyUserId()
-
-    override suspend fun getUserFeed(date: LocalDateTime, personId: Long, limit: Int): NetworkUserFeed =
-        api.getUserFeed(date, personId, limit)
-
-    override suspend fun getContextPerson(userId: Long): ContextPersonResponse =
-        api.getUserContext(userId)
+    override suspend fun getUserFeed(groupId: Long, personId: Long): NetworkUserFeed =
+        api.getUserFeed(groupId, personId)
 
     override suspend fun getClassmates(): List<Long> =
         api.getClassmates()
@@ -204,12 +210,35 @@ class RetrofitDnevnik @Inject constructor(
         personId: Long,
         periodId: Long,
         markId: Long
-    ): MarkDetailsResponse = api.getMarkDetails(personId, periodId, markId)
+    ): NetworkMarkDetails = api.getMarkDetails(personId, periodId, markId)
 
     override suspend fun getPersonGroups(personId: Long): List<NetworkGroup> {
         return api.getPersonGroups(personId)
     }
 
+    override suspend fun getHomeworkData(homeworkId: Long): NetworkHomeworkData =
+        api.getHomeworkData(homeworkId)
+
     override suspend fun getReportingPeriod(groupId: Long): List<NetworkPeriod> =
         api.getReportingPeriodGroup(groupId)
+
+    override suspend fun getPersonSchedule(
+        personId: Long,
+        schoolId: Long,
+        groupId: Long,
+        startDate: Long,
+        finishDate: Long
+    ): NetworkSchedule = api.getPersonSchedule(
+        personId,
+        schoolId,
+        groupId,
+        startDate,
+        finishDate
+    )
+
+    override suspend fun getAvatarUrl(userId: Long): String? =
+        api.getAvatarUrl(userId).avatar.url
+
+    override suspend fun getChatContacts(): ChatContactsResponse =
+        api.getChatContacts()
 }

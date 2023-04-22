@@ -51,18 +51,12 @@ private fun LoadingProfileInfo() {
             )
     ) {
         ProfilePicture(
-            onClick = {},
-            shortName = "SN",
+            avatarUrl = null,
             modifier = Modifier
                 .offset(y = (-48).dp)
                 .border(
                     width = 3.dp,
                     color = MaterialTheme.colorScheme.surface,
-                    shape = CircleShape
-                )
-                .placeholder(
-                    visible = true,
-                    highlight = PlaceholderHighlight.shimmer(),
                     shape = CircleShape
                 )
         )
@@ -115,8 +109,7 @@ private fun ProfileInfo(
             )
     ) {
         ProfilePicture(
-            onClick = {},
-            shortName = "${userContext.firstName} ${userContext.lastName.first()}",
+            avatarUrl = userContext.avatarUrl,
             modifier = Modifier
                 .offset(y = (-32).dp)
                 .size(128.dp)

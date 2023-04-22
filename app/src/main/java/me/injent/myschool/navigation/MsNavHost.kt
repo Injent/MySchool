@@ -4,9 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.navOptions
-import me.injent.myschool.feature.authorization.navigation.authorizationRoute
-import me.injent.myschool.feature.authorization.navigation.authorizationScreen
+import me.injent.myschool.feature.accounts.navigation.accountsScreen
+import me.injent.myschool.feature.auth.navigation.loginRoute
+import me.injent.myschool.feature.auth.navigation.loginScreen
+import me.injent.myschool.feature.auth.navigation.navigateToLogin
+import me.injent.myschool.feature.dashboard.navigation.dashboardRoute
 import me.injent.myschool.feature.dashboard.navigation.dashboardScreen
 import me.injent.myschool.feature.dashboard.navigation.navigateToDashboard
 import me.injent.myschool.feature.leaderboard.navigation.leaderBoardScreen
@@ -15,29 +17,42 @@ import me.injent.myschool.feature.markpage.navigation.markDetailsScreen
 import me.injent.myschool.feature.markpage.navigation.navigateToMarkDetails
 import me.injent.myschool.feature.personmarks.navigation.navigateToPersonMarks
 import me.injent.myschool.feature.personmarks.navigation.personMarksScreen
-import me.injent.myschool.feature.profile.navigation.profileScreen
 import me.injent.myschool.feature.statistics.navigation.statisticsScreen
 import me.injent.myschool.feature.students.navigation.myClassGraph
-import me.injent.myschool.feature.usersearch.navigation.userProfileScreen
 
 @Composable
 fun MsNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier,
-    startDestination: String = authorizationRoute,
+    startDestination: String = dashboardRoute,
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
         modifier = modifier
     ) {
-        authorizationScreen(onAuthorization = {
-            navController.navigateToDashboard(navOptions { popUpTo(0) })
+        loginScreen(onLogin = {
+            navController.navigate(dashboardRoute) {
+                popUpTo(loginRoute) {
+                    inclusive = true
+                }
+
+                launchSingleTop = true
+                restoreState = true
+            }
         })
 
+        accountsScreen(
+            onLogin = {
+                navController.navigateToDashboard(null)
+            }
+        )
         dashboardScreen(
             onMarkClick = { markId ->
                 navController.navigateToMarkDetails(markId)
+            },
+            onLogout = {
+                navController.navigateToLogin()
             }
         )
         myClassGraph(
@@ -53,9 +68,8 @@ fun MsNavHost(
             )
         }
         statisticsScreen()
-        profileScreen()
+        //profileScreen(onLogout = { navController.navigateToAccounts() })
 
         markDetailsScreen(onBack = { navController.popBackStack() })
-//        userProfileScreen()
     }
 }

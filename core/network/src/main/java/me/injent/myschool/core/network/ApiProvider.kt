@@ -1,8 +1,9 @@
 package me.injent.myschool.core.network
 
-import me.injent.myschool.core.network.model.auth.EsiaCredentials
-import me.injent.myschool.core.network.model.auth.EsiaLoginResponse
+import me.injent.myschool.core.network.model.NetworkUserContext
+import me.injent.myschool.core.network.model.UserIdResponse
 
 interface ApiProvider {
-    suspend fun authByCredentials(credentials: EsiaCredentials): EsiaLoginResponse
+    suspend fun auth(accessToken: String, userId: Long): NetworkUserContext
+    suspend fun userId(accessToken: String): UserIdResponse
 }

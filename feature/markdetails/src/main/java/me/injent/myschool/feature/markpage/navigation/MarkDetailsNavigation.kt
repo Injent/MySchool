@@ -1,10 +1,7 @@
 package me.injent.myschool.feature.markpage.navigation
 
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavType
+import androidx.navigation.*
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import me.injent.myschool.feature.markpage.MarkDetailsRoute
 
 const val markDetailsRoute = "mark_details_route"
@@ -22,6 +19,11 @@ fun NavGraphBuilder.markDetailsScreen(
         arguments = listOf(
             navArgument(MARK_ID) {
                 type = NavType.LongType
+            }
+        ),
+        deepLinks = listOf(
+            navDeepLink {
+                uriPattern = "myschool://mark/id={$MARK_ID}"
             }
         )
     ) {

@@ -1,7 +1,9 @@
 package me.injent.myschool.core.designsystem.icon
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Close
 import me.injent.myschool.core.designsystem.R
 
 object MsIcons {
@@ -19,6 +21,9 @@ object MsIcons {
     val AttachFile = R.drawable.ic_attach_file
     val Folder = R.drawable.ic_folder
     val Location = R.drawable.ic_place
+    val Add = Icons.Rounded.Add
+    val Close = Icons.Rounded.Close
+    val Logout = R.drawable.ic_logout
 //    val PlaceImageWhite = R.drawable.bg_place_image_white
 //    val PlaceImageYellow = R.drawable.bg_place_image_yellow
 //    val PlaceWidgetWhite = R.drawable.bg_place_widget_white

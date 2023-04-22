@@ -1,44 +1,34 @@
 package me.injent.myschool.feature.dashboard
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.LazyGridScope
-import androidx.compose.material.ripple.rememberRipple
-import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.LocalDate
 import kotlinx.datetime.LocalDateTime
-import me.injent.myschool.core.common.util.BIRTHDAY_DATE_FORMAT
-import me.injent.myschool.core.common.util.DEFAULT_DATE_TIME_FORMAT
 import me.injent.myschool.core.common.util.currentLocalDateTime
-import me.injent.myschool.core.common.util.format
-import me.injent.myschool.core.designsystem.component.GradientOverflowText
-import me.injent.myschool.core.designsystem.icon.MsIcons
 import me.injent.myschool.core.model.UserFeed
+import me.injent.myschool.core.ui.Tag
 
 fun LazyGridScope.greeting(
     name: String,
+    onLogout: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     item {
-        Box(
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(96.dp)
+                .height(96.dp),
         ) {
             val welcomeTextId = remember {
                 when (LocalDateTime.currentLocalDateTime().hour) {
@@ -54,57 +44,25 @@ fun LazyGridScope.greeting(
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.W900,
                 modifier = modifier
-                    .align(Alignment.TopStart)
                     .padding(top = 32.dp)
             )
         }
     }
 }
 
-sealed interface FeedUiState {
-    object Loading : FeedUiState
-    object Error : FeedUiState
-    data class Success(
-        val todayHomeworks: List<UserFeed.Homework>,
-        val todaySchedule: List<UserFeed.Schedule>,
-        val marksCards: List<UserFeed.MarkCard>
-    ) : FeedUiState
-}
-
-fun LazyGridScope.homeworks(
-    feedUiState: FeedUiState,
-    onClick: (UserFeed.Homework) -> Unit
+fun LazyGridScope.currentLesson(
+    feedUiState: FeedUiState
 ) {
     when (feedUiState) {
-        FeedUiState.Loading -> Unit
         FeedUiState.Error -> Unit
+        FeedUiState.Loading -> Unit
         is FeedUiState.Success -> {
-            if (feedUiState.todayHomeworks.isEmpty()) return
             item {
-                Text(
-                    text = stringResource(R.string.homeworks),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-                Spacer(Modifier.height(16.dp))
-                Column(
-                    modifier = Modifier
-                        .clip(MaterialTheme.shapes.medium)
-                        .background(MaterialTheme.colorScheme.surface)
-                ) {
-                    for (homework in feedUiState.todayHomeworks) {
-                        HomeworkItem(
-                            homework = homework,
-                            onClick = { onClick(homework) },
-                            contentPadding = PaddingValues(16.dp),
-                        )
-                        Divider(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(start = 24.dp),
-                            color = MaterialTheme.colorScheme.outlineVariant
-                        )
-                    }
+                feedUiState.currentLesson?.let { lesson ->
+                    CurrentLesson(
+                        lesson = lesson,
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
         }
@@ -112,106 +70,33 @@ fun LazyGridScope.homeworks(
 }
 
 @Composable
-private fun HomeworkItem(
-    onClick: () -> Unit,
-    homework: UserFeed.Homework,
-    contentPadding: PaddingValues
+private fun CurrentLesson(
+    lesson: UserFeed.Lesson,
+    modifier: Modifier = Modifier,
 ) {
-    val interactionSource = remember { MutableInteractionSource() }
-
-    Column(
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(
-                onClick = onClick,
-                interactionSource = interactionSource,
-                indication = rememberRipple(
-                    color = MaterialTheme.colorScheme.primary.copy(.15f)
-                )
-            )
-            .padding(contentPadding)
+    Surface(
+        shape = CircleShape
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = modifier.padding(end = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = homework.subjectName,
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.tertiary
-            )
-            Text(
-                text = homework.work.sentDate?.format(DEFAULT_DATE_TIME_FORMAT) ?: "",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.secondary
-            )
-        }
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.Top
-        ) {
-            GradientOverflowText(
-                text = homework.work.text,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.secondary,
-                gradientColor = MaterialTheme.colorScheme.surface,
-                collapsedLines = 2,
-            )
-            if (false) { // TODO("Show files with new API")
-                Icon(
-                    painter = painterResource(MsIcons.AttachFile),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.secondary,
-                    modifier = Modifier.size(20.dp)
+            Tag(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.surface,
+                shape = CircleShape,
+                contentPadding = PaddingValues(horizontal = 8.dp, vertical = 2.dp),
+                modifier = Modifier.fillMaxHeight()
+            ) {
+                Text(
+                    text = stringResource(R.string.now)
                 )
             }
-        }
-    }
-}
-
-sealed interface BirthdaysUiState {
-    object Loading : BirthdaysUiState
-    data class Success(val personToBirthday: Map<String, LocalDate>) : BirthdaysUiState
-}
-
-fun LazyGridScope.birthdays(
-    birthdaysUiState: BirthdaysUiState
-) {
-    when (birthdaysUiState) {
-        BirthdaysUiState.Loading -> Unit
-        is BirthdaysUiState.Success -> {
-            item {
-                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
-                    Text(
-                        text = stringResource(R.string.birthdays),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
-                    for ((name, date) in birthdaysUiState.personToBirthday) {
-                        Row (
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .alpha(.9f)
-                        ) {
-                            Text(
-                                text = "$name.",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.weight(.5f)
-                            )
-                            Text(
-                                text = date.format(BIRTHDAY_DATE_FORMAT) ?: "",
-                                style = MaterialTheme.typography.bodyLarge,
-                                color = MaterialTheme.colorScheme.onBackground,
-                                modifier = Modifier.weight(.5f)
-                            )
-                        }
-                    }
-                }
-            }
+            Text(
+                text = lesson.subjectName,
+                style = MaterialTheme.typography.bodyMedium
+            )
         }
     }
 }

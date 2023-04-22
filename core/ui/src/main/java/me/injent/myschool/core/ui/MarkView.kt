@@ -1,12 +1,10 @@
 package me.injent.myschool.core.ui
 
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontFamily
@@ -22,14 +20,14 @@ fun MarkView(
     value: String,
     modifier: Modifier = Modifier,
     color: Color? = null,
-    alpha: Float = .75f
-) {
-    val backgroundColor by animateColorAsState(targetValue = when (value.toFloatOrNull() ?: -1f) {
+    backgroundColor: Color = when (value.toFloatOrNull() ?: -1f) {
         in 4f..5f -> MaterialTheme.colorScheme.positive
         in 3f..3.99f -> MaterialTheme.colorScheme.warning
         in 0f..2.99f -> MaterialTheme.colorScheme.negative
         else -> MaterialTheme.colorScheme.link
-    })
+    },
+    alpha: Float = .75f
+) {
     Text(
         text = value,
         color = color ?: backgroundColor,

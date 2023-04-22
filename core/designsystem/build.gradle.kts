@@ -10,4 +10,5 @@ android {
 dependencies {
     implementation(Dependencies.CORE_KTX)
     implementation(Dependencies.ACCOMPANIST_SYSTEMUICONTROLLER)
+    implementation(Dependencies.COIL)
 }

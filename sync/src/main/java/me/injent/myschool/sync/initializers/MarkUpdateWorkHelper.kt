@@ -1,67 +1,90 @@
 package me.injent.myschool.sync.initializers
 
-import android.app.Notification
-import android.app.NotificationChannel
-import android.app.NotificationManager
+import android.Manifest
+import android.app.*
 import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import androidx.work.Constraints
 import androidx.work.ForegroundInfo
 import androidx.work.NetworkType
 import me.injent.myschool.sync.R
 
-private const val MarkUpdateNotificationId = 1
-private const val MarkUpdateNotificationChannelID = "MarkUpdateNotificationChannel"
+private val MarkUpdateNotificationId: Int
+    get() = "MarkUpdate".hashCode()
+private const val MarkUpdateNotificationChannelId = "mark_update_channel"
 
-// All sync work needs an internet connectionS
-val MarkUpdateWorkConstraints
+internal val MarkUpdateWorkConstraints
     get() = Constraints.Builder()
         .setRequiredNetworkType(NetworkType.CONNECTED)
         .build()
 
-/**
- * Foreground information for sync on lower API levels when sync workers are being
- * run with a foreground service
- */
-fun Context.markUpdateForegroundInfo() = ForegroundInfo(
-    MarkUpdateNotificationId,
-    markUpdateWorkNotification(""),
-)
+internal fun Context.markUpdateForegroundInfo(): ForegroundInfo {
+    val notification = NotificationCompat.Builder(
+        this,
+        SilentChannelId,
+    )
+        .setSmallIcon(R.drawable.ic_notification)
+        .setContentTitle(getString(R.string.mark_update_foreground_title))
+        .setPriority(NotificationCompat.PRIORITY_MIN)
+        .build()
 
-fun Context.showMarkUpdateNotification(content: String) {
-    NotificationManagerCompat.from(this)
-        .notify(MarkUpdateNotificationId, markUpdateWorkNotification(content))
+    return ForegroundInfo(
+        SilentNotificationId,
+        notification,
+    )
 }
 
-/**
- * Notification displayed on lower API levels when sync workers are being
- * run with a foreground service
- */
-private fun Context.markUpdateWorkNotification(
-    content: String
-): Notification {
+internal fun Context.showMarkUpdateNotification(content: String, markId: Long) {
+    if (ActivityCompat.checkSelfPermission(
+            this,
+            Manifest.permission.POST_NOTIFICATIONS
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        throw IllegalStateException()
+    } else {
+        NotificationManagerCompat.from(this)
+            .notify(MarkUpdateNotificationId, markUpdateNotification(content, markId))
+    }
+}
+
+private fun Context.markUpdateNotification(content: String, markId: Long): Notification {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         val channel = NotificationChannel(
-            SyncNotificationChannelID,
+            MarkUpdateNotificationChannelId,
             getString(R.string.mark_update_notification_name),
-            NotificationManager.IMPORTANCE_DEFAULT,
+            NotificationManager.IMPORTANCE_HIGH,
         )
 
-        val notificationManager: NotificationManager? =
-            getSystemService(Context.NOTIFICATION_SERVICE) as? NotificationManager
+        notificationManager.createNotificationChannel(channel)
+    }
 
-        notificationManager?.createNotificationChannel(channel)
+    val markDetailsIntent = Intent(
+        Intent.ACTION_VIEW,
+        "${getString(R.string.mark_update_notification_deeplink)}=$markId".toUri(),
+        this,
+        Class.forName("$packageName.MainActivity")
+    )
+
+    val pending: PendingIntent = TaskStackBuilder.create(this).run {
+        addNextIntentWithParentStack(markDetailsIntent)
+        getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
     }
 
     return NotificationCompat.Builder(
         this,
-        SyncNotificationChannelID,
+        MarkUpdateNotificationChannelId,
     )
         .setSmallIcon(R.drawable.ic_notification)
         .setContentTitle(getString(R.string.mark_update_notification_title))
         .setContentText(content)
-        .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        .setContentIntent(pending)
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setAutoCancel(true)
         .build()
 }

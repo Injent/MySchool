@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "572855693051",
+    "project_id": "myschool-application",
+    "storage_bucket": "myschool-application.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:572855693051:android:25fc790e994798b7360a5e",
+        "android_client_info": {
+          "package_name": "me.injent.myschool"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "572855693051-71m0s0rt9robrrd10bnp58cfcgmc1reb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "me.injent.myschool",
+            "certificate_hash": "f3812be8a6e2db28971bfea8198e8c0c9730165f"
+          }
+        },
+        {
+          "client_id": "572855693051-e2grrl1a5p3t3p9737hrg2ldk834etmd.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB1PJuBJiKToN9UAIPWV30HqCUjt7SWIwY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "572855693051-e2grrl1a5p3t3p9737hrg2ldk834etmd.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

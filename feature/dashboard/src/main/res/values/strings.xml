@@ -7,4 +7,11 @@
 
     <string name="homeworks">Домашние задания</string>
     <string name="birthdays">Ближайшие дни рождения</string>
+    <string name="school_class">Класс</string>
+    <string name="unfold">Раскрыть</string>
+    <string name="lesson">Урок</string>
+    <string name="now">Сейчас</string>
+    <string name="you_havent_marks_yet">У вас еще нет оценок</string>
+    <string name="failed_to_load_data">Не удалось загрузить данные</string>
+    <string name="retry">Повторить</string>
 </resources>

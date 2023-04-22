@@ -1,25 +1,30 @@
 package me.injent.myschool.feature.dashboard
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.placeholder.PlaceholderHighlight
+import com.google.accompanist.placeholder.material.placeholder
+import com.google.accompanist.placeholder.material.shimmer
 import kotlinx.datetime.LocalDateTime
-import me.injent.myschool.core.common.util.currentLocalDateTime
-import me.injent.myschool.core.common.util.relativeTimeFormat
+import me.injent.myschool.core.common.util.*
 import me.injent.myschool.core.designsystem.component.AutoResizableText
+import me.injent.myschool.core.designsystem.component.MsTextButton
 import me.injent.myschool.core.designsystem.theme.link
 import me.injent.myschool.core.designsystem.theme.negative
 import me.injent.myschool.core.designsystem.theme.positive
@@ -29,48 +34,66 @@ import me.injent.myschool.core.model.UserFeed
 
 fun LazyGridScope.recentMarks(
     feedUiState: FeedUiState,
+    onRetry: () -> Unit,
     onMarkClick: (markId: Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (feedUiState) {
-        is FeedUiState.Success -> {
-            item {
-                RecentMarks(
-                    marksCards = feedUiState.marksCards,
-                    onMarkClick = onMarkClick,
-                    modifier = modifier
-                )
-            }
+        is FeedUiState.Success -> item {
+            RecentMarks(
+                marksCards = feedUiState.recentMarks,
+                onMarkClick = onMarkClick,
+                modifier = modifier
+            )
         }
-        FeedUiState.Error -> Unit
-        FeedUiState.Loading -> Unit
+        FeedUiState.Error -> item {
+            ErrorRecentMarks(onRetry = onRetry)
+        }
+        FeedUiState.Loading -> item {
+            LoadingRecentMarks(
+                modifier = modifier
+            )
+        }
     }
 }
 
 @Composable
 private fun RecentMarks(
-    marksCards: List<UserFeed.MarkCard>,
+    marksCards: List<UserFeed.RecentMark>,
     onMarkClick: (markId: Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
-        modifier = modifier,
-        contentPadding = PaddingValues(horizontal = 16.dp)
-    ) {
-        items(marksCards) { markCard ->
-            MarksCard(
-                markCard = markCard,
-                onClick = { onMarkClick(markCard.marks.first().id) }
+    if (marksCards.isEmpty()) {
+        Box(
+            modifier = Modifier.height(48.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.you_havent_marks_yet),
+                style = MaterialTheme.typography.bodyLarge,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.align(Alignment.Center)
             )
+        }
+    } else {
+        LazyRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = modifier,
+            contentPadding = PaddingValues(horizontal = 16.dp),
+        ) {
+            items(marksCards) { markCard ->
+                MarkCard(
+                    recentMark = markCard,
+                    onClick = { onMarkClick(markCard.marks.first().id) }
+                )
+            }
         }
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MarksCard(
-    markCard: UserFeed.MarkCard,
+private fun MarkCard(
+    recentMark: UserFeed.RecentMark,
     onClick: () -> Unit
 ) {
     Surface(
@@ -82,14 +105,14 @@ private fun MarksCard(
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
             val markText = remember {
-                if (markCard.marks.size == 1) {
-                    markCard.marks.first().value
+                if (recentMark.marks.size == 1) {
+                    recentMark.marks.first().value
                 } else {
-                    markCard.marks.map(Mark::value).joinToString("/")
+                    recentMark.marks.map(UserFeed.Mark::value).joinToString("/")
                 }
             }
             val markDate = remember {
-                markCard.marks.first().date.relativeTimeFormat(LocalDateTime.currentLocalDateTime())
+                recentMark.date.relativeTimeFormat(LocalDateTime.currentLocalDateTime())
             }
             Text(
                 text = markDate,
@@ -103,14 +126,14 @@ private fun MarksCard(
             )
             AutoResizableText(
                 text = markText,
-                color = markCard.marks.first().mood.toColor(),
+                color = recentMark.marks.first().mood.toColor(),
                 style = TextStyle(fontSize = 26.sp),
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
                     .padding(16.dp)
             )
             Text(
-                text = markCard.subjectName,
+                text = recentMark.subjectName,
                 style = MaterialTheme.typography.labelLarge,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
@@ -119,8 +142,11 @@ private fun MarksCard(
                     .padding(top = 8.dp)
                     .widthIn(max = 90.dp)
             )
+            val formatDate = remember {
+                recentMark.lessonDate.date.format(MONTH_DATE_FORMAT)
+            }
             Text(
-                text = markCard.workTypeName,
+                text = formatDate,
                 color = MaterialTheme.colorScheme.secondary,
                 style = MaterialTheme.typography.labelMedium,
                 maxLines = 1,
@@ -134,8 +160,58 @@ private fun MarksCard(
 }
 
 @Composable
-private fun LoadingRecentMarks() {
+private fun LoadingRecentMarks(
+    modifier: Modifier = Modifier
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        modifier = modifier
+    ) {
+        Spacer(Modifier.width(8.dp))
+        repeat(5) {
+            Spacer(
+                modifier = Modifier
+                    .width(110.dp)
+                    .height(140.dp)
+                    .clip(MaterialTheme.shapes.medium)
+                    .placeholder(
+                        visible = true,
+                        highlight = PlaceholderHighlight.shimmer()
+                    )
+            )
+        }
+        Spacer(Modifier.width(8.dp))
+    }
+}
 
+@Composable
+private fun ErrorRecentMarks(
+    onRetry: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        modifier = modifier
+            .height(140.dp)
+            .fillMaxWidth()
+            .background(
+                MaterialTheme.colorScheme.background,
+                MaterialTheme.shapes.medium
+            )
+    ) {
+        Column(
+            modifier = Modifier.align(Alignment.Center),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = stringResource(R.string.failed_to_load_data)
+            )
+            MsTextButton(
+                text = stringResource(R.string.retry),
+                onClick = onRetry,
+                containerColor = Color.Transparent
+            )
+        }
+    }
 }
 
 @Composable

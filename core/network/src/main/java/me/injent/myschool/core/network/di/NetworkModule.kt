@@ -1,16 +1,14 @@
 package me.injent.myschool.core.network.di
 
-import android.content.Context
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
 import me.injent.myschool.core.network.ApiProvider
 import me.injent.myschool.core.network.DnevnikNetworkDataSource
-import me.injent.myschool.core.network.retrofit.AuthInterceptor
+import me.injent.myschool.core.network.retrofit.AuthTokenInterceptor
 import me.injent.myschool.core.network.retrofit.RetrofitApiProvider
 import me.injent.myschool.core.network.retrofit.RetrofitDnevnik
 import okhttp3.OkHttpClient
@@ -29,10 +27,10 @@ object NetworkModule {
     @Singleton
     @Provides
     fun providesOkHttpClient(
-        @ApplicationContext context: Context
+        interceptor: AuthTokenInterceptor
     ): OkHttpClient {
         return OkHttpClient.Builder()
-            .addInterceptor(AuthInterceptor(context))
+            .addInterceptor(interceptor)
             .build()
     }
 
@@ -43,9 +41,9 @@ object NetworkModule {
          * Selects [RetrofitDnevnik] as default REST API tool
          */
         @Binds
-        fun RetrofitDnevnik.binds(): DnevnikNetworkDataSource
+        fun RetrofitDnevnik.bindsDnevnikNetworkDataSource(): DnevnikNetworkDataSource
 
         @Binds
-        fun RetrofitApiProvider.binds(): ApiProvider
+        fun RetrofitApiProvider.bindsApiProvider(): ApiProvider
     }
 }

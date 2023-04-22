@@ -19,7 +19,8 @@ data class Person(
     val birthday: LocalDate? = null,
     val sex: Sex,
     val roles: List<String>,
-    val phone: String? = null
+    val phone: String? = null,
+    val avatarUrl: String? = null
 )
 
 @Serializable(SexSerializer::class)

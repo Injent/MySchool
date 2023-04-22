@@ -8,5 +8,5 @@ interface Syncable {
      * Starts syncrhonization in all [Syncable] repositories
      * Returns true if successful
      */
-    suspend fun synchronize(): Boolean
+    suspend fun synchronize(onProgress: ((Int) -> Unit)? = null): Boolean
 }

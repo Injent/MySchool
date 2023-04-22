@@ -4,13 +4,15 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import me.injent.myschool.core.common.util.atTimeZone
 import me.injent.myschool.core.common.util.currentLocalDateTime
 import me.injent.myschool.core.data.repository.*
-import me.injent.myschool.core.data.repository.remote.ReportingPeriodRepository
 import me.injent.myschool.core.model.Group
 import me.injent.myschool.core.model.Person
 import me.injent.myschool.core.model.RecentMarks

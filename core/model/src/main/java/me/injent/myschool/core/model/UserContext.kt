@@ -16,5 +16,5 @@ data class UserContext(
     val sex: Sex,
     val group: Group,
     val reportingPeriodGroup: ReportingPeriodGroup,
-    val school: School,
+    val school: School
 )

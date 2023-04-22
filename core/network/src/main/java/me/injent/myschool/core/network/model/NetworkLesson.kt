@@ -7,5 +7,6 @@ data class NetworkLesson(
     val id: Long,
     val title: String,
     val teachers: List<Long>,
-    val subject: NetworkSubject? = null
+    val subject: NetworkSubject? = null,
+    val works: List<NetworkWork>
 )

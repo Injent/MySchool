@@ -4,11 +4,13 @@ import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import me.injent.myschool.core.model.Work
+import me.injent.myschool.core.network.IdSerializer
 
 @Serializable
 data class NetworkWork(
+    @SerialName("id_str")
+    @Serializable(IdSerializer::class)
     val id: Long,
-    val markCount: Int,
     @SerialName("lesson")
     val lessonId: Long,
     val text: String,
@@ -21,7 +23,6 @@ data class NetworkWork(
 
 fun NetworkWork.asExternalModel() = Work(
     id = id,
-    markCount = markCount,
     lessonId = lessonId,
     text = text,
     subjectId = subjectId,

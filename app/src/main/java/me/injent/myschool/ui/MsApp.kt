@@ -1,26 +1,25 @@
 package me.injent.myschool.ui
 
-import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.*
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import me.injent.myschool.R
+import me.injent.myschool.auth.AuthState
+import me.injent.myschool.core.data.version.Update
 import me.injent.myschool.core.designsystem.component.MsBackground
 import me.injent.myschool.core.ui.MsNavigationBarItem
-import me.injent.myschool.feature.authorization.AuthState
-import me.injent.myschool.feature.authorization.navigation.authorizationRoute
+import me.injent.myschool.feature.auth.navigation.loginRoute
 import me.injent.myschool.feature.dashboard.navigation.dashboardRoute
 import me.injent.myschool.navigation.MsNavHost
 import me.injent.myschool.navigation.RootDestination
@@ -29,15 +28,30 @@ import me.injent.myschool.navigation.RootDestination
 @Composable
 fun MsApp(
     authState: AuthState,
+    update: Update?,
     appState: MsAppState = rememberMsAppState(),
 ) {
-    MsBackground {
-        val context = LocalContext.current
-        LaunchedEffect(authState) {
-            if (authState != AuthState.NETWORK_ERROR) return@LaunchedEffect
-            Toast.makeText(context, context.getString(R.string.network_error), Toast.LENGTH_LONG).show()
+    val context = LocalContext.current
+    LaunchedEffect(authState) {
+        if (authState is AuthState.Error) {
+            Toast.makeText(
+                context,
+                context.getString(R.string.network_error),
+                Toast.LENGTH_LONG
+            ).show()
         }
+    }
+    var showUpdateDialog by remember(update) {
+        mutableStateOf(update != null)
+    }
+    if (showUpdateDialog) {
+        UpdateDialog(
+            update = update!!,
+            onDismiss = { showUpdateDialog = false }
+        )
+    }
 
+    MsBackground {
         Scaffold(
             containerColor = Color.Transparent,
             contentColor = MaterialTheme.colorScheme.onBackground,
@@ -66,8 +80,8 @@ fun MsApp(
             ) {
                 MsNavHost(
                     navController = appState.navController,
-                    startDestination = if (authState == AuthState.NOT_AUTHED) {
-                        authorizationRoute
+                    startDestination = if (authState is AuthState.NotAuthed) {
+                        loginRoute
                     } else {
                         dashboardRoute
                     }

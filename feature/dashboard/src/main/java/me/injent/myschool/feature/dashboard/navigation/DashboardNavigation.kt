@@ -13,11 +13,13 @@ fun NavController.navigateToDashboard(navOptions: NavOptions?) {
 }
 
 fun NavGraphBuilder.dashboardScreen(
-    onMarkClick: (markId: Long) -> Unit
+    onMarkClick: (markId: Long) -> Unit,
+    onLogout: () -> Unit,
 ) {
     composable(route = dashboardRoute) {
         DashboardRoute(
-            onMarkClick = onMarkClick
+            onMarkClick = onMarkClick,
+            onLogout = onLogout
         )
     }
 }

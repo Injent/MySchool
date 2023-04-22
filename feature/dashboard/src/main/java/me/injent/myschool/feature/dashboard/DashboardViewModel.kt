@@ -1,107 +1,156 @@
 package me.injent.myschool.feature.dashboard
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
-import kotlinx.datetime.LocalDateTime
-import me.injent.myschool.core.common.util.currentDateTimeAtStartOfDay
-import me.injent.myschool.core.data.repository.PersonRepository
+import kotlinx.coroutines.launch
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.plus
+import me.injent.myschool.core.common.util.currentLocalDate
+import me.injent.myschool.core.data.repository.ScheduleRepository
+import me.injent.myschool.core.data.repository.SubjectRepository
 import me.injent.myschool.core.data.repository.UserContextRepository
-import me.injent.myschool.core.data.repository.remote.UserFeedRepository
+import me.injent.myschool.core.data.repository.UserFeedRepository
+import me.injent.myschool.core.model.Schedule
+import me.injent.myschool.core.model.UserContext
 import me.injent.myschool.core.model.UserFeed
+import me.injent.myschool.core.ui.ScheduleUiState
 import javax.inject.Inject
-
-private const val BIRTHDAYS_LIMIT = 3
 
 @HiltViewModel
 class DashboardViewModel @Inject constructor(
-    personRepository: PersonRepository,
     userContextRepository: UserContextRepository,
-    userFeedRepository: UserFeedRepository
+    userFeedRepository: UserFeedRepository,
+    subjectRepository: SubjectRepository,
+    scheduleRepository: ScheduleRepository
 ) : ViewModel() {
 
-    val feedUiState: StateFlow<FeedUiState> = feedUiState(
-        userFeedRepository = userFeedRepository,
-        userContextRepository = userContextRepository
-    )
+    private val feedRetries = MutableStateFlow(0)
+    val feedUiState: StateFlow<FeedUiState> = feedRetries.flatMapLatest {
+        feedUiState(
+            userFeedRepository = userFeedRepository,
+            userContextRepository = userContextRepository,
+            subjectRepository = subjectRepository
+        )
+    }
         .stateIn(
             scope = viewModelScope,
-            started = SharingStarted.Eagerly,
+            started = SharingStarted.Lazily,
             initialValue = FeedUiState.Loading
-        )
-
-    val birthdaysUiState = personRepository.getClosestBirthdays(BIRTHDAYS_LIMIT)
-        .map {
-            BirthdaysUiState.Success(it)
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = BirthdaysUiState.Loading
-        )
-
-    val myName: StateFlow<String> = userContextRepository.userContext
-        .map { context ->
-            context?.firstName ?: ""
-        }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = ""
         )
 
     private val _uiState = MutableStateFlow(DashboardUiState())
     val uiState: StateFlow<DashboardUiState>
         get() = _uiState.asStateFlow()
 
+    val scheduleUiState = scheduleUiState(
+        scheduleRepository = scheduleRepository,
+        uiState = _uiState
+    )
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Lazily,
+            initialValue = ScheduleUiState.Loading
+        )
+
+    init {
+        viewModelScope.launch {
+            _uiState.update {
+                it.copy(myName = userContextRepository.userContext.first()!!.firstName)
+            }
+        }
+    }
+
     fun onEvent(event: PointEvent) {
         when (event) {
             is PointEvent.GoToMarkDetails -> {
-                _uiState.update {
-                    it.copy(viewingMarkDetails = event.markId)
-                }
+                _uiState.update { it.copy(viewingMarkDetails = event.markId) }
             }
-            is PointEvent.OpenHomeworkDialog -> {
-                _uiState.update {
-                    it.copy(viewingHomework = event.homework)
-                }
+            is PointEvent.OpenLessonDialog -> {
+                _uiState.update { it.copy(viewingHomework = event.homework) }
             }
-            PointEvent.CloseHomeworkDialog -> {
+            PointEvent.CloseLessonDialog -> {
                 _uiState.update { it.copy(viewingHomework = null) }
             }
             PointEvent.BackEvent -> {
-                _uiState.update {
-                    it.copy(viewingMarkDetails = null)
-                }
+                _uiState.update { it.copy(viewingMarkDetails = null) }
+            }
+            is PointEvent.ChangeScheduleVariant -> {
+                _uiState.update { it.copy(selectedSchedule = event.variant) }
+            }
+            PointEvent.RetryRecentMarks -> {
+                feedRetries.value++
             }
         }
     }
 }
 
 data class DashboardUiState(
-    val viewingHomework: UserFeed.Homework? = null,
-    val viewingMarkDetails: Long? = null
+    val viewingMarkDetails: Long? = null,
+    val viewingHomework: Schedule.Lesson? = null,
+    val myName: String = "",
+    val selectedSchedule: Schedule.Variant? = null
 )
 
-private const val DAY_INTERVAL = 10
+sealed interface FeedUiState {
+    object Loading : FeedUiState
+    object Error : FeedUiState
+    data class Success(
+        val recentMarks: List<UserFeed.RecentMark>,
+        val currentLesson: UserFeed.Lesson? = null
+    ) : FeedUiState
+}
 
 private fun feedUiState(
     userFeedRepository: UserFeedRepository,
-    userContextRepository: UserContextRepository
+    userContextRepository: UserContextRepository,
+    subjectRepository: SubjectRepository
 ): Flow<FeedUiState> = flow {
-    val userFeed = userFeedRepository.getUserFeed(
-        date = LocalDateTime.currentDateTimeAtStartOfDay(),
-        personId = userContextRepository.userContext.first()!!.personId,
-        limit = DAY_INTERVAL
-    )
+    try {
+        val userContext: UserContext = userContextRepository.userContext.first()!!
+        val userFeed = userFeedRepository.getUserFeed(
+            groupId = userContext.group.id,
+            personId = userContext.personId,
+        )
+        val uiState = FeedUiState.Success(
+            recentMarks = userFeed.recentMarks.map { recentMark ->
+                recentMark.copy(
+                    subjectName = subjectRepository.getSubjectName(recentMark.subjectName.toLong())
+                )
+            },
+            currentLesson = userFeed.currentLesson
+        )
+        emit(uiState)
+    } catch (e: Exception) {
+        e.printStackTrace()
+        emit(FeedUiState.Error)
+    }
+}
 
-    emit(FeedUiState.Success(
-        todayHomeworks = userFeed.currentDay?.todayHomeworks ?: emptyList(),
-        todaySchedule = userFeed.currentDay?.todaySchedule ?: emptyList(),
-        marksCards = userFeed.days
-            .flatMap { it.marksCards }
-            .filter { it.marks.isNotEmpty() }
-    ))
+
+private fun scheduleUiState(
+    scheduleRepository: ScheduleRepository,
+    uiState: MutableStateFlow<DashboardUiState>,
+): Flow<ScheduleUiState> {
+    return combine(
+        scheduleRepository.getSchedule(LocalDate.currentLocalDate()),
+        scheduleRepository.getSchedule(LocalDate.currentLocalDate().plus(1, DateTimeUnit.DAY))
+    ) { todaySchedule, tomorrowSchedule ->
+        if (tomorrowSchedule != null) {
+            uiState.update {
+                it.copy(selectedSchedule = Schedule.Variant.Tomorrow)
+            }
+        } else {
+            uiState.update {
+                it.copy(selectedSchedule = Schedule.Variant.Today)
+            }
+        }
+        @Suppress("USELESS_CAST")
+        ScheduleUiState.Success(
+            todaySchedule = todaySchedule,
+            tomorrowSchedule = tomorrowSchedule
+        ) as ScheduleUiState
+    }.catch { emit(ScheduleUiState.Error) }
 }

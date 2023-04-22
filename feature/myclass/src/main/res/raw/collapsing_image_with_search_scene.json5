@@ -12,11 +12,10 @@
         top: ['parent', 'top', 16],
         alpha: 1,
       },
-      search: {
+      periods: {
         width: 'wrap',
         height: 'wrap',
-        start: ['parent', 'start', 16],
-        bottom: ['parent', 'bottom', 16],
+        bottom: ['parent', 'bottom', 0],
       }
     },
     end: {
@@ -33,12 +32,9 @@
         translationX: -500,
         translationY: -50,
       },
-      search: {
+      periods: {
         width: 'parent',
         height: 'wrap',
-        start: ['parent', 'start', 48],
-        end: ['parent', 'end', 48],
-        top: ['parent', 'top', 0],
         bottom: ['parent', 'bottom', 0]
       }
     }

@@ -11,6 +11,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import me.injent.myschool.core.designsystem.R
 
 @Composable
 fun MsBackground(
@@ -44,5 +46,21 @@ fun MsBackgroundWithImageOnTop(
             )
             content()
         }
+    }
+}
+
+@Composable
+fun MsCityBackground(
+    modifier: Modifier = Modifier,
+    content: @Composable () -> Unit
+) {
+    Surface(modifier = modifier) {
+        Image(
+            painter = painterResource(R.drawable.bg_auth),
+            contentScale = ContentScale.Crop,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize()
+        )
+        content()
     }
 }

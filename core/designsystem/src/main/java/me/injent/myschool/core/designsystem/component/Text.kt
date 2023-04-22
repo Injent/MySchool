@@ -1,6 +1,6 @@
 package me.injent.myschool.core.designsystem.component
 
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
@@ -8,17 +8,22 @@ import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.isUnspecified
 
 @Composable
 fun AutoResizableText(
     text: String,
     modifier: Modifier = Modifier,
-    style: TextStyle = TextStyle.Default,
+    style: TextStyle = LocalTextStyle.current,
+    fontWeight: FontWeight = FontWeight.Normal,
     color: Color = Color.Unspecified
 ) {
-    var resizedTextStyle by remember { mutableStateOf(style) }
-    val defaultFontSize = MaterialTheme.typography.bodySmall.fontSize
+    var resizedTextStyle by remember {
+        mutableStateOf(
+            style.merge(TextStyle(fontWeight = fontWeight))
+        )
+    }
     var shouldDraw by remember { mutableStateOf(false) }
     Text(
         text = text,
@@ -34,7 +39,7 @@ fun AutoResizableText(
             if (result.didOverflowWidth) {
                 if (style.fontSize.isUnspecified) {
                     resizedTextStyle = resizedTextStyle.copy(
-                        fontSize = defaultFontSize
+                        fontSize = style.fontSize
                     )
                 }
                 resizedTextStyle = resizedTextStyle.copy(

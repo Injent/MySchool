@@ -11,10 +11,16 @@ data class NetworkHomeworkData(
     @SerialName("works")
     val homeworks: List<NetworkHomework>,
     val files: List<NetworkAttachment>,
-    val subjects: List<NetworkHomeworkSubject>,
-    val lessons: List<NetworkLesson>,
+    val subjects: List<NetworkSubject>,
+    val lessons: List<Lesson>,
     val teachers: List<NetworkTeacher>
-)
+) {
+    @Serializable
+    data class Lesson(
+        val id: Long,
+        val teachers: List<Long>
+    )
+}
 
 fun NetworkHomeworkData.asExternalModelList(): List<Homework> {
     return homeworks
@@ -26,7 +32,7 @@ fun NetworkHomeworkData.asExternalModelList(): List<Homework> {
             Homework(
                 text = homework.text,
                 subject = subject.asExternalModel(),
-                files = files.map(NetworkAttachment::asExternalModel),
+                attachments = files.map(NetworkAttachment::asExternalModel),
                 sentDate = homework.sentDate.atTimeZone(TimeZone.currentSystemDefault()),
                 teacher = teacher.asExternalModel()
             )

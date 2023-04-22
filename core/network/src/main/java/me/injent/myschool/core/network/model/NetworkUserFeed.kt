@@ -2,94 +2,147 @@ package me.injent.myschool.core.network.model
 
 import kotlinx.datetime.LocalDateTime
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.*
+import me.injent.myschool.core.model.EpochLocalDateTimeSerializer
 import me.injent.myschool.core.model.UserFeed
-import me.injent.myschool.core.network.DaySerializer
 
 @Serializable
 data class NetworkUserFeed(
-    val days: List<Day>
+    val schedule: Schedule,
+    val recentMarks: List<RecentMark>,
+    val feed: List<FeedItem>
 ) {
-    @Serializable(DaySerializer::class)
-    data class Day(
-        val date: LocalDateTime,
-        val nextWorkingDayDate: LocalDateTime?,
-        val marksCards: List<MarkCard>,
-        val todayHomeworks: List<Homework>,
-        val todaySchedule: List<Schedule>
-    )
-
     @Serializable
-    data class MarkCard(
-        val subjectName: String,
-        val subjectId: Long,
-        val workTypeName: String,
-        val lesson: Lesson?,
-        val marks: List<NetworkMark>,
-    )
-
-    @Serializable
-    data class Homework(
-        val subjectName: String,
-        val workTypeName: String,
-        val work: NetworkWork
+    data class Schedule(
+        val todayLessons: List<Lesson>
     )
 
     @Serializable
     data class Lesson(
         val id: Long,
-        val date: LocalDateTime,
+        val number: Int,
+        val place: String,
+        val hours: NetworkHours,
+        val startTime: Long,
+        val endTime: Long,
+        val subject: Subject
     )
 
     @Serializable
-    data class Schedule(
-        val lessonId: Long,
-        val lessonStatus: String,
-        val number: Int,
-        val subjectName: String
+    data class Subject(
+        val id: Long,
+        val name: String
     )
-}
 
-fun NetworkUserFeed.asExternalModel() = UserFeed(
-    days = days.map { day ->
-        with(day) {
-            UserFeed.Day(
-                date = date,
-                nextWorkingDayDate = nextWorkingDayDate,
-                marksCards = marksCards
-                    .map { markCard ->
-                        with(markCard) {
-                            UserFeed.MarkCard(
-                                subjectName = subjectName,
-                                subjectId = subjectId,
-                                workTypeName = workTypeName,
-                                lesson = lesson?.run { UserFeed.Lesson(id, date) },
-                                marks = marks.map(NetworkMark::asExternalModel)
-                            )
-                        }
-                    },
-                todayHomeworks = todayHomeworks
-                    .map { homework ->
-                        with(homework) {
-                            UserFeed.Homework(
-                                subjectName = subjectName,
-                                workTypeName = workTypeName,
-                                work = work.asExternalModel()
-                            )
-                        }
-                    },
-                todaySchedule = todaySchedule
-                    .map { schedule ->
-                        with(schedule) {
-                            UserFeed.Schedule(
-                                lessonId = lessonId,
-                                lessonStatus = lessonStatus,
-                                number = number,
-                                subjectName = subjectName
-                            )
-                        }
-                    }
+    @Serializable
+    data class RecentMark(
+        @Serializable(EpochLocalDateTimeSerializer::class)
+        val date: LocalDateTime,
+        @Serializable(EpochLocalDateTimeSerializer::class)
+        val lessonDate: LocalDateTime,
+        val subject: Subject,
+        val marks: List<Mark>
+    )
+
+    @Serializable
+    data class Mark(
+        val id: Long,
+        val value: String,
+        @Serializable
+        val mood: me.injent.myschool.core.model.Mark.Mood
+    )
+
+    @Serializable
+    data class FeedItem(
+        val type: Type,
+        val content: Content
+    ) {
+        @Serializable
+        enum class Type {
+            StudentRating,
+            Post,
+            WeekSummary,
+            ImportantWork
+        }
+
+        @Serializable
+        data class Content(
+            @Serializable(EpochLocalDateTimeSerializer::class)
+            val date: LocalDateTime? = null,
+            val items: List<Item>? = null
+        ) {
+            @Serializable
+            data class Item(
+                @Serializable(EpochLocalDateTimeSerializer::class)
+                val date: LocalDateTime,
+                val subject: Subject,
+                val subjectMarks: List<SubjectMark>
+            )
+
+            @Serializable
+            data class Subject(
+                val id: Long,
+                val name: String
+            )
+
+            @Serializable
+            data class SubjectMark(
+                val marks: List<Mark>
             )
         }
     }
+}
+
+fun NetworkUserFeed.asExternalModel(): UserFeed {
+    val currentSeconds = java.time.Clock.systemUTC().instant().epochSecond
+
+    return UserFeed(
+        currentLesson = schedule.todayLessons.find { lesson ->
+            currentSeconds in lesson.startTime..lesson.endTime
+        }?.asExternalModel(),
+        recentMarks = recentMarks.map(NetworkUserFeed.RecentMark::asExternalModel),
+        weekSummary = feed.filter {
+            it.type == NetworkUserFeed.FeedItem.Type.WeekSummary
+        }.map(NetworkUserFeed.FeedItem::asExternalModel)
+    )
+}
+
+fun NetworkUserFeed.Lesson.asExternalModel() = UserFeed.Lesson(
+    id = id,
+    number = number,
+    place = place,
+    hours = hours.asExternalModel(),
+    subjectName = subject.name,
+    startTime = startTime,
+    endTime = endTime
+)
+
+fun NetworkUserFeed.RecentMark.asExternalModel() = UserFeed.RecentMark(
+    date = date,
+    lessonDate = lessonDate,
+    subjectName = subject.id.toString(),
+    marks = marks.map { mark ->
+        with(mark) {
+            UserFeed.Mark(
+                id = id,
+                value = value,
+                mood = mood
+            )
+        }
+    }
+)
+
+fun NetworkUserFeed.FeedItem.asExternalModel(): UserFeed.SubjectCard {
+    if (this.type != NetworkUserFeed.FeedItem.Type.WeekSummary) throw IllegalStateException()
+    return UserFeed.SubjectCard(
+        date = this.content.date!!,
+        subjectName = content.items?.first()!!.subject.name,
+        marks = content.items.first().subjectMarks
+            .map(NetworkUserFeed.FeedItem.Content.SubjectMark::asExternalModel)
+    )
+}
+
+fun NetworkUserFeed.FeedItem.Content.SubjectMark.asExternalModel() = UserFeed.Mark(
+    id = this.marks.first().id,
+    value = this.marks.first().value,
+    mood = this.marks.first().mood
 )

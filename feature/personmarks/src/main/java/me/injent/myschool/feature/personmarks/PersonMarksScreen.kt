@@ -55,8 +55,7 @@ private fun PersonMarksScreen(
                         title = personUiState.person.shortName,
                         actions = {
                             ProfilePicture(
-                                shortName = personUiState.person.shortName,
-                                onClick = {},
+                                avatarUrl = personUiState.person.avatarUrl,
                                 modifier = Modifier.padding(ButtonDefaults.IconSpacing)
                             )
                         },

@@ -1,15 +1,22 @@
+@file:Suppress("unused")
+
 package me.injent.myschool.core.data.di
 
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import dagger.Binds
 import dagger.Module
+import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import me.injent.myschool.core.data.downloader.AndroidDownloader
 import me.injent.myschool.core.data.downloader.Downloader
 import me.injent.myschool.core.data.repository.*
-import me.injent.myschool.core.data.repository.remote.*
 import me.injent.myschool.core.data.util.ConnectivityManagerMonitor
 import me.injent.myschool.core.data.util.NetworkMonitor
+import me.injent.myschool.core.data.version.FirebaseVersionController
+import me.injent.myschool.core.data.version.VersionController
+import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -57,8 +64,8 @@ interface DataModule {
 
     @Binds
     fun bindsHomeworkRepository(
-        remoteHomeworkRepository: RemoteHomeworkRepository
-    ): HomeworkRepository
+        remoteHomeworkRepository: RemoteScheduleRepository
+    ): ScheduleRepository
 
     @Binds
     fun bindsNetworkMonitor(
@@ -77,6 +84,17 @@ interface DataModule {
 
     @Binds
     fun bindsEsiaAuthorizationRepository(
-        authorizationRepositoryImpl: LoginRepositoryImpl
+        authorizationRepositoryImpl: RemoteLoginRepository
     ): LoginRepository
+
+    @Binds
+    fun bindsVersionController(
+        firebaseVersionController: FirebaseVersionController
+    ): VersionController
+
+    companion object {
+        @Provides
+        @Singleton
+        fun providesFirestore() = Firebase.firestore
+    }
 }

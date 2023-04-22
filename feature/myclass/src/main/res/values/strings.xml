@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="your_place">Вы на {place} месте</string>
+    <string name="your_place">место в классе</string>
+    <string name="half_year">Полугодие</string>
+    <string name="quarter">Четверть</string>
+    <string name="semester">Семестр</string>
+    <string name="trimester">Триместр</string>
+    <string name="module">Модуль</string>
 </resources>

@@ -11,7 +11,7 @@ android {
         buildConfigField(
             "String",
             "API_BASE_URL",
-            "\"https://api.dnevnik.ru/v2/authorizations/bycredentials\""
+            "\"https://api.dnevnik.ru/\""
         )
         buildConfigField(
             "String",
@@ -29,6 +29,7 @@ android {
 dependencies {
     implementation(project(":core:common"))
     implementation(project(":core:model"))
+    implementation(project(":core:auth"))
     implementation(Dependencies.DATETIME)
     retrofit()
 }

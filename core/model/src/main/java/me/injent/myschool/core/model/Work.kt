@@ -4,7 +4,6 @@ import kotlinx.datetime.LocalDateTime
 
 data class Work(
     val id: Long,
-    val markCount: Int,
     val lessonId: Long,
     val text: String,
     val subjectId: Long,

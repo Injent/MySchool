@@ -1,76 +1,81 @@
 package me.injent.myschool.core.ui
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Person
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import me.injent.myschool.core.designsystem.component.DynamicAsyncImage
 
 @Composable
 fun ProfilePicture(
-    onClick: () -> Unit,
+    avatarUrl: String?,
     modifier: Modifier = Modifier,
-    shortName: String
+    name: String? = null,
 ) {
-    Box(
-        modifier = modifier
-            .sizeIn(minWidth = 40.dp, minHeight = 40.dp)
-            .clip(CircleShape)
-            .clickable(onClick = onClick)
-            .background(MaterialTheme.colorScheme.primary)
-    ) {
-        Text(
-            text = "${shortName.first()}${shortName.last()}",
-            color = MaterialTheme.colorScheme.onPrimary,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold,
-            modifier = Modifier.align(Alignment.Center)
-        )
+    var showPictureDialog by remember { mutableStateOf(false) }
+
+    if (showPictureDialog && name != null) {
+        Dialog(onDismissRequest = { showPictureDialog = false }) {
+            Box(Modifier.size(256.dp)) {
+                DynamicAsyncImage(
+                    imageUrl = avatarUrl!!,
+                    contentDescription = null,
+                    placeholder = painterResource(R.drawable.avatar_placeholder),
+                    modifier = Modifier.matchParentSize()
+
+                )
+                Surface(
+                    color = Color.Black.copy(.5f),
+                    modifier = Modifier.align(Alignment.BottomStart)
+                ) {
+                    Box(
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp, vertical = 6.dp)
+                    ) {
+                        Text(
+                            text = name,
+                            color = Color.White,
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        )
+                    }
+                }
+            }
+        }
     }
-}
 
-@Composable
-fun LoadingProfilePicture(
-    modifier: Modifier = Modifier
-) {
-    Spacer(
-        modifier = modifier
-            .requiredSize(48.dp)
-            .background(
-                color = MaterialTheme.colorScheme.secondary,
-                shape = CircleShape
-            )
-    )
-}
-
-@Composable
-fun FailedProfilePicture(
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .requiredSize(48.dp)
-            .background(
-                color = MaterialTheme.colorScheme.secondary,
-                shape = CircleShape
-            )
-    ) {
-        Icon(
-            imageVector = Icons.Rounded.Person,
+    if (!avatarUrl.isNullOrEmpty()) {
+        DynamicAsyncImage(
+            imageUrl = avatarUrl,
             contentDescription = null,
-            tint = MaterialTheme.colorScheme.tertiary,
-            modifier = Modifier.align(Alignment.Center)
+            placeholder = painterResource(R.drawable.avatar_placeholder),
+            modifier = modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .clickable {
+                    showPictureDialog = true
+                }
+        )
+    } else {
+        Image(
+            painter = painterResource(R.drawable.avatar_placeholder),
+            contentDescription = null,
+            modifier = modifier
+                .size(32.dp)
+                .clip(CircleShape)
         )
     }
 }

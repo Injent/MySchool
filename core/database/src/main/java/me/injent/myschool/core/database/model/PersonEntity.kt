@@ -3,9 +3,7 @@ package me.injent.myschool.core.database.model
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
 import kotlinx.datetime.LocalDate
-import me.injent.myschool.core.database.util.LocalDateConverter
 import me.injent.myschool.core.model.Person
 import me.injent.myschool.core.model.Sex
 
@@ -20,7 +18,9 @@ data class PersonEntity(
     val birthday: LocalDate? = null,
     val sex: Sex,
     val roles: List<String>,
-    val phone: String? = null
+    val phone: String? = null,
+    @ColumnInfo(name = "avatar_url")
+    var avatarUrl: String? = null
 )
 
 fun PersonEntity.asExternalModel() = Person(
@@ -30,7 +30,8 @@ fun PersonEntity.asExternalModel() = Person(
     birthday = birthday,
     sex = sex,
     roles = roles,
-    phone = phone
+    phone = phone,
+    avatarUrl = avatarUrl
 )
 
 data class PersonIdAndName(
