@@ -12,6 +12,7 @@ interface UserDataRepository {
     suspend fun updateMarksSyncDateTime()
     suspend fun setInitizalized()
     suspend fun selectPeriod(period: Period)
+    suspend fun ignoreUpdate(ignore: Boolean)
 }
 
 class UserDataRepositoryImpl @Inject constructor(
@@ -29,4 +30,7 @@ class UserDataRepositoryImpl @Inject constructor(
 
     override suspend fun selectPeriod(period: Period) =
         userDataSource.selectPeriod(period)
+
+    override suspend fun ignoreUpdate(ignore: Boolean) =
+        userDataSource.ignoreUpdate(ignore)
 }

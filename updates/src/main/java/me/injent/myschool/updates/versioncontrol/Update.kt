@@ -1,4 +1,4 @@
-package me.injent.myschool.core.data.version
+package me.injent.myschool.updates.versioncontrol
 
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.PropertyName

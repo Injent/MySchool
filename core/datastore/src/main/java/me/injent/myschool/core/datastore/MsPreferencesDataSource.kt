@@ -51,4 +51,10 @@ class MsPreferencesDataSource @Inject constructor(
             it.copy(selectedPeriod = period)
         }
     }
+
+    suspend fun ignoreUpdate(ignore: Boolean) {
+        dataStore.updateData {
+            it.copy(ignoreUpdate = ignore)
+        }
+    }
 }

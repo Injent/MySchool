@@ -11,7 +11,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import me.injent.myschool.R
-import me.injent.myschool.core.data.version.Update
+import me.injent.myschool.updates.versioncontrol.Update
 import me.injent.myschool.core.designsystem.component.HtmlText
 import me.injent.myschool.core.designsystem.component.MsTextButton
 
@@ -19,7 +19,7 @@ import me.injent.myschool.core.designsystem.component.MsTextButton
 @Composable
 internal fun UpdateDialog(
     update: Update,
-    onInstallClick: () -> Unit,
+    onUpdateRequest: () -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -62,7 +62,6 @@ internal fun UpdateDialog(
                         .padding(horizontal = 16.dp)
                         .verticalScroll(scrollState)
                 )
-
                 Row(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
@@ -84,7 +83,7 @@ internal fun UpdateDialog(
                         text = stringResource(R.string.move_to_download),
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary,
-                        onClick = onInstallClick
+                        onClick = onUpdateRequest
                     )
                 }
             }

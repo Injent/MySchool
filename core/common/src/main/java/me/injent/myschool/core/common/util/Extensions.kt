@@ -3,9 +3,13 @@ package me.injent.myschool.core.common.util
 import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
+import android.net.Uri
+import android.os.Build.VERSION.SDK_INT
 import android.text.format.Formatter
+import androidx.core.content.FileProvider
 import androidx.core.net.toUri
 import kotlinx.datetime.*
+import java.io.File
 import kotlin.time.Duration
 
 fun LocalDate.Companion.currentLocalDate() =
@@ -53,20 +57,14 @@ fun Context.openUrl(url: String) {
     startActivity(intent)
 }
 
-fun String.unescapeUnicode(): String {
-    val sb = StringBuilder()
-    var oldIndex = 0
-    var i = 0
-    while (i + 2 < length) {
-        if (substring(i, i + 2) == "\\u") {
-            sb.append(substring(oldIndex, i))
-            val codePoint = substring(i + 2, i + 6).toInt(16)
-            sb.append(Character.toChars(codePoint))
-            i += 5
-            oldIndex = i + 1
-        }
-        i++
+fun File.provideUri(context: Context): Uri {
+    return if (SDK_INT < 24) {
+        Uri.fromFile(this)
+    } else {
+        FileProvider.getUriForFile(
+            context,
+            context.packageName + ".provider",
+            this
+        )
     }
-    sb.append(substring(oldIndex, length))
-    return sb.toString()
 }

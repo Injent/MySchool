@@ -1,10 +1,12 @@
 package me.injent.myschool
 
+import android.content.Intent
 import android.os.Build.VERSION.SDK_INT
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
@@ -13,31 +15,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
-import me.injent.myschool.auth.AccountHelper
 import me.injent.myschool.auth.AuthStatus
-import me.injent.myschool.core.data.util.NetworkMonitor
-import me.injent.myschool.core.data.version.Update
-import me.injent.myschool.core.data.version.VersionController
 import me.injent.myschool.core.designsystem.theme.MySchoolTheme
 import me.injent.myschool.ui.MsApp
 import me.injent.myschool.ui.PermissionDialog
-import javax.inject.Inject
+import me.injent.myschool.updates.installer.ACTION_UPDATE_DOWNLOADED
+import me.injent.myschool.updates.installer.openUpdateApk
 
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @Inject
-    lateinit var accountHelper: AccountHelper
-    @Inject
-    lateinit var networkMonitor: NetworkMonitor
-    @Inject
-    lateinit var versionController: VersionController
+    private val viewModel: MainViewModel by viewModels()
 
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
@@ -49,44 +39,30 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
-    var showPermissionDialog by mutableStateOf(false)
-
-    var update: Update? by mutableStateOf(null)
+    private var showPermissionDialog by mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        handleIntent(intent)
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        var authStatus: AuthStatus by mutableStateOf(AuthStatus.CheckingAccounts)
-        lifecycleScope.launch {
-            networkMonitor.isOnline
-                .onEach {
-                    authStatus = accountHelper.checkAuth(it)
-                    update = versionController.getUpdate()
-                }
-                .collect()
-        }
-
         splashScreen.setKeepOnScreenCondition {
-            authStatus == AuthStatus.CheckingAccounts
+            viewModel.authStatus == AuthStatus.CheckingAccounts
         }
 
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            if (authStatus !is AuthStatus.CheckingAccounts) {
+            if (viewModel.authStatus !is AuthStatus.CheckingAccounts) {
                 MySchoolTheme {
                     MsApp(
-                        authStatus = authStatus,
-                        update = update,
-                        onUpdate = {
-                            lifecycleScope.launch {
-                                versionController.installUpdate(update!!)
-                            }
-                        }
+                        authStatus = viewModel.authStatus,
+                        update = viewModel.update,
+                        onUpdateRequest = { viewModel.onUpdateRequest(this) }
                     )
                 }
             }
+            // Used for calculation of insets on the screen while MsApp composable is loading
             Box(Modifier.fillMaxSize())
 
             if (showPermissionDialog) {
@@ -106,5 +82,13 @@ class MainActivity : ComponentActivity() {
         }
 
         requestPermissionLauncher.launch(permissionRequest.toTypedArray())
+    }
+
+    private fun handleIntent(intent: Intent) {
+        when (intent.action) {
+            ACTION_UPDATE_DOWNLOADED -> {
+                if (intent.data != null) this.openUpdateApk(intent.data!!)
+            }
+        }
     }
 }

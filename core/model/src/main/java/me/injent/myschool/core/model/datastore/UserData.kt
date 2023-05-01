@@ -10,5 +10,6 @@ data class UserData(
     val userContext: UserContext? = null,
     val lastMarksSyncDateTime: LocalDateTime? = null,
     val isInitialized: Boolean = false,
-    val selectedPeriod: Period? = null
+    val selectedPeriod: Period? = null,
+    val ignoreUpdate: Boolean = false
 )

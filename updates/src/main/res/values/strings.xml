@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="downloading_update">Скачивание обновления</string>
+    <string name="update_channel_name">Обновление</string>
+    <string name="update_download_completed">Обновление скачано</string>
+    <string name="press_to_install">Нажмите чтобы установить</string>
+    <string name="open_app">Открыть приложение</string>
+</resources>

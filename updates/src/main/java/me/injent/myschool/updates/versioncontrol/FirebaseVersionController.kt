@@ -1,4 +1,4 @@
-package me.injent.myschool.core.data.version
+package me.injent.myschool.updates.versioncontrol
 
 import android.content.Context
 import android.content.pm.PackageManager
@@ -6,16 +6,18 @@ import android.os.Build
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.tasks.await
-import me.injent.myschool.core.data.util.UpdateInstaller
+import me.injent.myschool.updates.installer.updateApkFile
+import java.io.File
 import javax.inject.Inject
 
 private const val VersionCollection = "versions"
 
 class FirebaseVersionController @Inject constructor(
     private val firestore: FirebaseFirestore,
-    @ApplicationContext context: Context,
-    private val updateInstaller: UpdateInstaller
+    @ApplicationContext context: Context
 ) : VersionController {
+
+    private val updateFile: File = context.updateApkFile
 
     private val appVersion = if (Build.VERSION.SDK_INT >= 33) {
         context.packageManager.getPackageInfo(
@@ -40,7 +42,7 @@ class FirebaseVersionController @Inject constructor(
         null
     }
 
-    override suspend fun installUpdate(update: Update) {
-        updateInstaller.update(update.url)
+    override suspend fun hasNonInstalledUpdate(): Boolean {
+        return updateFile.exists()
     }
 }

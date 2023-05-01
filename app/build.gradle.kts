@@ -50,7 +50,6 @@ android {
 }
 
 dependencies {
-    implementation(project(":sync"))
     implementation(project(":core:analytics"))
     implementation(project(":core:auth"))
     implementation(project(":core:data"))
@@ -70,6 +69,9 @@ dependencies {
     implementation(project(":feature:markdetails"))
     implementation(project(":feature:userprofile"))
     implementation(project(":feature:accounts"))
+
+    implementation(project(":sync"))
+    implementation(project(":updates"))
 
     implementation(Dependencies.CORE_KTX)
     implementation(Dependencies.ACTIVITY_COMPOSE)

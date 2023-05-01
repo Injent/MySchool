@@ -1,25 +1,14 @@
 @file:Suppress("unused")
-
 package me.injent.myschool.core.data.di
 
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import me.injent.myschool.core.common.network.Dispatcher
-import me.injent.myschool.core.common.network.MsDispatchers
 import me.injent.myschool.core.data.downloader.*
 import me.injent.myschool.core.data.repository.*
 import me.injent.myschool.core.data.util.ConnectivityManagerMonitor
 import me.injent.myschool.core.data.util.NetworkMonitor
-import me.injent.myschool.core.data.version.FirebaseVersionController
-import me.injent.myschool.core.data.version.VersionController
-import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -101,15 +90,4 @@ interface DataModule {
     fun bindsEsiaAuthorizationRepository(
         authorizationRepositoryImpl: RemoteLoginRepository
     ): LoginRepository
-
-    @Binds
-    fun bindsVersionController(
-        firebaseVersionController: FirebaseVersionController
-    ): VersionController
-
-    companion object {
-        @Provides
-        @Singleton
-        fun providesFirestore() = Firebase.firestore
-    }
 }

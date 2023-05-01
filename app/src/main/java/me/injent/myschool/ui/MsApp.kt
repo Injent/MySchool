@@ -19,7 +19,7 @@ import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import me.injent.myschool.R
 import me.injent.myschool.auth.AuthStatus
-import me.injent.myschool.core.data.version.Update
+import me.injent.myschool.updates.versioncontrol.Update
 import me.injent.myschool.core.designsystem.component.MsBackground
 import me.injent.myschool.core.ui.MsNavigationBarItem
 import me.injent.myschool.feature.auth.navigation.loginRoute
@@ -33,7 +33,7 @@ fun MsApp(
     authStatus: AuthStatus,
     update: Update?,
     appState: MsAppState = rememberMsAppState(),
-    onUpdate: () -> Unit
+    onUpdateRequest: () -> Unit
 ) {
     var showUpdateDialog by remember { mutableStateOf(false) }
     LaunchedEffect(update) {
@@ -41,11 +41,13 @@ fun MsApp(
     }
 
     if (showUpdateDialog) {
-        UpdateDialog(
-            update = update!!,
-            onInstallClick = onUpdate,
-            onDismiss = { showUpdateDialog = false }
-        )
+        update?.let {
+            UpdateDialog(
+                update = it,
+                onUpdateRequest = onUpdateRequest,
+                onDismiss = { showUpdateDialog = false }
+            )
+        }
     }
 
     val showNetworkError by remember(authStatus) {

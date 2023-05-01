@@ -28,6 +28,9 @@ class InternalStorageDownloader @Inject constructor(
     @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
 ) : Downloader {
 
+    private val scope: CoroutineScope
+        get() = CoroutineScope(ioDispatcher)
+
     private class Process(
         var uri: Uri,
         var status: Status,
@@ -51,7 +54,7 @@ class InternalStorageDownloader @Inject constructor(
         val file = File(context.cacheDir, preferredFileName)
         processes[downloadId] = Process(file.toUri(), Status.RUNNING, 0)
 
-        CoroutineScope(ioDispatcher).launch {
+        scope.launch {
             try {
                 val url = URL(sourceUrl)
                 val urlConnection = url.openConnection().apply {
