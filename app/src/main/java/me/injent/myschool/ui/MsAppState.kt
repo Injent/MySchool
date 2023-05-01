@@ -35,9 +35,6 @@ class MsAppState(
     val navController: NavHostController,
     val coroutineScope: CoroutineScope
 ) {
-    val rootDestinations: List<RootDestination>
-        get() = RootDestination.values().asList().filter { it.route != profileRoute }
-
     val currentDestination: NavDestination?
         @Composable get() = navController.currentBackStackEntryAsState().value?.destination
 
@@ -55,8 +52,27 @@ class MsAppState(
     val shouldShowBottomNavigation: Boolean
         @Composable get() = currentDestination.isChildOfRootDestination(currentRootDestination)
 
+    /**
+     * List of root screens used in navigation.
+     */
+    val rootDestinations: List<RootDestination>
+        get() = RootDestination.values().asList().filter { it.route != profileRoute }
+
+    /**
+     * Navigates to the root destination, saving and restoring only one copy of the destination from
+     * the backstack.
+     *
+     * @param destination: The root destination the app needs to navigate to.
+     */
     fun navigateTo(destination: RootDestination) {
-        val rootNavOptions = rootNavOptions()
+        val rootNavOptions = navOptions {
+            popUpTo(0) {
+                saveState = true
+            }
+
+            launchSingleTop = true
+            restoreState = true
+        }
 
         when (destination) {
             RootDestination.DASHBOARD -> navController.navigateToDashboard(rootNavOptions)
@@ -65,13 +81,4 @@ class MsAppState(
             RootDestination.STATISTICS -> navController.navigateToStatistics(rootNavOptions)
         }
     }
-}
-
-fun rootNavOptions() = navOptions {
-    popUpTo(0) {
-        saveState = true
-    }
-
-    launchSingleTop = true
-    restoreState = true
 }

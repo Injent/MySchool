@@ -24,3 +24,14 @@ val Warning = Color(0xFFf2c037)
 val Link = Color(0xFF31ccec)
 val Hint = Background
 val Olive = Color(0xFF705b27)
+
+val DarkSurface = Color(0xFF1e1e1e)
+val DarkOnSurface = Color(0xffe2e2e2)
+val DarkBackground = Color(0xFF121212)
+val DarkOnBackground = Color.White
+
+val DarkOutline = Color(0xFF3F3F3F)
+val DarkOutlineVariant = DarkBackground
+
+val DarkPrimaryContainer = Color(0xff2d2d2d)
+val DarkOnPrimaryContainer = Color(0xffc3c3c3)

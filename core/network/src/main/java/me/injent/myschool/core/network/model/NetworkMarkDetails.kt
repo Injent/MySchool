@@ -8,7 +8,7 @@ import me.injent.myschool.core.model.MarkDetails
 @Serializable
 data class NetworkMarkDetails(
     @Serializable(EpochLocalDateTimeSerializer::class)
-    val date: LocalDateTime,
+    val date: LocalDateTime?,
     val markDetails: MarkDetails,
     val categories: List<Category>
 ) {

@@ -24,6 +24,10 @@ object MsIcons {
     val Add = Icons.Rounded.Add
     val Close = Icons.Rounded.Close
     val Logout = R.drawable.ic_logout
+    val Visibility = R.drawable.ic_visibility
+    val VisibilityOff = R.drawable.ic_visibility_off
+    val AndroidPhone = R.drawable.ic_android_phone
+    val Database = R.drawable.ic_database
 //    val PlaceImageWhite = R.drawable.bg_place_image_white
 //    val PlaceImageYellow = R.drawable.bg_place_image_yellow
 //    val PlaceWidgetWhite = R.drawable.bg_place_widget_white

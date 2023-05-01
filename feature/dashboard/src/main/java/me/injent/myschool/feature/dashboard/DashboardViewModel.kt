@@ -1,5 +1,6 @@
 package me.injent.myschool.feature.dashboard
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,6 +14,8 @@ import me.injent.myschool.core.data.repository.ScheduleRepository
 import me.injent.myschool.core.data.repository.SubjectRepository
 import me.injent.myschool.core.data.repository.UserContextRepository
 import me.injent.myschool.core.data.repository.UserFeedRepository
+import me.injent.myschool.core.data.util.NetworkMonitor
+import me.injent.myschool.core.model.Birthday
 import me.injent.myschool.core.model.Schedule
 import me.injent.myschool.core.model.UserContext
 import me.injent.myschool.core.model.UserFeed
@@ -24,7 +27,8 @@ class DashboardViewModel @Inject constructor(
     userContextRepository: UserContextRepository,
     userFeedRepository: UserFeedRepository,
     subjectRepository: SubjectRepository,
-    scheduleRepository: ScheduleRepository
+    scheduleRepository: ScheduleRepository,
+    networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
     private val feedRetries = MutableStateFlow(0)
@@ -45,10 +49,14 @@ class DashboardViewModel @Inject constructor(
     val uiState: StateFlow<DashboardUiState>
         get() = _uiState.asStateFlow()
 
-    val scheduleUiState = scheduleUiState(
-        scheduleRepository = scheduleRepository,
-        uiState = _uiState
-    )
+    val scheduleUiState: StateFlow<ScheduleUiState> = networkMonitor.isOnline
+        .filter { it }
+        .flatMapLatest {
+            scheduleUiState(
+                scheduleRepository = scheduleRepository,
+                uiState = _uiState
+            )
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.Lazily,
@@ -58,7 +66,11 @@ class DashboardViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             _uiState.update {
-                it.copy(myName = userContextRepository.userContext.first()!!.firstName)
+                it.copy(
+                    myName = userContextRepository.userContext.first()!!.firstName,
+                    upcomingBirthdays =
+                        userFeedRepository.getClosestBirthdays(LocalDate.currentLocalDate())
+                )
             }
         }
     }
@@ -91,7 +103,8 @@ data class DashboardUiState(
     val viewingMarkDetails: Long? = null,
     val viewingHomework: Schedule.Lesson? = null,
     val myName: String = "",
-    val selectedSchedule: Schedule.Variant? = null
+    val selectedSchedule: Schedule.Variant? = null,
+    val upcomingBirthdays: List<Birthday> = emptyList()
 )
 
 sealed interface FeedUiState {
@@ -108,26 +121,22 @@ private fun feedUiState(
     userContextRepository: UserContextRepository,
     subjectRepository: SubjectRepository
 ): Flow<FeedUiState> = flow {
-    try {
-        val userContext: UserContext = userContextRepository.userContext.first()!!
-        val userFeed = userFeedRepository.getUserFeed(
-            groupId = userContext.group.id,
-            personId = userContext.personId,
-        )
-        val uiState = FeedUiState.Success(
-            recentMarks = userFeed.recentMarks.map { recentMark ->
-                recentMark.copy(
-                    subjectName = subjectRepository.getSubjectName(recentMark.subjectName.toLong())
-                )
-            },
-            currentLesson = userFeed.currentLesson
-        )
-        emit(uiState)
-    } catch (e: Exception) {
-        e.printStackTrace()
-        emit(FeedUiState.Error)
-    }
-}
+    emit(FeedUiState.Loading)
+    val userContext: UserContext = userContextRepository.userContext.first()!!
+    val userFeed = userFeedRepository.getUserFeed(
+        groupId = userContext.group.id,
+        personId = userContext.personId,
+    )
+    val uiState = FeedUiState.Success(
+        recentMarks = userFeed.recentMarks.map { recentMark ->
+            recentMark.copy(
+                subjectName = subjectRepository.getSubjectName(recentMark.subjectName.toLong())
+            )
+        },
+        currentLesson = userFeed.currentLesson
+    ) as FeedUiState
+    emit(uiState)
+}.catch { emit(FeedUiState.Error) }
 
 
 private fun scheduleUiState(

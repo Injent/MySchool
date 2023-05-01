@@ -53,7 +53,6 @@ class SyncWorker @AssistedInject constructor(
             val isSynchronized = listOf(
                 personRepository.synchronize { percentage ->
                     progress["person"] = percentage
-                    Log.e("Sync", percentage.toString())
                 },
                 subjectRepository.synchronize { percentage ->
                     progress["subject"] = percentage

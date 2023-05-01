@@ -62,12 +62,16 @@ class SessionManager @Inject constructor(
     suspend fun isAccessTokenExpire(): Boolean = withContext(ioDispatcher) {
         val url = URL("https://api.dnevnik.ru/v2/users/me/organizations")
         val connection = url.openConnection() as HttpURLConnection
-        connection.apply {
-            connectTimeout = 10000
-            connection.requestMethod = "GET"
-            connection.setRequestProperty("Access-Token", getAccessToken())
-            connection.connect()
+        return@withContext try {
+            connection.apply {
+                connectTimeout = 10_000
+                connection.requestMethod = "GET"
+                connection.setRequestProperty("Access-Token", getAccessToken())
+                connection.connect()
+            }
+            connection.responseCode != 200
+        } catch (_: Exception) {
+            false
         }
-        return@withContext connection.responseCode != 200
     }
 }

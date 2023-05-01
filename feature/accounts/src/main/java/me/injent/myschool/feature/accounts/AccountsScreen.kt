@@ -19,32 +19,33 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import me.injent.myschool.auth.AuthState
+import me.injent.myschool.auth.AuthStatus
 import me.injent.myschool.core.auth.BuildConfig
 import me.injent.myschool.core.designsystem.component.MsCityBackground
 import me.injent.myschool.feature.accounts.model.ExpandedAccount
+import me.injent.myschool.feature.accounts.AccountsContract.State
 
 @Composable
 internal fun AccountsRoute(
     onLogin: () -> Unit,
     viewModel: AccountsViewModel = hiltViewModel()
 ) {
-    val accountsUiState by viewModel.accountsUiState.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
 
     AccountsScreen(
-        accountsUiState = accountsUiState,
+        state = state,
         onSelectAccount = viewModel::selectAccount
     )
 
     var isLoginLoading by remember { mutableStateOf(false) }
 
-    LaunchedEffect(accountsUiState.authState) {
-        when (accountsUiState.authState) {
-            is AuthState.Success -> {
+    LaunchedEffect(state.status) {
+        when (state.status) {
+            is AuthStatus.Success -> {
                 isLoginLoading = false
                 onLogin()
             }
-            is AuthState.Loading -> isLoginLoading = true
+            is AuthStatus.Loading -> isLoginLoading = true
             else -> Unit
         }
     }
@@ -56,14 +57,14 @@ internal fun AccountsRoute(
 
 @Composable
 private fun AccountsScreen(
-    accountsUiState: AccountsUiState,
+    state: State,
     onSelectAccount: (ExpandedAccount) -> Unit
 ) {
     MsCityBackground {
         Box(modifier = Modifier.fillMaxSize()) {
             val context = LocalContext.current
             AccountCards(
-                accountsUiState = accountsUiState,
+                state = state,
                 onSelectAccount = onSelectAccount,
                 onAddAccount = { authInBrowser(context) },
                 modifier = Modifier.align(Alignment.Center)

@@ -5,10 +5,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
-import kotlinx.datetime.LocalDate
-import kotlinx.datetime.toJavaLocalDate
-import kotlinx.datetime.toKotlinLocalDate
-import me.injent.myschool.core.common.util.currentLocalDate
 import me.injent.myschool.core.data.model.asEntity
 import me.injent.myschool.core.data.util.RepoDependency
 import me.injent.myschool.core.database.dao.PersonDao
@@ -18,16 +14,23 @@ import me.injent.myschool.core.datastore.MsPreferencesDataSource
 import me.injent.myschool.core.model.Person
 import me.injent.myschool.core.network.DnevnikNetworkDataSource
 import me.injent.myschool.core.network.model.asExternalModel
-import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
 interface PersonRepository : Syncable {
+    /**
+     * Stream of list of [Person]
+     */
     val persons: Flow<List<Person>>
+
+    /**
+     * Stream of [Person]
+     * @param personId id of the person looking for
+     */
     fun getPersonStream(personId: Long): Flow<Person?>
     fun getPersonByUserId(userId: Long): Flow<Person?>
-    fun getClosestBirthdays(limit: Int = 3): Flow<Map<String, LocalDate>>
     suspend fun getAvatarUrl(userId: Long): String?
+    suspend fun savePersons(userIds: Array<Long>)
 }
 
 @RepoDependency(UserContextRepository::class)
@@ -85,17 +88,21 @@ class OfflineFirstPersonRepository @Inject constructor(
         emit(networkDataSource.getPerson(userId)?.asExternalModel())
     }
 
-    override fun getClosestBirthdays(limit: Int): Flow<Map<String, LocalDate>> = flow {
-        val currentDate = LocalDate.currentLocalDate()
-        val data = personDao.getClosestBirthdays(
-            from = currentDate,
-            to = currentDate.toJavaLocalDate()
-                .with(TemporalAdjusters.lastDayOfYear()).toKotlinLocalDate()
-        )
-        emit(data)
-    }
-
     override suspend fun getAvatarUrl(userId: Long): String? {
         return networkDataSource.getAvatarUrl(userId)
+    }
+
+    override suspend fun savePersons(userIds: Array<Long>) {
+        val contacts = networkDataSource.getChatContacts()
+        val personEntities = userIds.mapNotNull { userId ->
+            networkDataSource.getPerson(userId)?.run {
+                val contact = contacts.contacts.find { it.userId == userId }
+                this.asEntity().copy(
+                    shortName = contact?.name ?: this.shortName,
+                    avatarUrl = networkDataSource.getAvatarUrl(userId)
+                )
+            }
+        }
+        personDao.savePersons(personEntities)
     }
 }

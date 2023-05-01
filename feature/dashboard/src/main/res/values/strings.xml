@@ -6,12 +6,12 @@
     <string name="welcome_text_night">Спать надо</string>
 
     <string name="homeworks">Домашние задания</string>
-    <string name="birthdays">Ближайшие дни рождения</string>
+    <string name="birthday">День рождения</string>
     <string name="school_class">Класс</string>
     <string name="unfold">Раскрыть</string>
     <string name="lesson">Урок</string>
     <string name="now">Сейчас</string>
+    <string name="birthday_today">cегодня</string>
     <string name="you_havent_marks_yet">У вас еще нет оценок</string>
-    <string name="failed_to_load_data">Не удалось загрузить данные</string>
-    <string name="retry">Повторить</string>
+    <string name="days_until_birthday">дней до дня рождения</string>
 </resources>

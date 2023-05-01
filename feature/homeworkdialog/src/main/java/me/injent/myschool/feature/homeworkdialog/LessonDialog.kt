@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -25,6 +26,7 @@ import me.injent.myschool.core.model.Attachment
 import me.injent.myschool.core.model.Schedule
 import me.injent.myschool.core.ui.DocumentPreview
 import me.injent.myschool.core.ui.Tag
+import me.injent.myschool.core.ui.TextWithLinks
 
 @Composable
 fun LessonDialog(
@@ -81,10 +83,15 @@ fun LessonDialog(
                     )
                 }
                 Divider(color = MaterialTheme.colorScheme.outlineVariant)
-                Text(
+
+                val uriHandler = LocalUriHandler.current
+                TextWithLinks(
                     text = lesson.homeworkText ?: "",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface,
+                    onLinkClick = { url ->
+                        uriHandler.openUri(url)
+                    },
                     modifier = Modifier.padding(vertical = 16.dp)
                 )
                 Divider(color = MaterialTheme.colorScheme.outlineVariant)
@@ -115,10 +122,7 @@ private fun Files(
             onDownloadClick = {
                 enabled = false
                 viewModel.downloadFile(
-                    file = file,
-                    onDownloadComplitionListener = { success ->
-                        enabled = !success
-                    }
+                    file = file
                 )
             }
         )

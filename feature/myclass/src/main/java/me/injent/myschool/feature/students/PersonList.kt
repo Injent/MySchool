@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -163,7 +164,8 @@ private fun LoadingPersonItem(
     ) {
         val placeholder = Modifier.placeholder(
             visible = true,
-            highlight = PlaceholderHighlight.shimmer()
+            highlight = PlaceholderHighlight.shimmer(),
+            color = MaterialTheme.colorScheme.surface
         )
         val (avatar, placeText, cupIcon, name, markValue) = createRefs()
 

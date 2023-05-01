@@ -33,17 +33,6 @@ class AuthTokenInterceptor @Inject constructor (
             } else {
                 chain.proceed(request)
             }
-        } catch (e: SocketTimeoutException) {
-            if (DEBUG) {
-                Log.d("AuthTokenInterceptor", "Error during request to ${request.url}:", e)
-            }
-            return Response.Builder()
-                .request(request)
-                .protocol(Protocol.HTTP_1_1)
-                .code(0)
-                .message("Socket timeout")
-                .body("{${e}}".toResponseBody(null))
-                .build()
         } catch (e: Exception) {
             if (DEBUG) {
                 Log.d("AuthTokenInterceptor", "Error during request to ${request.url}:", e)

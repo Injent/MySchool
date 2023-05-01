@@ -6,6 +6,7 @@
     <string name="redirect_host">myauth</string>
     <string name="terms_of_use">Условия использования</string>
     <string name="login">Войти</string>
+    <string name="empty_fields">Поля не заполнены</string>
     <string name="login_field">Логин</string>
     <string name="password_field">Пароль</string>
     <string name="successful_login">Успешный вход</string>

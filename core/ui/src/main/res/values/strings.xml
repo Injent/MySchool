@@ -8,4 +8,6 @@
     <string name="no_lessons">Уроков нет</string>
     <string name="follow_updates">Следите за обновлениями</string>
     <string name="telegram_link">https://t.me/myschool_channel</string>
+    <string name="failed_to_load_data">Не удалось загрузить данные</string>
+    <string name="retry">Повторить</string>
 </resources>

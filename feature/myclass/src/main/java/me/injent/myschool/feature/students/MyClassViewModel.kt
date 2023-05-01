@@ -56,8 +56,7 @@ sealed interface MyClassUiState {
         val myPlace: Int,
         val personsAndMarks: List<PersonAndMarkValue>,
         val periods: List<PeriodChip>,
-        val selectedPeriodNumber: Int,
-        val closestBirthdays: Map<String, LocalDate>
+        val selectedPeriodNumber: Int
     ) : MyClassUiState
 }
 
@@ -68,9 +67,8 @@ private fun myClassUiState(
 ): Flow<MyClassUiState> {
     return combine(
         userDataRepository.userData,
-        personRepository.persons,
-        personRepository.getClosestBirthdays()
-    ) { userData, persons, birthdays ->
+        personRepository.persons
+    ) { userData, persons ->
         val userContext = userData.userContext!!
         val selectedPeriod = userData.selectedPeriod!!
 
@@ -108,8 +106,7 @@ private fun myClassUiState(
             myPlace = myPlace + 1,
             personsAndMarks = personsTop,
             periods = periods,
-            selectedPeriodNumber = selectedPeriod.number,
-            closestBirthdays = birthdays
+            selectedPeriodNumber = selectedPeriod.number
         )
     }
 }

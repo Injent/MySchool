@@ -6,7 +6,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.injent.myschool.auth.AccountHelper
-import me.injent.myschool.auth.AuthState
+import me.injent.myschool.auth.AuthStatus
 import me.injent.myschool.core.common.sync.SyncState
 import me.injent.myschool.core.data.repository.LoginRepository
 import me.injent.myschool.core.data.repository.UserContextRepository
@@ -24,21 +24,29 @@ class AccountsViewModel @Inject constructor(
     private val userContextRepository: UserContextRepository,
     private val userDataRepository: UserDataRepository,
     workStatusMonitor: SyncWorkStatusMonitor
-) : ViewModel() {
+) : ViewModel(), AccountsContract {
 
-    private val _accountsUiState = MutableStateFlow(AccountsUiState())
-    val accountsUiState: StateFlow<AccountsUiState>
-        get() = _accountsUiState.asStateFlow()
+    private val _state = MutableStateFlow(AccountsContract.State())
+    override val state: StateFlow<AccountsContract.State>
+        get() = _state.asStateFlow()
+
+    override fun onEvent(event: AccountsContract.Event) {
+        when (event) {
+            AccountsContract.Event.AddAccount -> TODO()
+            is AccountsContract.Event.DeleteAccount -> TODO()
+            is AccountsContract.Event.SelectAccount -> TODO()
+        }
+    }
 
     init {
         viewModelScope.launch {
             workStatusMonitor.isSyncing
                 .onEach { syncState ->
                     when (syncState) {
-                        SyncState.IDLE -> setAuthState(AuthState.NotAuthed)
-                        SyncState.SYNCING -> setAuthState(AuthState.Loading)
+                        SyncState.IDLE -> setAuthState(AuthStatus.NotAuthed)
+                        SyncState.SYNCING -> setAuthState(AuthStatus.Loading)
                         SyncState.SUCCESS -> {
-                            setAuthState(AuthState.Success)
+                            setAuthState(AuthStatus.Success)
                             workHelper.pruneWork()
                         }
                     }
@@ -57,7 +65,7 @@ class AccountsViewModel @Inject constructor(
                     avatarUrl = accountHelper.getAccountAvatarUrl(androidAccount)
                 )
             }
-        _accountsUiState.update {
+        _state.update {
             it.copy(
                 isLoading = false,
                 accounts = accounts
@@ -66,10 +74,10 @@ class AccountsViewModel @Inject constructor(
     }
 
     fun selectAccount(account: ExpandedAccount) {
-        if (_accountsUiState.value.authState is AuthState.Loading) return
+        if (_state.value.status is AuthStatus.Loading) return
         val isSameAccount = accountHelper.getCurrentAccount()?.name?.toLong() == account.userId
         if (isSameAccount) {
-            setAuthState(AuthState.Success)
+            setAuthState(AuthStatus.Success)
             return
         }
 
@@ -89,15 +97,7 @@ class AccountsViewModel @Inject constructor(
         }
     }
 
-    private fun setAuthState(authState: AuthState) {
-        _accountsUiState.update {
-            it.copy(authState = authState)
-        }
+    private fun setAuthState(authStatus: AuthStatus) {
+        _state.update { it.copy(status = authStatus) }
     }
 }
-
-data class AccountsUiState(
-    val isLoading: Boolean = true,
-    val accounts: List<ExpandedAccount> = emptyList(),
-    val authState: AuthState = AuthState.NotAuthed
-)

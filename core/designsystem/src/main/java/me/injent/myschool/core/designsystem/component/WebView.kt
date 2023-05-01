@@ -16,6 +16,7 @@ import androidx.compose.ui.viewinterop.AndroidView
 fun WebView(
     url: String,
     modifier: Modifier = Modifier,
+    options: (WebView.() -> Unit)? = null,
 ) {
     AndroidView(
         modifier = modifier,
@@ -25,9 +26,10 @@ fun WebView(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
-                webViewClient = WebViewClient()
                 settings.javaScriptEnabled = true
                 settings.setSupportZoom(false)
+                webViewClient = WebViewClient()
+                options?.invoke(this)
                 loadUrl(url)
             }
         },

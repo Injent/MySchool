@@ -1,6 +1,6 @@
 package me.injent.myschool.feature.dashboard
 
-import androidx.compose.foundation.background
+import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.LazyGridScope
@@ -11,7 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -24,13 +23,13 @@ import com.google.accompanist.placeholder.material.shimmer
 import kotlinx.datetime.LocalDateTime
 import me.injent.myschool.core.common.util.*
 import me.injent.myschool.core.designsystem.component.AutoResizableText
-import me.injent.myschool.core.designsystem.component.MsTextButton
 import me.injent.myschool.core.designsystem.theme.link
 import me.injent.myschool.core.designsystem.theme.negative
 import me.injent.myschool.core.designsystem.theme.positive
 import me.injent.myschool.core.designsystem.theme.warning
 import me.injent.myschool.core.model.Mark
 import me.injent.myschool.core.model.UserFeed
+import me.injent.myschool.core.ui.ErrorCard
 
 fun LazyGridScope.recentMarks(
     feedUiState: FeedUiState,
@@ -47,7 +46,12 @@ fun LazyGridScope.recentMarks(
             )
         }
         FeedUiState.Error -> item {
-            ErrorRecentMarks(onRetry = onRetry)
+            ErrorCard(
+                onRetry = onRetry,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(140.dp)
+            )
         }
         FeedUiState.Loading -> item {
             LoadingRecentMarks(
@@ -143,7 +147,7 @@ private fun MarkCard(
                     .widthIn(max = 90.dp)
             )
             val formatDate = remember {
-                recentMark.lessonDate.date.format(MONTH_DATE_FORMAT)
+                recentMark.lessonDate?.date?.format(MONTH_DATE_FORMAT) ?: recentMark.markTypeText
             }
             Text(
                 text = formatDate,
@@ -176,41 +180,12 @@ private fun LoadingRecentMarks(
                     .clip(MaterialTheme.shapes.medium)
                     .placeholder(
                         visible = true,
-                        highlight = PlaceholderHighlight.shimmer()
+                        highlight = PlaceholderHighlight.shimmer(),
+                        color = MaterialTheme.colorScheme.surface
                     )
             )
         }
         Spacer(Modifier.width(8.dp))
-    }
-}
-
-@Composable
-private fun ErrorRecentMarks(
-    onRetry: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Box(
-        modifier = modifier
-            .height(140.dp)
-            .fillMaxWidth()
-            .background(
-                MaterialTheme.colorScheme.background,
-                MaterialTheme.shapes.medium
-            )
-    ) {
-        Column(
-            modifier = Modifier.align(Alignment.Center),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = stringResource(R.string.failed_to_load_data)
-            )
-            MsTextButton(
-                text = stringResource(R.string.retry),
-                onClick = onRetry,
-                containerColor = Color.Transparent
-            )
-        }
     }
 }
 

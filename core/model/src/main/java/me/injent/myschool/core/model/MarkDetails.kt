@@ -3,7 +3,7 @@ package me.injent.myschool.core.model
 import kotlinx.datetime.LocalDateTime
 
 data class MarkDetails(
-    val date: LocalDateTime,
+    val date: LocalDateTime?,
     val markInfo: MarkInfo,
     val categories: List<Category>
 ) {

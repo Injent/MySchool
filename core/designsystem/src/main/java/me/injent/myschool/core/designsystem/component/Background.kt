@@ -29,7 +29,7 @@ fun MsBackground(
 
 @Composable
 fun MsBackgroundWithImageOnTop(
-    color: Color = Color.Transparent,
+    color: Color = MaterialTheme.colorScheme.background,
     painter: Painter,
     content: @Composable () -> Unit
 ) {

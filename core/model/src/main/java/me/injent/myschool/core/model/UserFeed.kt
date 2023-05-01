@@ -5,7 +5,8 @@ import kotlinx.datetime.LocalDateTime
 data class UserFeed(
     val currentLesson: Lesson?,
     val recentMarks: List<RecentMark>,
-    val weekSummary: List<SubjectCard>
+    val weekSummary: List<SubjectCard>,
+    val posts: List<Post>
 ) {
     data class Lesson(
         val id: Long,
@@ -19,9 +20,10 @@ data class UserFeed(
 
     data class RecentMark(
         val date: LocalDateTime,
-        val lessonDate: LocalDateTime,
+        val lessonDate: LocalDateTime?,
         val subjectName: String,
-        val marks: List<Mark>
+        val marks: List<Mark>,
+        val markTypeText: String
     )
 
     data class Mark(
@@ -35,4 +37,22 @@ data class UserFeed(
         val subjectName: String,
         val marks: List<Mark>
     )
+
+    data class Post(
+        val title: String?,
+        val subtitle: String?,
+        val text: String?,
+        val createdDateTime: LocalDateTime,
+        val commentsCount: Int,
+        val authorImageUrl: String?,
+        val authorFirstName: String?,
+        val authorMiddleName: String?,
+        val authorLastName: String,
+        val files: List<File>
+    ) {
+        data class File(
+            val fileName: String,
+            val fileLink: String
+        )
+    }
 }

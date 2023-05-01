@@ -6,13 +6,15 @@ import android.os.Build
 import com.google.firebase.firestore.FirebaseFirestore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.tasks.await
+import me.injent.myschool.core.data.util.UpdateInstaller
 import javax.inject.Inject
 
 private const val VersionCollection = "versions"
 
 class FirebaseVersionController @Inject constructor(
     private val firestore: FirebaseFirestore,
-    @ApplicationContext context: Context
+    @ApplicationContext context: Context,
+    private val updateInstaller: UpdateInstaller
 ) : VersionController {
 
     private val appVersion = if (Build.VERSION.SDK_INT >= 33) {
@@ -36,5 +38,9 @@ class FirebaseVersionController @Inject constructor(
     } catch (e: Exception) {
         e.printStackTrace()
         null
+    }
+
+    override suspend fun installUpdate(update: Update) {
+        updateInstaller.update(update.url)
     }
 }

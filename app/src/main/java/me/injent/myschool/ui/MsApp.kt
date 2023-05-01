@@ -1,6 +1,9 @@
 package me.injent.myschool.ui
 
-import android.widget.Toast
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -8,14 +11,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
 import me.injent.myschool.R
-import me.injent.myschool.auth.AuthState
+import me.injent.myschool.auth.AuthStatus
 import me.injent.myschool.core.data.version.Update
 import me.injent.myschool.core.designsystem.component.MsBackground
 import me.injent.myschool.core.ui.MsNavigationBarItem
@@ -27,27 +30,30 @@ import me.injent.myschool.navigation.RootDestination
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun MsApp(
-    authState: AuthState,
+    authStatus: AuthStatus,
     update: Update?,
     appState: MsAppState = rememberMsAppState(),
+    onUpdate: () -> Unit
 ) {
-    val context = LocalContext.current
-    LaunchedEffect(authState) {
-        if (authState is AuthState.Error) {
-            Toast.makeText(
-                context,
-                context.getString(R.string.network_error),
-                Toast.LENGTH_LONG
-            ).show()
-        }
+    var showUpdateDialog by remember { mutableStateOf(false) }
+    LaunchedEffect(update) {
+        showUpdateDialog = update != null
     }
-    var showUpdateDialog by remember(update) {
-        mutableStateOf(update != null)
-    }
+
     if (showUpdateDialog) {
         UpdateDialog(
             update = update!!,
+            onInstallClick = onUpdate,
             onDismiss = { showUpdateDialog = false }
+        )
+    }
+
+    val showNetworkError by remember(authStatus) {
+        mutableStateOf(
+            when (authStatus) {
+                is AuthStatus.Error, AuthStatus.Offline -> true
+                else -> false
+            }
         )
     }
 
@@ -57,13 +63,31 @@ fun MsApp(
             contentColor = MaterialTheme.colorScheme.onBackground,
             contentWindowInsets = WindowInsets(0, 0, 0, 0),
             bottomBar = {
-                if (appState.shouldShowBottomNavigation) {
-                    MsBottomNavigation(
-                        destinations = appState.rootDestinations,
-                        onNavigate = appState::navigateTo,
-                        currentDestination = appState.currentDestination,
-                        modifier = Modifier.navigationBarsPadding()
-                    )
+                Column(modifier = Modifier.navigationBarsPadding()) {
+                    if (appState.shouldShowBottomNavigation) {
+                        MsBottomNavigation(
+                            destinations = appState.rootDestinations,
+                            onNavigate = appState::navigateTo,
+                            currentDestination = appState.currentDestination,
+                        )
+                    }
+
+                    AnimatedVisibility(
+                        visible = showNetworkError,
+                        enter = expandVertically(tween(1000)),
+                        exit = shrinkVertically(tween(1000))
+                    ) {
+                        Text(
+                            text = stringResource(R.string.network_error),
+                            color = Color.White,
+                            style = MaterialTheme.typography.bodySmall,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(MaterialTheme.colorScheme.primary)
+                                .padding(vertical = 2.dp)
+                        )
+                    }
                 }
             }
         ) { padding ->
@@ -80,7 +104,7 @@ fun MsApp(
             ) {
                 MsNavHost(
                     navController = appState.navController,
-                    startDestination = if (authState is AuthState.NotAuthed) {
+                    startDestination = if (authStatus is AuthStatus.NotAuthed || authStatus is AuthStatus.Error) {
                         loginRoute
                     } else {
                         dashboardRoute
@@ -88,7 +112,6 @@ fun MsApp(
                 )
             }
         }
-
     }
 }
 

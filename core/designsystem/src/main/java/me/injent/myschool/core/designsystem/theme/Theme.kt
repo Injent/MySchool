@@ -28,6 +28,21 @@ private val LightColorScheme = lightColorScheme(
     outlineVariant = OutlineVariant
 )
 
+private val DarkColorScheme = lightColorScheme(
+    primary = Primary,
+    onPrimary = OnPrimary,
+    primaryContainer = DarkPrimaryContainer,
+    onPrimaryContainer = DarkOnPrimaryContainer,
+    secondary = Secondary,
+    tertiary = Tertiary,
+    background = DarkBackground,
+    onBackground = DarkOnBackground,
+    surface = DarkSurface,
+    onSurface = DarkOnSurface,
+    outline = DarkOutline,
+    outlineVariant = DarkOutlineVariant
+)
+
 @get:Composable
 val ColorScheme.positive: Color
     get() = Positive
@@ -44,24 +59,16 @@ val ColorScheme.warning: Color
 val ColorScheme.link: Color
     get() = Link
 
-@get:Composable
-val ColorScheme.hint: Color
-    get() = Hint
-
 @Composable
 fun MySchoolTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-//    val colorScheme = when {
-//        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-//            val context = LocalContext.current
-//            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-//        }
-//        darkTheme -> DarkColorScheme
-//        else -> LightColorScheme
-//    }
-    val colorScheme = LightColorScheme
+    val colorScheme = if (darkTheme) {
+        DarkColorScheme
+    } else {
+        LightColorScheme
+    }
 
     val sysUiController = rememberSystemUiController()
     SideEffect {
@@ -77,8 +84,8 @@ fun MySchoolTheme(
             val insets = WindowCompat.getInsetsController(window, view)
             window.statusBarColor = Color.Transparent.toArgb()
             window.navigationBarColor = colorScheme.surface.toArgb()
-            insets.isAppearanceLightStatusBars = true
-            insets.isAppearanceLightNavigationBars = true
+            insets.isAppearanceLightStatusBars = !darkTheme
+            insets.isAppearanceLightNavigationBars = !darkTheme
         }
     }
 

@@ -10,6 +10,11 @@ import me.injent.myschool.feature.statistics.navigation.statisticsRoute
 import me.injent.myschool.feature.students.navigation.myClassGraphRoutePattern
 import me.injent.myschool.feature.students.navigation.myClassRoute
 
+/**
+ * Implementation of the root screens of the application, which has the basic data for the
+ * navigation bar. Root screen may contains another screens optionally. When creating another root
+ * screen, you must specify its data in this enum class.
+ */
 enum class RootDestination(
     @StringRes val titleTextId: Int,
     @DrawableRes val selectedIcon: Int,

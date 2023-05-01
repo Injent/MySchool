@@ -44,12 +44,13 @@ internal fun Context.showMarkUpdateNotification(content: String, markId: Long) {
     if (ActivityCompat.checkSelfPermission(
             this,
             Manifest.permission.POST_NOTIFICATIONS
-        ) != PackageManager.PERMISSION_GRANTED
+        ) == PackageManager.PERMISSION_GRANTED
     ) {
-        throw IllegalStateException()
-    } else {
         NotificationManagerCompat.from(this)
-            .notify(MarkUpdateNotificationId, markUpdateNotification(content, markId))
+            .notify(
+                MarkUpdateNotificationId + markId.hashCode(),
+                markUpdateNotification(content, markId)
+            )
     }
 }
 

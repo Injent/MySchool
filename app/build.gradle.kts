@@ -12,8 +12,8 @@ android {
         applicationId = "me.injent.myschool"
         minSdk = Versions.MIN_ANDROID_SDK
         targetSdk = Versions.TARGET_ANDROID_SDK
-        versionCode = 1
-        versionName = "1.0.0" // X.Y.Z; X = Major, Y = minor, Z = Patch level
+        versionCode = 3
+        versionName = "1.17.0" // X.Y.Z; X = Major, Y = Minor, Z = Patch level
 
         vectorDrawables {
             useSupportLibrary = true

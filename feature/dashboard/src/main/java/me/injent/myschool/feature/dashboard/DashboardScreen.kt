@@ -1,8 +1,6 @@
 package me.injent.myschool.feature.dashboard
 
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
@@ -108,6 +106,21 @@ private fun DashboardScreen(
                     onEvent(PointEvent.ChangeScheduleVariant(variant))
                 }
             )
+            item {
+                Spacer(Modifier.height(8.dp))
+            }
+            item {
+                if (uiState.upcomingBirthdays.isNotEmpty()) {
+                    Row(Modifier.fillMaxWidth()) {
+                        BirthdayCard(
+                            birthday = uiState.upcomingBirthdays.first(),
+                            onClick = { /*TODO*/ },
+                            modifier = Modifier.weight(.5f)
+                        )
+                        Spacer(Modifier.weight(.5f))
+                    }
+                }
+            }
         }
         StatusBar()
     }

@@ -9,8 +9,11 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import me.injent.myschool.core.data.downloader.AndroidDownloader
-import me.injent.myschool.core.data.downloader.Downloader
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import me.injent.myschool.core.common.network.Dispatcher
+import me.injent.myschool.core.common.network.MsDispatchers
+import me.injent.myschool.core.data.downloader.*
 import me.injent.myschool.core.data.repository.*
 import me.injent.myschool.core.data.util.ConnectivityManagerMonitor
 import me.injent.myschool.core.data.util.NetworkMonitor
@@ -21,6 +24,18 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 interface DataModule {
+
+    @Binds
+    @MsDownloader(MsDownloaderType.Android)
+    fun providesAndroidDownloader(
+        androidDownloader: AndroidDownloader
+    ): Downloader
+
+    @Binds
+    @MsDownloader(MsDownloaderType.Internal)
+    fun providesInternalStorageDownloader(
+        internalStorageDownloader: InternalStorageDownloader
+    ): Downloader
 
     @Binds
     fun bindsUserFeedRepository(

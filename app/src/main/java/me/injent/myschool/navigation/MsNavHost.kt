@@ -38,7 +38,7 @@ fun MsNavHost(
                 }
 
                 launchSingleTop = true
-                restoreState = true
+                restoreState = false
             }
         })
 
@@ -52,7 +52,12 @@ fun MsNavHost(
                 navController.navigateToMarkDetails(markId)
             },
             onLogout = {
-                navController.navigateToLogin()
+                navController.navigate(loginRoute) {
+                    popUpTo(dashboardRoute) {
+                        inclusive = true
+                        saveState = false
+                    }
+                }
             }
         )
         myClassGraph(

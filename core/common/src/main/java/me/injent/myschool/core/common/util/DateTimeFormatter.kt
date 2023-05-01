@@ -4,6 +4,7 @@ import android.icu.text.RelativeDateTimeFormatter
 import android.os.Build
 import kotlinx.datetime.*
 import java.time.format.DateTimeFormatter
+import kotlin.math.abs
 
 
 const val DEFAULT_DATE_FORMAT = "dd.MM.yyyy"
@@ -24,9 +25,9 @@ fun LocalDateTime.relativeTimeFormat(dateTime: LocalDateTime): String {
         val endInstant = dateTime.toInstant(TimeZone.currentSystemDefault())
 
         val difference = endInstant - startInstant
-        val diffInDays = difference.inWholeDays
-        val diffInHours = difference.inWholeHours
-        val diffInMinutes = difference.inWholeMinutes
+        val diffInDays = abs(difference.inWholeDays)
+        val diffInHours = abs(difference.inWholeHours)
+        val diffInMinutes = abs(difference.inWholeMinutes)
 
         val relativeTimeUnit: RelativeDateTimeFormatter.RelativeUnit
 

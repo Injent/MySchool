@@ -3,18 +3,18 @@ package me.injent.myschool.feature.dashboard
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDateTime
 import me.injent.myschool.core.common.util.currentLocalDateTime
+import me.injent.myschool.core.designsystem.component.AutoResizableText
 import me.injent.myschool.core.model.UserFeed
 import me.injent.myschool.core.ui.Tag
 
@@ -25,10 +25,11 @@ fun LazyGridScope.greeting(
 ) {
     item {
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
             modifier = Modifier
                 .fillMaxWidth()
-                .height(96.dp),
+                .padding(bottom = 16.dp, top = 12.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             val welcomeTextId = remember {
                 when (LocalDateTime.currentLocalDateTime().hour) {
@@ -38,14 +39,25 @@ fun LazyGridScope.greeting(
                     else -> R.string.welcome_text_night
                 }
             }
-            Text(
+            AutoResizableText(
                 text = "${stringResource(welcomeTextId)}, $name!",
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.W900,
                 modifier = modifier
-                    .padding(top = 32.dp)
             )
+            TextButton(
+                onClick = onLogout,
+                colors = ButtonDefaults.textButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            ) {
+                Text(
+                    text = "Выйти",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }

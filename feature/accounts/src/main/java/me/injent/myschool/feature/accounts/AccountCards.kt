@@ -17,10 +17,12 @@ import androidx.compose.ui.unit.dp
 import me.injent.myschool.core.designsystem.component.DynamicAsyncImage
 import me.injent.myschool.core.designsystem.icon.MsIcons
 import me.injent.myschool.feature.accounts.model.ExpandedAccount
+import me.injent.myschool.feature.accounts.AccountsContract.State
+import me.injent.myschool.feature.accounts.AccountsContract.Event
 
 @Composable
 fun AccountCards(
-    accountsUiState: AccountsUiState,
+    state: State,
     onSelectAccount: (ExpandedAccount) -> Unit,
     onAddAccount: () -> Unit,
     modifier: Modifier = Modifier,
@@ -38,7 +40,7 @@ fun AccountCards(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(horizontal = 32.dp)
         ) {
-            items(accountsUiState.accounts) { account ->
+            items(state.accounts) { account ->
                 AccountCard(
                     account = account,
                     onClick = { onSelectAccount(account) }

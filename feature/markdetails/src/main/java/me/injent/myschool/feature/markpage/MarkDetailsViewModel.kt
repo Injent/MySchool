@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.*
 import me.injent.myschool.core.data.repository.MarkRepository
 import me.injent.myschool.core.data.repository.SubjectRepository
 import me.injent.myschool.core.data.repository.UserContextRepository
+import me.injent.myschool.core.data.util.NetworkMonitor
 import me.injent.myschool.core.model.MarkDetails
 import me.injent.myschool.core.model.Subject
 import me.injent.myschool.feature.markpage.navigation.MARK_ID
@@ -18,20 +19,28 @@ class MarkDetailsViewModel @Inject constructor(
     markRepository: MarkRepository,
     userContextRepository: UserContextRepository,
     subjectRepository: SubjectRepository,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
+    networkMonitor: NetworkMonitor
 ) : ViewModel() {
 
-    val markDetailsUiState = markDetailsUiState(
-        markRepository = markRepository,
-        userContextRepository = userContextRepository,
-        subjectRepository = subjectRepository,
-        markId = savedStateHandle[MARK_ID] ?: throw RuntimeException("$MARK_ID must be not null")
-    )
+    private val markDetailsRetries = MutableStateFlow(0)
+    val markDetailsUiState = markDetailsRetries.flatMapLatest {
+        markDetailsUiState(
+            markRepository = markRepository,
+            userContextRepository = userContextRepository,
+            subjectRepository = subjectRepository,
+            markId = savedStateHandle[MARK_ID] ?: throw RuntimeException("$MARK_ID must be not null")
+        )
+    }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = MarkDetailsUiState.Loading
         )
+
+    fun reloadData() {
+        markDetailsRetries.value++
+    }
 }
 
 sealed interface MarkDetailsUiState {
@@ -69,4 +78,6 @@ private fun markDetailsUiState(
             subject = subject
         )
     }
+        .onStart { emit(MarkDetailsUiState.Loading) }
+        .catch { emit(MarkDetailsUiState.Error); it.printStackTrace() }
 }

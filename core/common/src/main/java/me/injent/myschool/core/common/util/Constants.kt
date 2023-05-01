@@ -1,3 +1,3 @@
 package me.injent.myschool.core.common.util
 
-const val DIGITS_NUMBER_IN_MARK = 4
+const val LINK_REGEX_SCHEME = ".*(#\\w+)|(http(s)?://.+).*"

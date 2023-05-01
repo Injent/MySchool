@@ -38,9 +38,10 @@ data class NetworkUserFeed(
         @Serializable(EpochLocalDateTimeSerializer::class)
         val date: LocalDateTime,
         @Serializable(EpochLocalDateTimeSerializer::class)
-        val lessonDate: LocalDateTime,
+        val lessonDate: LocalDateTime? = null,
         val subject: Subject,
-        val marks: List<Mark>
+        val marks: List<Mark>,
+        val markTypeText: String
     )
 
     @Serializable
@@ -102,7 +103,8 @@ fun NetworkUserFeed.asExternalModel(): UserFeed {
         recentMarks = recentMarks.map(NetworkUserFeed.RecentMark::asExternalModel),
         weekSummary = feed.filter {
             it.type == NetworkUserFeed.FeedItem.Type.WeekSummary
-        }.map(NetworkUserFeed.FeedItem::asExternalModel)
+        }.map(NetworkUserFeed.FeedItem::asSubjectCard),
+        posts = emptyList()
     )
 }
 
@@ -128,10 +130,11 @@ fun NetworkUserFeed.RecentMark.asExternalModel() = UserFeed.RecentMark(
                 mood = mood
             )
         }
-    }
+    },
+    markTypeText = markTypeText
 )
 
-fun NetworkUserFeed.FeedItem.asExternalModel(): UserFeed.SubjectCard {
+fun NetworkUserFeed.FeedItem.asSubjectCard(): UserFeed.SubjectCard {
     if (this.type != NetworkUserFeed.FeedItem.Type.WeekSummary) throw IllegalStateException()
     return UserFeed.SubjectCard(
         date = this.content.date!!,

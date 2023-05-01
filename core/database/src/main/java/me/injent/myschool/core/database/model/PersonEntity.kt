@@ -33,10 +33,3 @@ fun PersonEntity.asExternalModel() = Person(
     phone = phone,
     avatarUrl = avatarUrl
 )
-
-data class PersonIdAndName(
-    @ColumnInfo(name = "person_id")
-    val id: Long,
-    @ColumnInfo(name = "short_name")
-    val name: String
-)

@@ -7,20 +7,19 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import me.injent.myschool.R
-import me.injent.myschool.core.common.util.openUrl
 import me.injent.myschool.core.data.version.Update
 import me.injent.myschool.core.designsystem.component.HtmlText
 import me.injent.myschool.core.designsystem.component.MsTextButton
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UpdateDialog(
+internal fun UpdateDialog(
     update: Update,
+    onInstallClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -32,7 +31,7 @@ fun UpdateDialog(
     ) {
         Surface(
             modifier = Modifier
-                .fillMaxWidth(.75f),
+                .fillMaxWidth(.85f),
             shape = MaterialTheme.shapes.small
         ) {
             Column(
@@ -81,13 +80,11 @@ fun UpdateDialog(
                     } else {
                         Spacer(Modifier)
                     }
-
-                    val context = LocalContext.current
                     MsTextButton(
                         text = stringResource(R.string.move_to_download),
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary,
-                        onClick = { context.openUrl(update.url) },
+                        onClick = onInstallClick
                     )
                 }
             }

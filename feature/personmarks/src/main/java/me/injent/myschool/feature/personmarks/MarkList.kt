@@ -24,6 +24,9 @@ import me.injent.myschool.core.designsystem.icon.MsIcons
 import me.injent.myschool.core.model.Mark
 import me.injent.myschool.core.model.Subject
 import me.injent.myschool.core.ui.MarkView
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 @Composable
 internal fun ColumnScope.MarksList(
@@ -54,7 +57,6 @@ internal fun ColumnScope.MarksList(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun MarksList(
     subjectsToMarks: Map<Subject, List<Mark>>,
@@ -87,8 +89,8 @@ private fun SubjectSection(
             .background(color = MaterialTheme.colorScheme.primaryContainer)
     ) {
         val averageMarkValue by produceState(initialValue = "...") {
-            val averageMark = marks.map { it.value.toInt() }.average()
-            value = String.format("%.1f", averageMark)
+            val averageMark = marks.mapNotNull { it.value.toIntOrNull() }.average()
+            value = DecimalFormat("0.##").format(averageMark)
         }
         MarkView(
             value = averageMarkValue,
@@ -129,6 +131,7 @@ private fun SubjectSection(
             MarkView(
                 value = mark.value,
                 color = Color.White,
+                alpha = .75f,
                 modifier = Modifier
                     .padding(top = 12.dp)
                     .clickable {

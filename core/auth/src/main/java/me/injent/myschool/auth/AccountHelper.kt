@@ -20,7 +20,7 @@ class AccountHelper @Inject constructor(
     @ApplicationContext context: Context,
     @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher,
     private val sessionManager: SessionManager,
-    private val preferencesDataSource: MsPreferencesDataSource
+    private val preferencesDataSource: MsPreferencesDataSource,
 ) {
     companion object {
         const val AUTH_TOKEN_TYPE = "full_access"
@@ -56,16 +56,21 @@ class AccountHelper @Inject constructor(
     private fun accountExists(account: Account): Boolean =
         accounts.any { it.name == account.name }
 
-    suspend fun checkAuth(): AuthState = when {
-        !preferencesDataSource.userData.first().isInitialized -> AuthState.NotAuthed
-        getCurrentAccount() != null -> if (sessionManager.isAccessTokenExpire()) {
-            AuthState.NotAuthed
-        } else {
-            AuthState.Success
+    suspend fun checkAuth(hasInternetConnection: Boolean): AuthStatus {
+        val isInitialized = preferencesDataSource.userData.first().isInitialized
+        return when {
+            !hasInternetConnection && isInitialized -> AuthStatus.Offline
+            !hasInternetConnection && !isInitialized -> AuthStatus.Error()
+            !isInitialized -> AuthStatus.NotAuthed
+            getCurrentAccount() != null -> if (sessionManager.isAccessTokenExpire()) {
+                AuthStatus.NotAuthed
+            } else {
+                AuthStatus.Success
+            }
+            accounts.isEmpty() -> AuthStatus.NotAuthed
+            accounts.isNotEmpty() -> AuthStatus.HaveMultipleAccounts
+            else -> AuthStatus.Error()
         }
-        accounts.isEmpty() -> AuthState.NotAuthed
-        accounts.isNotEmpty() -> AuthState.HaveMultipleAccounts
-        else -> AuthState.Error()
     }
 
     fun getAccountUserName(account: Account): String =

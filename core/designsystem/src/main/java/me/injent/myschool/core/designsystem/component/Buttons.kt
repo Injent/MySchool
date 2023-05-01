@@ -5,8 +5,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.unit.dp
-import me.injent.myschool.core.designsystem.theme.hint
 
 @Composable
 fun MsButton(
@@ -34,6 +34,7 @@ fun MsTextButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
+    shape: Shape = MaterialTheme.shapes.small,
     containerColor: Color = MaterialTheme.colorScheme.primaryContainer,
     contentColor: Color = MaterialTheme.colorScheme.tertiary
 ) {
@@ -43,10 +44,10 @@ fun MsTextButton(
         colors = ButtonDefaults.textButtonColors(
             containerColor = containerColor,
             contentColor = contentColor,
-            disabledContainerColor = MaterialTheme.colorScheme.hint,
+            disabledContainerColor = MaterialTheme.colorScheme.background,
             disabledContentColor = MaterialTheme.colorScheme.secondary
         ),
-        shape = MaterialTheme.shapes.small,
+        shape = shape,
         enabled = enabled
     ) {
         Text(

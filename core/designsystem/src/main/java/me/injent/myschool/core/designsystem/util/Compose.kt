@@ -1,17 +1,16 @@
 package me.injent.myschool.core.designsystem.util
 
 import androidx.annotation.RawRes
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.constraintlayout.compose.MotionScene
-import me.injent.myschool.core.designsystem.theme.negative
-import me.injent.myschool.core.designsystem.theme.positive
-import me.injent.myschool.core.designsystem.theme.warning
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import me.injent.myschool.core.common.util.UnidirectionalViewModel
 
 @Composable
 fun Modifier.conditional(condition: Boolean, modifier: @Composable Modifier.() -> Modifier): Modifier {
@@ -37,3 +36,22 @@ fun Modifier.ignoreHorizontalParentPadding(horizontal: Dp): Modifier {
         }
     }
 }
+
+@Composable
+inline fun <reified STATE, EVENT> use(
+    viewModel: UnidirectionalViewModel<STATE, EVENT>,
+): StateDispatchEffect<STATE, EVENT> {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+
+    val dispatch: (EVENT) -> Unit = viewModel::onEvent
+
+    return StateDispatchEffect(
+        state = state,
+        dispatch = dispatch,
+    )
+}
+
+data class StateDispatchEffect<STATE, EVENT>(
+    val state: STATE,
+    val dispatch: (EVENT) -> Unit
+)

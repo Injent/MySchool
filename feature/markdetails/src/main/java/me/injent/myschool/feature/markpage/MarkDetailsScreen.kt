@@ -21,7 +21,8 @@ internal fun MarkDetailsRoute(
 
     MarkDetailsScreen(
         onBack = onBack,
-        markDetailsUiState = markDetailsUiState
+        markDetailsUiState = markDetailsUiState,
+        onRetry = viewModel::reloadData
     )
 }
 
@@ -29,6 +30,7 @@ internal fun MarkDetailsRoute(
 @Composable
 private fun MarkDetailsScreen(
     onBack: () -> Unit,
+    onRetry: () -> Unit,
     markDetailsUiState: MarkDetailsUiState
 ) {
     Scaffold(
@@ -46,7 +48,10 @@ private fun MarkDetailsScreen(
                 .padding(padding)
                 .padding(horizontal = 16.dp)
         ) {
-            MarkCard(markDetailsUiState = markDetailsUiState)
+            MarkCard(
+                markDetailsUiState = markDetailsUiState,
+                onRetry = onRetry
+            )
         }
     }
 }

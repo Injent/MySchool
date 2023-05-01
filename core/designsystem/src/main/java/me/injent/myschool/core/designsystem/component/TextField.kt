@@ -9,8 +9,8 @@ import androidx.compose.ui.Modifier
 fun MsOutlinedTextField(
     text: String,
     onValueChange: (String) -> Unit,
-    placeholder: String,
     modifier: Modifier = Modifier,
+    placeholder: String = "",
     label: @Composable (() -> Unit)? = null,
     leadingIcon: @Composable (() -> Unit)? = null,
     trailingIcon: @Composable (() -> Unit)? = null,

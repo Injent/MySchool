@@ -1,14 +1,11 @@
 package me.injent.myschool.core.data.repository
 
 import android.util.Log
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
-import me.injent.myschool.core.common.network.Dispatcher
-import me.injent.myschool.core.common.network.MsDispatchers.IO
 import me.injent.myschool.core.common.util.atTimeZone
 import me.injent.myschool.core.data.model.asEntity
 import me.injent.myschool.core.data.util.RepoDependency
@@ -81,7 +78,7 @@ class OfflineFirstMarkRepository @Inject constructor(
     private val userContextRepository: UserContextRepository,
     private val userDataRepository: UserDataRepository,
     private val personDao: PersonDao,
-    @Dispatcher(IO) private val ioDispatcher: CoroutineDispatcher
+    private val personRepository: PersonRepository
 ) : MarkRepository {
 
     override suspend fun synchronize(onProgress: ((Int) -> Unit)?): Boolean = try {
@@ -134,8 +131,7 @@ class OfflineFirstMarkRepository @Inject constructor(
                 personId = this.personId
                 schoolId = this.school.id
                 reportingPeriodGroup.periods.find(Period::isCurrent)!!.run {
-                    dateStart = userDataRepository.userData.first().lastMarksSyncDateTime
-                        ?: this.dateStart
+                    dateStart = this.dateStart
                     dateEnd = this.dateFinish
                 }
             }
@@ -194,12 +190,23 @@ class OfflineFirstMarkRepository @Inject constructor(
             period = this.reportingPeriodGroup.periods.find(Period::isCurrent)!!
         }
 
+        val networkClassmateIds = networkDataSource.getClassmates()
+        val localClassmateIds = personDao.getClassmatesUserIds(myPersonId)
+        if (!networkClassmateIds.containsAll(localClassmateIds)) {
+            val sum = networkClassmateIds + localClassmateIds
+            val newClassmateIds = sum.groupBy { it }
+                .filter { it.value.size == 1 }
+                .flatMap { it.value }
+                .toTypedArray()
+
+            personRepository.savePersons(newClassmateIds)
+        }
+
         for (personId in personDao.getClassmatesPersonIds(myPersonId)) {
             val marks = networkDataSource.getPersonMarksByPeriod(
                 personId = personId,
                 schoolId = schoolId,
-                from = userDataRepository.userData.first().lastMarksSyncDateTime
-                    ?: period.dateStart,
+                from = period.dateStart,
                 to = period.dateFinish
             ).filterNot { markDao.contains(it.id) }
 

@@ -1,19 +1,21 @@
 package me.injent.myschool.feature.auth
 
-import androidx.lifecycle.SavedStateHandle
+import android.annotation.SuppressLint
+import android.content.Context
+import android.webkit.WebView
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.injent.myschool.auth.AccountHelper
-import me.injent.myschool.auth.AuthState
+import me.injent.myschool.auth.AuthStatus
+import me.injent.myschool.core.auth.BuildConfig.AUTH_URL
 import me.injent.myschool.core.common.sync.SyncState
 import me.injent.myschool.core.data.repository.LoginRepository
 import me.injent.myschool.core.data.repository.UserContextRepository
 import me.injent.myschool.core.data.util.SyncProgressMonitor
 import me.injent.myschool.core.data.util.SyncStatusMonitor
-import me.injent.myschool.feature.auth.navigation.ARG_TOKEN
 import me.injent.myschool.sync.WorkHelper
 import javax.inject.Inject
 
@@ -25,14 +27,11 @@ class LoginViewModel @Inject constructor(
     private val syncStatusMonitor: SyncStatusMonitor,
     syncProgressMonitor: SyncProgressMonitor,
     private val workHelper: WorkHelper,
-    savedStateHandle: SavedStateHandle
-) : ViewModel() {
+) : ViewModel(), LoginContract {
 
-    private val token: String? = savedStateHandle[ARG_TOKEN]
-
-    private val _authState: MutableStateFlow<AuthState> = MutableStateFlow(AuthState.NotAuthed)
-    val authState: StateFlow<AuthState>
-        get() = _authState.asStateFlow()
+    private val _state = MutableStateFlow(LoginContract.State())
+    override val state: StateFlow<LoginContract.State>
+        get() = _state.asStateFlow()
 
     val syncProgress = syncProgressMonitor.progress
         .stateIn(
@@ -51,8 +50,23 @@ class LoginViewModel @Inject constructor(
                 }
                 .collect()
         }
-        viewModelScope.launch {
-            startSync(token)
+    }
+
+    override fun onEvent(event: LoginContract.Event) {
+        when (event) {
+            is LoginContract.Event.OnLogin -> {
+                authWithWebViewClient(
+                    context = event.context,
+                    login = state.value.login,
+                    password = state.value.password
+                )
+            }
+            is LoginContract.Event.OnLoginChange -> _state.update {
+                it.copy(login = event.value)
+            }
+            is LoginContract.Event.OnPasswordChange -> _state.update {
+                it.copy(password = event.value)
+            }
         }
     }
 
@@ -63,17 +77,38 @@ class LoginViewModel @Inject constructor(
         accountHelper.updateAccount(accessToken, userContext)
     }
 
-    private suspend fun startSync(accessToken: String?) {
-        if (accessToken != null) {
-            _authState.value = AuthState.Loading
-            createAccount(accessToken)
-            workHelper.startOneTimeSyncWork()
-        }
+    private suspend fun startSync(accessToken: String) {
+        _state.update { it.copy(status = AuthStatus.Loading) }
+        createAccount(accessToken)
+        workHelper.startOneTimeSyncWork()
     }
 
     private fun successLogin() {
-        _authState.value = AuthState.Success
+        _state.update { it.copy(status = AuthStatus.Success) }
         workHelper.pruneWork()
         workHelper.startPeriodicMarkUpdateWork()
+    }
+
+    @SuppressLint("SetJavaScriptEnabled")
+    fun authWithWebViewClient(
+        context: Context, login: String, password: String
+    ) {
+        _state.update { it.copy(status = AuthStatus.Connecting) }
+
+        val webView = WebView(context).apply {
+            settings.javaScriptEnabled = true
+            loadUrl("$AUTH_URL.com")
+        }
+
+        webView.webViewClient = AuthWebClient(
+            onTokenAcquired = { token ->
+                viewModelScope.launch { this@LoginViewModel.startSync(token) }
+            },
+            onError = { message ->
+                _state.update { it.copy(status = AuthStatus.Error(message)) }
+            },
+            login = login,
+            password = password
+        )
     }
 }

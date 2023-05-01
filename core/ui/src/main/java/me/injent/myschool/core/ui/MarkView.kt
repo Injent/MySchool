@@ -20,23 +20,23 @@ fun MarkView(
     value: String,
     modifier: Modifier = Modifier,
     color: Color? = null,
+    alpha: Float = 1f,
     backgroundColor: Color = when (value.toFloatOrNull() ?: -1f) {
         in 4f..5f -> MaterialTheme.colorScheme.positive
         in 3f..3.99f -> MaterialTheme.colorScheme.warning
         in 0f..2.99f -> MaterialTheme.colorScheme.negative
         else -> MaterialTheme.colorScheme.link
-    },
-    alpha: Float = .75f
+    }.copy(alpha),
 ) {
     Text(
         text = value,
-        color = color ?: backgroundColor,
+        color = color ?: backgroundColor.copy(1f),
         fontSize = 16.sp,
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.SemiBold,
         textAlign = TextAlign.Center,
         modifier = modifier
-            .background(color = backgroundColor.copy(alpha), shape = MaterialTheme.shapes.extraSmall)
+            .background(color = backgroundColor, shape = MaterialTheme.shapes.extraSmall)
             .padding(horizontal = 4.dp, vertical = 2.dp)
     )
 }

@@ -16,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import me.injent.myschool.core.designsystem.theme.hint
 import me.injent.myschool.core.designsystem.theme.positive
 import me.injent.myschool.core.model.PersonAndMarkValue
 import me.injent.myschool.core.ui.DefaultTopAppBar
@@ -148,7 +147,7 @@ private fun PersonInLeaderboardItem(
         LinearProgressIndicator(
             progress = progress.value,
             color = MaterialTheme.colorScheme.positive,
-            trackColor = MaterialTheme.colorScheme.hint,
+            trackColor = MaterialTheme.colorScheme.background,
             modifier = Modifier
                 .fillMaxWidth()
                 .clip(MaterialTheme.shapes.extraSmall)

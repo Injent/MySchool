@@ -33,10 +33,14 @@ import me.injent.myschool.core.designsystem.theme.warning
 import me.injent.myschool.core.model.Mark
 import me.injent.myschool.core.model.MarkDetails
 import me.injent.myschool.core.model.MarkDetails.MarkInfo
+import me.injent.myschool.core.ui.ErrorCard
 import me.injent.myschool.feature.markdetails.R
 
 @Composable
-internal fun MarkCard(markDetailsUiState: MarkDetailsUiState) {
+internal fun MarkCard(
+    markDetailsUiState: MarkDetailsUiState,
+    onRetry: () -> Unit
+) {
     when (markDetailsUiState) {
         MarkDetailsUiState.Loading -> Box(Modifier.fillMaxSize()) {
             CircularProgressIndicator(
@@ -52,7 +56,12 @@ internal fun MarkCard(markDetailsUiState: MarkDetailsUiState) {
             }
         }
         MarkDetailsUiState.Error -> {
-            Text(text = stringResource(R.string.failed_to_load_data))
+            Box(Modifier.fillMaxWidth()) {
+                ErrorCard(
+                    onRetry = onRetry,
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
         }
     }
 }
@@ -180,12 +189,13 @@ private fun MarkView(
         modifier = modifier
     ) {
         Text(
-            text = stringResource(R.string.your_mark),
+            text = marksInfo.markTypeText.ifEmpty { stringResource(R.string.your_mark) },
             style = MaterialTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold
         )
         Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             marksInfo.marks.forEach { mark ->
                 MarkInCircle(
@@ -194,7 +204,6 @@ private fun MarkView(
                 )
             }
         }
-
         Text(
             text = marksInfo.elapsedSetMarkTime,
             style = MaterialTheme.typography.labelLarge,
@@ -235,7 +244,7 @@ private fun MarkInCircle(
         drawContext.canvas.nativeCanvas.drawText(
             markValue,
             radius,
-            radius + (textHeight / 2),
+            radius + (textHeight / 3),
             textPaint
         )
     }

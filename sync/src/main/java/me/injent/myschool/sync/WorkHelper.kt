@@ -1,6 +1,7 @@
 package me.injent.myschool.sync
 
 import android.content.Context
+import android.util.Log
 import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkManager

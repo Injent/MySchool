@@ -6,6 +6,8 @@ plugins {
 
 android {
     namespace = "me.injent.myschool.feature.auth"
+
+
 }
 
 dependencies {
