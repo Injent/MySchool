@@ -10,16 +10,16 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-@Composable
-internal fun UserProfileRoute(
-    viewModel: UserProfileViewModel = hiltViewModel()
-) {
-    val userProfileUiState by viewModel.userProfileUiState.collectAsStateWithLifecycle()
-
-    UserProfileScreen(
-        profileUiState = userProfileUiState
-    )
-}
+//@Composable
+//internal fun UserProfileRoute(
+//    viewModel: UserProfileViewModel = hiltViewModel()
+//) {
+//    val userProfileUiState by viewModel.collectAsStateWithLifecycle()
+//
+//    UserProfileScreen(
+//        profileUiState = userProfileUiState
+//    )
+//}
 
 @Composable
 private fun UserProfileScreen(

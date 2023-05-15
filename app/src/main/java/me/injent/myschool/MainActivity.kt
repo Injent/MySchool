@@ -9,13 +9,16 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.lifecycleScope
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import me.injent.myschool.auth.AuthStatus
 import me.injent.myschool.core.designsystem.theme.MySchoolTheme
 import me.injent.myschool.ui.MsApp
@@ -40,6 +43,7 @@ class MainActivity : ComponentActivity() {
         }
     }
     private var showPermissionDialog by mutableStateOf(false)
+    private var updateDownloadProgress: Int? by mutableStateOf(null)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         handleIntent(intent)

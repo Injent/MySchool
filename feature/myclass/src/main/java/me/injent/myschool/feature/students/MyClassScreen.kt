@@ -15,9 +15,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import me.injent.myschool.core.ui.AnimatedCollapsingContent
+import me.injent.myschool.core.ui.MotionContent
 import me.injent.myschool.core.ui.height
 import me.injent.myschool.feature.myclass.R
+import me.injent.myschool.feature.students.model.PeriodChip
 
 @Composable
 internal fun MyClassRoute(
@@ -70,7 +71,7 @@ private fun MyClassTopAppBar(
     myClassUiState: MyClassUiState,
     onSelectPeriod: (PeriodChip) -> Unit
 ) {
-    AnimatedCollapsingContent(
+    MotionContent(
         scrollBehavior = scrollBehavior,
         pinnedHeight = TopAppBarDefaults.height,
         maxHeight = 128.dp,

@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import me.injent.myschool.core.designsystem.component.MsFilterChip
 import me.injent.myschool.core.model.PeriodType
 import me.injent.myschool.feature.myclass.R
+import me.injent.myschool.feature.students.model.PeriodChip
 
 @Composable
 internal fun RowScope.PeriodChips(

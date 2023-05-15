@@ -10,7 +10,7 @@ import me.injent.myschool.core.data.repository.MarkRepository
 import me.injent.myschool.core.data.repository.PersonRepository
 import me.injent.myschool.core.data.repository.SubjectRepository
 import me.injent.myschool.core.data.repository.UserDataRepository
-import me.injent.myschool.core.model.PersonAndMarkValue
+import me.injent.myschool.core.domain.model.PersonWithAverageMark
 import me.injent.myschool.feature.leaderboard.navigation.SUBJECT_ID
 import javax.inject.Inject
 
@@ -60,19 +60,19 @@ private fun leaderboardUiState(
                     subjectId,
                     period
                 )
-                PersonAndMarkValue(
+                PersonWithAverageMark(
                     personId = person.personId,
                     personName = person.shortName,
                     avatarUrl = person.avatarUrl,
-                    value = mark
+                    averageMarkValue = mark
                 )
             }
 
-        val minMark = personsAndMarkValues.minOf(PersonAndMarkValue::value)
-        val maxMark = personsAndMarkValues.maxOf(PersonAndMarkValue::value)
+        val minMark = personsAndMarkValues.minOf(PersonWithAverageMark::averageMarkValue)
+        val maxMark = personsAndMarkValues.maxOf(PersonWithAverageMark::averageMarkValue)
         LeaderboardUiState.Success(
             subject.name,
-            personsAndMarkValues.toList().sortedByDescending(PersonAndMarkValue::value),
+            personsAndMarkValues.toList().sortedByDescending(PersonWithAverageMark::averageMarkValue),
             MarkDataCounter(minMark, maxMark)
         )
     }
@@ -81,7 +81,7 @@ private fun leaderboardUiState(
 sealed interface LeaderboardUiState {
     data class Success(
         val subjectName: String,
-        val personsAndMarks: List<PersonAndMarkValue>,
+        val personsAndMarks: List<PersonWithAverageMark>,
         val counter: MarkDataCounter
     ) : LeaderboardUiState
     object Error : LeaderboardUiState

@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.injent.myschool.core.designsystem.theme.positive
-import me.injent.myschool.core.model.PersonAndMarkValue
+import me.injent.myschool.core.domain.model.PersonWithAverageMark
 import me.injent.myschool.core.ui.DefaultTopAppBar
 
 @Composable
@@ -80,8 +80,8 @@ private fun LazyListScope.topPersons(
             ) { index, personAndMarkValue ->
                 PersonInLeaderboardItem(
                     place = index + 1,
-                    personAndMarkValue = personAndMarkValue,
-                    successPercentage = leaderboardUiState.counter.markInPercentage(personAndMarkValue.value),
+                    personWithAverageMark = personAndMarkValue,
+                    successPercentage = leaderboardUiState.counter.markInPercentage(personAndMarkValue.averageMarkValue),
                     isAnimPlayed = state.isAnimationPlayed(index)
                 )
                 LaunchedEffect(state) {
@@ -95,7 +95,7 @@ private fun LazyListScope.topPersons(
 @Composable
 private fun PersonInLeaderboardItem(
     place: Int,
-    personAndMarkValue: PersonAndMarkValue,
+    personWithAverageMark: PersonWithAverageMark,
     successPercentage: Int,
     isAnimPlayed: Boolean
 ) {
@@ -125,7 +125,7 @@ private fun PersonInLeaderboardItem(
             .padding(16.dp)
     ) {
         Text(
-            text = "${stringResource(R.string.average_mark)} ${personAndMarkValue.value}",
+            text = "${stringResource(R.string.average_mark)} ${personWithAverageMark.averageMarkValue}",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.secondary
         )
@@ -134,7 +134,7 @@ private fun PersonInLeaderboardItem(
             modifier = Modifier.fillMaxWidth()
         ) {
             Text(
-                text = "$place. ${personAndMarkValue.personName}",
+                text = "$place. ${personWithAverageMark.personName}",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.tertiary,
             )

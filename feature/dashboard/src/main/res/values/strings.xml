@@ -3,7 +3,7 @@
     <string name="welcome_text_morning">Доброе утро</string>
     <string name="welcome_text_afternoon">Добрый день</string>
     <string name="welcome_text_evening">Добрый вечер</string>
-    <string name="welcome_text_night">Спать надо</string>
+    <string name="welcome_text_night">Доброй ночи</string>
 
     <string name="homeworks">Домашние задания</string>
     <string name="birthday">День рождения</string>

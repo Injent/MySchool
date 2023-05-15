@@ -19,10 +19,3 @@ data class Mark(
         NotSet
     }
 }
-
-data class PersonAndMarkValue(
-    val personId: Long,
-    val personName: String,
-    val avatarUrl: String?,
-    val value: Float
-)

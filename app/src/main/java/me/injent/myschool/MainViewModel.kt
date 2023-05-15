@@ -8,14 +8,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.transformWhile
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import me.injent.myschool.auth.AccountHelper
 import me.injent.myschool.auth.AuthStatus
 import me.injent.myschool.core.data.util.NetworkMonitor
 import me.injent.myschool.updates.installer.startUpdateService
+import me.injent.myschool.updates.monitor.UpdateDownloadMonitor
 import me.injent.myschool.updates.versioncontrol.Update
 import me.injent.myschool.updates.versioncontrol.VersionController
 import javax.inject.Inject
@@ -24,7 +23,8 @@ import javax.inject.Inject
 class MainViewModel @Inject constructor(
     networkMonitor: NetworkMonitor,
     accountHelper: AccountHelper,
-    private val versionController: VersionController
+    private val versionController: VersionController,
+    downloadMonitor: UpdateDownloadMonitor
 ) : ViewModel() {
 
     var update: Update? by mutableStateOf(null)
@@ -42,9 +42,6 @@ class MainViewModel @Inject constructor(
                     update = versionController.getUpdate()
                 }
                 .collect()
-        }
-        viewModelScope.launch {
-            Log.e("SASA", "${versionController.hasNonInstalledUpdate()}")
         }
     }
 

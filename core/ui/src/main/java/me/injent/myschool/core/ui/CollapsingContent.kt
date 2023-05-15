@@ -17,7 +17,7 @@ import me.injent.myschool.core.designsystem.util.rememberMotionScene
 
 @OptIn(ExperimentalMotionApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun AnimatedCollapsingContent(
+fun MotionContent(
     scrollBehavior: TopAppBarScrollBehavior,
     @RawRes motionSceneResId: Int,
     modifier: Modifier = Modifier,

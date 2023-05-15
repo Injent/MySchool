@@ -1,6 +1,6 @@
 package me.injent.myschool.feature.dashboard
 
-import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.LazyGridScope
@@ -15,6 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.placeholder.PlaceholderHighlight
@@ -50,7 +51,7 @@ fun LazyGridScope.recentMarks(
                 onRetry = onRetry,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(140.dp)
+                    .heightIn(minCardSize)
             )
         }
         FeedUiState.Loading -> item {
@@ -69,7 +70,7 @@ private fun RecentMarks(
 ) {
     if (marksCards.isEmpty()) {
         Box(
-            modifier = Modifier.height(48.dp)
+            modifier = Modifier.heightIn(min = 48.dp)
         ) {
             Text(
                 text = stringResource(R.string.you_havent_marks_yet),
@@ -104,7 +105,7 @@ private fun MarkCard(
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier
             .width(110.dp)
-            .height(140.dp),
+            .heightIn(minCardSize),
         onClick = onClick
     ) {
         Column(modifier = Modifier.fillMaxSize()) {
@@ -177,11 +178,10 @@ private fun LoadingRecentMarks(
                 modifier = Modifier
                     .width(110.dp)
                     .height(140.dp)
-                    .clip(MaterialTheme.shapes.medium)
                     .placeholder(
                         visible = true,
                         highlight = PlaceholderHighlight.shimmer(),
-                        color = MaterialTheme.colorScheme.surface
+                        shape = MaterialTheme.shapes.medium
                     )
             )
         }
@@ -197,3 +197,6 @@ private fun Mark.Mood.toColor() =
         Mark.Mood.Good -> MaterialTheme.colorScheme.positive
         Mark.Mood.NotSet -> MaterialTheme.colorScheme.link
     }
+
+private val minCardSize: Dp
+    get() = 140.dp

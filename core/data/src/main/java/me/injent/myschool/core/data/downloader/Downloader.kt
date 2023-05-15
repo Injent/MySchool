@@ -4,15 +4,10 @@ import android.net.Uri
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Qualifier
 
-@Qualifier
-@Retention(AnnotationRetention.RUNTIME)
-annotation class MsDownloader(val type: MsDownloaderType)
-
-enum class MsDownloaderType {
-    Android,
-    Internal
-}
-
+/**
+ * The [Downloader] is a tool class which can be provided by Hilt with annotation MsDownloader.
+ * It handles long-running HTTP downloads
+ */
 interface Downloader {
     fun getProgress(downloadId: Long): Flow<Int>
     fun getStatus(downloadId: Long): Flow<Status>

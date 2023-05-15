@@ -9,6 +9,7 @@ import me.injent.myschool.core.data.downloader.*
 import me.injent.myschool.core.data.repository.*
 import me.injent.myschool.core.data.util.ConnectivityManagerMonitor
 import me.injent.myschool.core.data.util.NetworkMonitor
+import javax.inject.Qualifier
 
 @Module
 @InstallIn(SingletonComponent::class)

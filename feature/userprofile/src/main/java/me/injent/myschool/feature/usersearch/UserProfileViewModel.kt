@@ -4,10 +4,8 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.TimeZone
 import me.injent.myschool.core.common.util.atTimeZone
@@ -26,23 +24,9 @@ class UserProfileViewModel @Inject constructor(
     markRepository: MarkRepository,
     userContextRepository: UserContextRepository,
     periodRepository: ReportingPeriodRepository,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val userId: Long = savedStateHandle[USER_ID] ?: throw RuntimeException()
-
-    val userProfileUiState = userProfileUiState(
-        personRepository = personRepository,
-        groupRepository = groupRepository,
-        markRepository = markRepository,
-        userContextRepository = userContextRepository,
-        periodRepository = periodRepository,
-        userId = userId,
-    )
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = UserProfileUiState.Loading
-        )
 
 }
 
@@ -53,39 +37,4 @@ sealed interface UserProfileUiState {
         val recentMarks: RecentMarks
     ) : UserProfileUiState
     object Error : UserProfileUiState
-}
-
-private fun userProfileUiState(
-    personRepository: PersonRepository,
-    groupRepository: GroupRepository,
-    markRepository: MarkRepository,
-    userContextRepository: UserContextRepository,
-    periodRepository: ReportingPeriodRepository,
-    userId: Long
-): Flow<UserProfileUiState> {
-    return combine(
-        personRepository.getPersonByUserId(userId),
-        userContextRepository.userContext
-    ) { person, userContext ->
-        if (person != null && userContext != null) {
-            val groupId = groupRepository.getPersonGroups(person.personId)
-                .find { it.type == Group.Type.Group }!!.id
-
-            UserProfileUiState.Success(
-                person = person,
-                recentMarks = markRepository.getRecentMarks(
-                    personId = person.personId,
-                    groupId = groupId,
-                    fromDate = periodRepository.getReportingPeriods(groupId)
-                        .find { period ->
-                            with(LocalDateTime.currentLocalDateTime().atTimeZone(TimeZone.UTC)) {
-                                period.dateStart <= this && period.dateFinish >= this
-                            }
-                        }?.dateStart
-                )
-            )
-        } else {
-            UserProfileUiState.Error
-        }
-    }
 }

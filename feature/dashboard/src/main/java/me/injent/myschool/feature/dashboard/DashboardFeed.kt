@@ -8,13 +8,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.LocalDateTime
 import me.injent.myschool.core.common.util.currentLocalDateTime
 import me.injent.myschool.core.designsystem.component.AutoResizableText
+import me.injent.myschool.core.designsystem.icon.MsIcons
 import me.injent.myschool.core.model.UserFeed
 import me.injent.myschool.core.ui.Tag
 
@@ -44,19 +45,16 @@ fun LazyGridScope.greeting(
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onBackground,
                 fontWeight = FontWeight.W900,
-                modifier = modifier
+                modifier = modifier.weight(0.7f)
             )
-            TextButton(
-                onClick = onLogout,
-                colors = ButtonDefaults.textButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = MaterialTheme.colorScheme.onPrimary
-                )
-            ) {
-                Text(
-                    text = "Выйти",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+            Box(Modifier.weight(.3f)) {
+                IconButton(onClick = onLogout, Modifier.align(Alignment.CenterEnd)) {
+                    Icon(
+                        painter = painterResource(MsIcons.Logout),
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
         }
     }

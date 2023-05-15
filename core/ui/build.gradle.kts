@@ -14,4 +14,6 @@ dependencies {
     implementation(Dependencies.DATETIME)
     implementation(Dependencies.COMPOSE_UI_TOOLING_PREVIEW)
     implementation(Dependencies.COMPOSE_UI_TOOLING)
+    implementation(Dependencies.LIFECYCLE_VIEWMODEL_SCOPE)
+    implementation(Dependencies.LIFECYCLE_RUNTIME_COMPOSE)
 }

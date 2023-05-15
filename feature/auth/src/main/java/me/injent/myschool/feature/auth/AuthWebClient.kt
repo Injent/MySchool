@@ -1,9 +1,11 @@
 package me.injent.myschool.feature.auth
 
+import android.graphics.Bitmap
 import android.util.Log
 import android.webkit.*
 import kotlinx.coroutines.*
 import me.injent.myschool.feature.auth.BuildConfig.DEBUG
+import java.io.File
 
 
 internal class AuthWebClient(
@@ -33,27 +35,19 @@ internal class AuthWebClient(
         return super.shouldOverrideUrlLoading(webView, request)
     }
 
-    override fun onPageFinished(webView: WebView, url: String) {
-        if (!tokenReceived) {
-            timeoutJob = CoroutineScope(Dispatchers.Default + SupervisorJob()).launch {
-                delay(10_000)
-                if (!errorChecked && !tokenReceived && isActive) {
-                    errorChecked = true
-                    onError("Unknown error")
-                    withContext(Dispatchers.Main) {
-                        webView.evaluateJavascript(
-                            "(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();"
-                        ) { html ->
-                            if (DEBUG) {
-                                Log.d("HTML", html!!)
-                            }
-                        }
-                        clearData(webView)
-                    }
-                }
-                cancel()
+    override fun onPageStarted(webView: WebView, url: String?, favicon: Bitmap?) {
+        super.onPageStarted(webView, url, favicon)
+        if (timeoutJob != null) return
+        timeoutJob = CoroutineScope(Dispatchers.Default).launch {
+            delay(10_000)
+            if (!pageLoaded) {
+                onError(webView.context.getString(R.string.slow_internet_connection))
             }
+            timeoutJob?.cancel()
         }
+    }
+
+    override fun onPageFinished(webView: WebView, url: String) {
         if (!pageLoaded) {
             inputData(webView, login, password)
             pageLoaded = true
@@ -80,6 +74,17 @@ internal class AuthWebClient(
                     errorChecked = true
                     onError(message)
                 }
+            }
+        }
+
+        webView.evaluateJavascript(
+            "(function() { return ('<html>'+document.getElementsByTagName('html')[0].innerHTML+'</html>'); })();"
+        ) { html ->
+            if (DEBUG) {
+                File(webView.context.cacheDir, "page.html").writeText(
+                    html!!
+                )
+                Log.d("HTML", "WRITEN")
             }
         }
     }
@@ -121,11 +126,10 @@ internal class AuthWebClient(
         if (tokenReceived) return
         val param = "#access_token="
         if (url.contains(param)) {
-            timeoutJob?.cancel()
             val token = url
                 .substringAfter(param)
                 .substringBefore("&state=")
-            Log.e("TOKEN", token)
+            timeoutJob?.cancel()
             onTokenAcquired(token)
             tokenReceived = true
             clearData(webView)

@@ -1,7 +1,5 @@
 package me.injent.myschool.feature.accounts
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -13,34 +11,30 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import me.injent.myschool.auth.AuthStatus
-import me.injent.myschool.core.auth.BuildConfig
 import me.injent.myschool.core.designsystem.component.MsCityBackground
-import me.injent.myschool.feature.accounts.model.ExpandedAccount
-import me.injent.myschool.feature.accounts.AccountsContract.State
+import me.injent.myschool.core.ui.util.use
+import me.injent.myschool.feature.accounts.model.UserAccount
 
 @Composable
 internal fun AccountsRoute(
     onLogin: () -> Unit,
     viewModel: AccountsViewModel = hiltViewModel()
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    val (uiState, event, action) = use(viewModel)
 
     AccountsScreen(
-        state = state,
+        uiState = uiState,
         onSelectAccount = viewModel::selectAccount
     )
 
     var isLoginLoading by remember { mutableStateOf(false) }
 
-    LaunchedEffect(state.status) {
-        when (state.status) {
+    LaunchedEffect(uiState.authStatus) {
+        when (uiState.authStatus) {
             is AuthStatus.Success -> {
                 isLoginLoading = false
                 onLogin()
@@ -57,16 +51,15 @@ internal fun AccountsRoute(
 
 @Composable
 private fun AccountsScreen(
-    state: State,
-    onSelectAccount: (ExpandedAccount) -> Unit
+    uiState: UiState,
+    onSelectAccount: (UserAccount) -> Unit
 ) {
     MsCityBackground {
         Box(modifier = Modifier.fillMaxSize()) {
-            val context = LocalContext.current
             AccountCards(
-                state = state,
+                uiState = uiState,
                 onSelectAccount = onSelectAccount,
-                onAddAccount = { authInBrowser(context) },
+                onAddAccount = {},
                 modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -99,9 +92,4 @@ private fun LoadingOverlay() {
             )
         }
     }
-}
-
-private fun authInBrowser(context: Context) {
-    val intent = Intent(Intent.ACTION_VIEW, BuildConfig.AUTH_URL.toUri())
-    context.startActivity(intent)
 }

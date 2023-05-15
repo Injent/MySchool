@@ -1,9 +1,7 @@
 package me.injent.myschool.feature.auth
 
 import android.annotation.SuppressLint
-import android.os.Build
 import androidx.annotation.IntRange
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -29,9 +27,7 @@ import me.injent.myschool.auth.AuthStatus
 import me.injent.myschool.core.designsystem.component.MsCityBackground
 import me.injent.myschool.core.designsystem.icon.MsIcons
 import me.injent.myschool.core.designsystem.theme.warning
-import me.injent.myschool.core.designsystem.util.use
-import me.injent.myschool.feature.auth.LoginContract.Event
-import me.injent.myschool.feature.auth.LoginContract.State
+import me.injent.myschool.core.ui.util.use
 
 private const val TRANSITION_DELAY = 1000L
 
@@ -40,50 +36,48 @@ internal fun LoginRoute(
     onLogin: () -> Unit,
     viewModel: LoginViewModel = hiltViewModel()
 ) {
-    val (state, event) = use(viewModel)
+    val (state, event, action) = use(viewModel)
     val syncProgress by viewModel.syncProgress.collectAsStateWithLifecycle()
 
-    LaunchedEffect(state.status) {
-        if (state.status is AuthStatus.Success) {
+    LaunchedEffect(state.authStatus) {
+        if (state.authStatus is AuthStatus.Success) {
             delay(TRANSITION_DELAY)
             onLogin()
         }
     }
 
     LoginScreen(
-        state = state,
+        uiState = state,
         syncProgress = syncProgress,
-        event = event::invoke
+        action = action::invoke
     )
 }
 
-@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 private fun LoginScreen(
-    state: State,
-    event: (Event) -> Unit,
+    uiState: UiState,
+    action: (Action) -> Unit,
     syncProgress: Int,
 ) {
     MsCityBackground(modifier = Modifier.navigationBarsPadding()) {
         Box(modifier = Modifier.fillMaxSize()) {
             LoginCard(
-                state = state,
-                event = event::invoke,
+                uiState = uiState,
+                action = action::invoke,
                 syncProgress = syncProgress,
                 modifier = Modifier
                     .fillMaxWidth(.75f)
                     .align(Alignment.Center)
             )
-
         }
     }
 }
 
 @Composable
 private fun LoginCard(
-    state: State,
-    event: (Event) -> Unit,
+    uiState: UiState,
+    action: (Action) -> Unit,
     syncProgress: Int,
     modifier: Modifier = Modifier
 ) {
@@ -99,10 +93,10 @@ private fun LoginCard(
                 }
             }
     ) {
-        when (state.status) {
+        when (uiState.authStatus) {
             AuthStatus.Loading -> LoadingContent(progress = syncProgress)
             AuthStatus.NotAuthed, is AuthStatus.Error, AuthStatus.Connecting -> {
-                LoginContent(state = state, event = event::invoke)
+                LoginContent(uiState = uiState, action = action::invoke)
             }
             AuthStatus.Success -> Box {
                 Text(
@@ -162,16 +156,16 @@ private fun LoadingContent(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LoginContent(
-    state: State,
-    event: (Event) -> Unit,
+    uiState: UiState,
+    action: (Action) -> Unit,
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         modifier = Modifier.padding(16.dp)
     ) {
-        if (state.status is AuthStatus.Error) {
+        if (uiState.authStatus is AuthStatus.Error) {
             Text(
-                text = state.status.message ?: "",
+                text = uiState.authStatus.message ?: "",
                 color = Color.Black,
                 style = MaterialTheme.typography.bodySmall,
                 modifier = Modifier
@@ -184,10 +178,10 @@ private fun LoginContent(
             )
         }
         OutlinedTextField(
-            value = state.login,
+            value = uiState.login,
             onValueChange = { value ->
-                if (state.status !is AuthStatus.Connecting)
-                    event(Event.OnLoginChange(value))
+                if (uiState.authStatus !is AuthStatus.Connecting)
+                    action(Action.ChangeLogin(value))
             },
             singleLine = true,
             placeholder = {
@@ -200,10 +194,10 @@ private fun LoginContent(
         )
         var passwordVisible by remember { mutableStateOf(false) }
         OutlinedTextField(
-            value = state.password,
+            value = uiState.password,
             onValueChange = { value ->
-                if (state.status !is AuthStatus.Connecting)
-                    event(Event.OnPasswordChange(value))
+                if (uiState.authStatus !is AuthStatus.Connecting)
+                    action(Action.ChangePassword(value))
             },
             singleLine = true,
             visualTransformation = if (passwordVisible)
@@ -242,7 +236,10 @@ private fun LoginContent(
             val context = LocalContext.current
             Button(
                 shape = MaterialTheme.shapes.extraSmall,
-                onClick = { if (state.status !is AuthStatus.Connecting) event(Event.OnLogin(context)) },
+                onClick = {
+                    if (uiState.authStatus !is AuthStatus.Connecting)
+                        action(Action.Login(context))
+                },
                 colors = ButtonDefaults.textButtonColors(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     containerColor = MaterialTheme.colorScheme.primary
@@ -251,7 +248,7 @@ private fun LoginContent(
                     .height(ButtonDefaults.MinHeight)
                     .width(120.dp)
             ) {
-                if (state.status is AuthStatus.Connecting) {
+                if (uiState.authStatus is AuthStatus.Connecting) {
                     CircularProgressIndicator(
                         color = MaterialTheme.colorScheme.onPrimary,
                         strokeWidth = 2.dp,

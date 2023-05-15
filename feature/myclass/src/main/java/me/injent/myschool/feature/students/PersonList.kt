@@ -1,5 +1,6 @@
 package me.injent.myschool.feature.students
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -12,7 +13,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -21,7 +21,7 @@ import com.google.accompanist.placeholder.material.placeholder
 import com.google.accompanist.placeholder.material.shimmer
 import me.injent.myschool.core.designsystem.icon.MsIcons
 import me.injent.myschool.core.designsystem.theme.warning
-import me.injent.myschool.core.model.PersonAndMarkValue
+import me.injent.myschool.core.domain.model.PersonWithAverageMark
 import me.injent.myschool.core.ui.MarkView
 import me.injent.myschool.core.ui.ProfilePicture
 
@@ -44,7 +44,7 @@ fun PersonList(
                     ) { index, personAndMarkValue ->
                         Person(
                             onClick = { onPersonClick(personAndMarkValue.personId) },
-                            personAndMarkValue = personAndMarkValue,
+                            personWithAverageMark = personAndMarkValue,
                             place = index + 1,
                             isMe = myClassUiState.myPlace == index + 1,
                             modifier = Modifier.fillMaxWidth()
@@ -60,7 +60,7 @@ fun PersonList(
 @Composable
 private fun Person(
     onClick: () -> Unit,
-    personAndMarkValue: PersonAndMarkValue,
+    personWithAverageMark: PersonWithAverageMark,
     place: Int,
     isMe: Boolean,
     modifier: Modifier = Modifier,
@@ -75,8 +75,8 @@ private fun Person(
         val (avatar, placeText, cupIcon, name, markValue) = createRefs()
 
         ProfilePicture(
-            avatarUrl = personAndMarkValue.avatarUrl,
-            name = personAndMarkValue.personName,
+            avatarUrl = personWithAverageMark.avatarUrl,
+            name = personWithAverageMark.personName,
             modifier = Modifier
                 .size(32.dp)
                 .constrainAs(avatar) {
@@ -89,7 +89,7 @@ private fun Person(
         val fontStyle = MaterialTheme.typography.bodyMedium
 
         Text(
-            text = personAndMarkValue.personName,
+            text = personWithAverageMark.personName,
             style = fontStyle,
             color = MaterialTheme.colorScheme.onSurface,
             modifier = Modifier.constrainAs(name) {
@@ -126,7 +126,7 @@ private fun Person(
         )
 
         MarkView(
-            value = personAndMarkValue.value.toString(),
+            value = personWithAverageMark.averageMarkValue.toString(),
             alpha = .15f,
             modifier = Modifier
                 .clip(CircleShape)
@@ -164,8 +164,7 @@ private fun LoadingPersonItem(
     ) {
         val placeholder = Modifier.placeholder(
             visible = true,
-            highlight = PlaceholderHighlight.shimmer(),
-            color = MaterialTheme.colorScheme.surface
+            highlight = PlaceholderHighlight.shimmer()
         )
         val (avatar, placeText, cupIcon, name, markValue) = createRefs()
 

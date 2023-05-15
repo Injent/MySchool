@@ -10,8 +10,9 @@
     <string name="important_update">ОБЯЗАТЕЛЬНОЕ ОБНОВЛЕНИЕ</string>
     <string name="update_available">ДОСТУПНО ОБНОВЛЕНИЕ</string>
     <string name="later">Позже</string>
-    <string name="move_to_download">Установить</string>
+    <string name="install">Установить</string>
     <string name="update">Обновление</string>
+    <string name="has_update">Есть обновление</string>
     <string name="permission_description">Запрошенные разрешения должны быть разрешены. Без них
         приложение не сможет скачивать контент, отправлять уведомления</string>
 </resources>

@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -35,19 +36,27 @@ fun MsApp(
     appState: MsAppState = rememberMsAppState(),
     onUpdateRequest: () -> Unit
 ) {
-    var showUpdateDialog by remember { mutableStateOf(false) }
-    LaunchedEffect(update) {
-        showUpdateDialog = update != null
-    }
+    val snackState = remember { SnackbarHostState() }
 
-    if (showUpdateDialog) {
-        update?.let {
-            UpdateDialog(
-                update = it,
-                onUpdateRequest = onUpdateRequest,
-                onDismiss = { showUpdateDialog = false }
+    var showUpdateAlert by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    LaunchedEffect(update) {
+        showUpdateAlert = update != null
+        if (update?.isIgnored == true) {
+            snackState.showSnackbar(
+                message = context.getString(R.string.has_update),
+                actionLabel = context.getString(R.string.install),
+                duration = SnackbarDuration.Indefinite
             )
         }
+    }
+
+    if (showUpdateAlert && update?.isIgnored == false) {
+        UpdateDialog(
+            update = update,
+            onUpdateRequest = onUpdateRequest,
+            onDismiss = { showUpdateAlert = false }
+        )
     }
 
     val showNetworkError by remember(authStatus) {
@@ -91,6 +100,9 @@ fun MsApp(
                         )
                     }
                 }
+            },
+            snackbarHost = {
+                UpdateSnackbar(state = snackState)
             }
         ) { padding ->
             Column(

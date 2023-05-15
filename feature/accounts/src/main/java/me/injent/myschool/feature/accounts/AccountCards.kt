@@ -16,14 +16,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import me.injent.myschool.core.designsystem.component.DynamicAsyncImage
 import me.injent.myschool.core.designsystem.icon.MsIcons
-import me.injent.myschool.feature.accounts.model.ExpandedAccount
-import me.injent.myschool.feature.accounts.AccountsContract.State
-import me.injent.myschool.feature.accounts.AccountsContract.Event
+import me.injent.myschool.feature.accounts.model.UserAccount
 
 @Composable
 fun AccountCards(
-    state: State,
-    onSelectAccount: (ExpandedAccount) -> Unit,
+    uiState: UiState,
+    onSelectAccount: (UserAccount) -> Unit,
     onAddAccount: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -40,7 +38,7 @@ fun AccountCards(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             contentPadding = PaddingValues(horizontal = 32.dp)
         ) {
-            items(state.accounts) { account ->
+            items(uiState.accounts) { account ->
                 AccountCard(
                     account = account,
                     onClick = { onSelectAccount(account) }
@@ -55,7 +53,7 @@ fun AccountCards(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun AccountCard(account: ExpandedAccount, onClick: () -> Unit) {
+private fun AccountCard(account: UserAccount, onClick: () -> Unit) {
     Surface(shape = MaterialTheme.shapes.medium, onClick = onClick) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,

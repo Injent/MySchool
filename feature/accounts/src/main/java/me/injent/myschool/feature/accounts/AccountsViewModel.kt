@@ -1,6 +1,5 @@
 package me.injent.myschool.feature.accounts
 
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.*
@@ -11,7 +10,8 @@ import me.injent.myschool.core.common.sync.SyncState
 import me.injent.myschool.core.data.repository.LoginRepository
 import me.injent.myschool.core.data.repository.UserContextRepository
 import me.injent.myschool.core.data.repository.UserDataRepository
-import me.injent.myschool.feature.accounts.model.ExpandedAccount
+import me.injent.myschool.core.ui.util.BaseViewModel
+import me.injent.myschool.feature.accounts.model.UserAccount
 import me.injent.myschool.sync.WorkHelper
 import me.injent.myschool.sync.monitor.SyncWorkStatusMonitor
 import javax.inject.Inject
@@ -24,19 +24,11 @@ class AccountsViewModel @Inject constructor(
     private val userContextRepository: UserContextRepository,
     private val userDataRepository: UserDataRepository,
     workStatusMonitor: SyncWorkStatusMonitor
-) : ViewModel(), AccountsContract {
+) : BaseViewModel<UiState, Event, Action>() {
 
-    private val _state = MutableStateFlow(AccountsContract.State())
-    override val state: StateFlow<AccountsContract.State>
-        get() = _state.asStateFlow()
-
-    override fun onEvent(event: AccountsContract.Event) {
-        when (event) {
-            AccountsContract.Event.AddAccount -> TODO()
-            is AccountsContract.Event.DeleteAccount -> TODO()
-            is AccountsContract.Event.SelectAccount -> TODO()
-        }
-    }
+    private val _uiState = MutableStateFlow(UiState())
+    override val uiState: StateFlow<UiState>
+        get() = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {
@@ -56,16 +48,22 @@ class AccountsViewModel @Inject constructor(
         loadAccounts()
     }
 
+    override fun processAction(action: Action) = when (action) {
+        Action.Back -> sendEvent(Event.Back)
+        is Action.RemoveAccount -> TODO()
+        is Action.SelectAccount -> selectAccount(action.account)
+    }
+
     private fun loadAccounts() {
         val accounts = accountHelper.accounts
             .map { androidAccount ->
-                ExpandedAccount(
+                UserAccount(
                     userId = androidAccount.name.toLong(),
                     name = accountHelper.getAccountUserName(androidAccount),
                     avatarUrl = accountHelper.getAccountAvatarUrl(androidAccount)
                 )
             }
-        _state.update {
+        _uiState.update {
             it.copy(
                 isLoading = false,
                 accounts = accounts
@@ -73,8 +71,8 @@ class AccountsViewModel @Inject constructor(
         }
     }
 
-    fun selectAccount(account: ExpandedAccount) {
-        if (_state.value.status is AuthStatus.Loading) return
+    fun selectAccount(account: UserAccount) {
+        if (_uiState.value.authStatus is AuthStatus.Loading) return
         val isSameAccount = accountHelper.getCurrentAccount()?.name?.toLong() == account.userId
         if (isSameAccount) {
             setAuthState(AuthStatus.Success)
@@ -82,8 +80,8 @@ class AccountsViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            val androidAccount =
-                accountHelper.accounts.find { it.name.toLong() == account.userId }!!
+            val androidAccount = accountHelper.accounts
+                .find { it.name.toLong() == account.userId }!!
             val accessToken = accountHelper.getAccountAuthToken(androidAccount)
             val userContext = loginRepository.login(accessToken)
             userDataRepository.clear()
@@ -98,6 +96,6 @@ class AccountsViewModel @Inject constructor(
     }
 
     private fun setAuthState(authStatus: AuthStatus) {
-        _state.update { it.copy(status = authStatus) }
+        _uiState.update { it.copy(authStatus = authStatus) }
     }
 }

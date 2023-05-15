@@ -2,21 +2,20 @@ package me.injent.myschool.feature.auth
 
 import android.content.Context
 import me.injent.myschool.auth.AuthStatus
-import me.injent.myschool.core.common.util.UnidirectionalViewModel
 
-interface LoginContract
-    : UnidirectionalViewModel<LoginContract.State, LoginContract.Event> {
+data class UiState(
+    val login: String = "",
+    val password: String = "",
+    val authStatus: AuthStatus = AuthStatus.NotAuthed
+)
 
-    data class State(
-        val status: AuthStatus = AuthStatus.NotAuthed,
-        val login: String = "",
-        val password: String = "",
-        val readyToLogin: Boolean = false
-    )
+sealed interface UiEvent {
+    object Back : UiEvent
+}
 
-    sealed class Event {
-        data class OnLoginChange(val value: String) : Event()
-        data class OnPasswordChange(val value: String) : Event()
-        data class OnLogin(val context: Context) : Event()
-    }
+sealed interface Action {
+    object Back : Action
+    data class Login(val context: Context) : Action
+    data class ChangeLogin(val value: String) : Action
+    data class ChangePassword(val value: String) : Action
 }

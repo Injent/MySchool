@@ -3,7 +3,6 @@ package me.injent.myschool.feature.usersearch.navigation
 import android.content.Intent
 import androidx.navigation.*
 import androidx.navigation.compose.composable
-import me.injent.myschool.feature.usersearch.UserProfileRoute
 
 const val userProfileRoute = "profile_user_route"
 internal const val USER_ID = "userId"
@@ -27,6 +26,6 @@ fun NavGraphBuilder.userProfileScreen() {
             }
         )
     ) {
-        UserProfileRoute()
+
     }
 }

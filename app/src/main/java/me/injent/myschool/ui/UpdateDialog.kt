@@ -80,7 +80,7 @@ internal fun UpdateDialog(
                         Spacer(Modifier)
                     }
                     MsTextButton(
-                        text = stringResource(R.string.move_to_download),
+                        text = stringResource(R.string.install),
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary,
                         onClick = onUpdateRequest
